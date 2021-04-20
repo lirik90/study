@@ -198,6 +198,8 @@ struct Udp_Message_Context
 	boost::array<uint8_t, HZ_MAX_UDP_PACKET_SIZE> _recv_buffer;
 };
 
+int th_id() { return (std::hash<std::thread::id>{}(std::this_thread::get_id()) % 1000); }
+
 class Udp_Server final : public Abstract_Handler
 {
 public:
@@ -256,60 +258,28 @@ private:
 		{
 			std::shared_ptr<Node_Handler> node = get_node(msg_context->_remote_endpoint);
 
+			std::unique_ptr<uint8_t[]> data(new uint8_t[ size ]);
+			memcpy(data.get(), msg_context->_recv_buffer.data(), size);
+
+			{
+				static std::mutex _data_mutex;
+				std::unique_lock lock(_data_mutex, std::defer_lock_t);
+
+				while (true)
+				{
+					lock.lock();
+					_data_cond.wait(lock, []() { return !_data_map.empty() && _data_map.begin()->first == _msg_processed_counter; });
+
+					lock.unlock();
+				}
+			}
+
 			std::string text{reinterpret_cast<const char*>(msg_context->_recv_buffer.data()), size};
-			uint32_t data = std::stoul(text);
+
+			uint8_t id = msg_context->_id - 1;
+			while (_msg_processed_counter.load(std::memory_order_acquire) != id)
 			{
-				static std::mutex m;
-				std::lock_guard l(m);
-				static std::set<uint32_t> d;
-				if (data == 100000)
-				{
-					uint32_t t = data;
-					for (uint32_t i: d)
-					{
-						if (t != i)
-						{
-							std::cout << "Lost from: " << t << " to " << i << std::endl;
-						}
-						t = i + 1;
-					}
-
-					std::cout << "Last before: " << t << std::endl;
-					d.clear();
-				}
-
-				d.insert(data);
-			}
-			start_receive(std::move(msg_context));
-			return;
-			static uint32_t expected = 99999;
-
-			static int64_t extra_counter = 0;
-			int th_id = (std::hash<std::thread::id>{}(std::this_thread::get_id()) % 1000);
-			bool first = true;
-			uint8_t id = msg_context->_id - 1,
-					id0 = _msg_processed_counter.load(std::memory_order_acquire);
-			while (id0 != id)
-			{
-				++extra_counter;
 				std::this_thread::yield();
-				if (first) {
-					first = false;
-					// std::cout << "Expected id: " << (int)id << " now id: " << (int)id0 << " T: " << th_id << std::endl;
-				}
-				id0 = _msg_processed_counter.load(std::memory_order_acquire);
-			}
-
-			{
-				if (++expected != data)
-				{
-				std::cout << msg_context->_remote_endpoint << " Recv text: " << text << " exp " << (expected - 0)
-					<< " t: " << th_id
-					<< " c: " << int(msg_context->_id) << ' ' << int(id0) << std::endl;
-				std::cout << "Bad: " << extra_counter << std::endl;
-				extra_counter = 0;
-				expected = data;
-				}
 			}
 
 			_msg_processed_counter.store(msg_context->_id, std::memory_order_release);
