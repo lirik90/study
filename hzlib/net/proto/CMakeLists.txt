@@ -8,4 +8,4 @@ project(hzUdpServer)
 
 add_executable(hzUdpServer main.cpp)
 
-target_link_libraries(hzUdpServer PUBLIC pthread)
+target_link_libraries(hzUdpServer PUBLIC pthread boost_thread)
