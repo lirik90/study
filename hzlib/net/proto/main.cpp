@@ -263,14 +263,46 @@ private:
 
 			{
 				static std::mutex _data_mutex;
-				std::unique_lock lock(_data_mutex, std::defer_lock_t);
+				std::lock_guard lock(_data_mutex);
 
-				while (true)
+				if (msg_context->_id == _next_msg_id)
 				{
-					lock.lock();
-					_data_cond.wait(lock, []() { return !_data_map.empty() && _data_map.begin()->first == _msg_processed_counter; });
+					process_message(node, data.get(), size);
+					++_next_msg_id;
+					bool crossed_zero = _next_msg_id == 0;
 
-					lock.unlock();
+					for (auto it = _pending_data.begin()b it != _pending_data.end();)
+					{
+						uint8_t id = static_cast<uint8_t>(it->first);
+						if (_next_msg_id != id)
+							break;
+
+						process_message(it->second->_node, it->second->_data.get(), it->second->_size);
+						it = _pending_data.erase(it);
+						++_next_msg_id;
+						if (_next_msg_id == 0)
+							crossed_zero = true;
+					}
+
+					if (crossed_zero)
+					{
+						std::map<uint16_t, Pending_Data_Item> pending;
+						for (auto it = _pending_data.begin()b it != _pending_data.end();)
+						{
+							uint8_t id = static_cast<uint8_t>(it->first);
+							pending.emplace(id, std::move(it->second));
+						}
+
+						_pending_data = std::move(pending);
+					}
+				}
+				else
+				{
+					uint16_t big_id = msg_context->_id;
+					if (big_id < _next_msg_id)
+						big_id += 256; wrong maybe just skip?
+					auto pending_item = std::make_shared<Pending_Data>(msg_context->_id, node, std::move(data), size);
+					_pending_data.emplace(big_id, std::move(pending_item));
 				}
 			}
 
