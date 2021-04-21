@@ -6,6 +6,28 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 project(hzUdpServer)
 
-add_executable(hzUdpServer main.cpp)
+set(SOURCES
+	main.cpp
+	hz_net_abstract_handler.h
+	hz_net_abstract_node_handler.h
+	hz_net_data_packet.h
+	hz_net_defs.h
+	hz_net_dtls_credentials_manager.cpp
+	hz_net_dtls_credentials_manager.h
+	hz_net_dtls_server.h
+	hz_net_dtls_tools.cpp
+	hz_net_dtls_tools.h
+	hz_net_handler.h
+	hz_net_node.h
+	hz_net_node_handler.h
+	hz_net_server.h
+	hz_net_udp_server.h
+)
+add_executable(hzUdpServer ${SOURCES})
 
-target_link_libraries(hzUdpServer PUBLIC pthread boost_thread)
+set(DEP_LIBS
+	pthread
+	boost_thread
+	botan-2
+)
+target_link_libraries(hzUdpServer PUBLIC ${DEP_LIBS})
