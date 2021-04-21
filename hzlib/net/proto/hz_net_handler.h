@@ -12,7 +12,7 @@ class Handler
 {
 public:
 	virtual ~Handler() {}
-	virtual std::shared_ptr<Handler> set_next_handler(std::shared_ptr<Handler> handler) = 0;
+	virtual std::shared_ptr<Handler> set_next_handler(std::shared_ptr<Handler> handler, Handler* prev = nullptr) = 0;
 
 	template<typename T, typename... Args>
 	std::shared_ptr<Handler> create_next_handler(Args&& ...args)

@@ -10,7 +10,27 @@ class Node_Handler
 {
 public:
 	virtual ~Node_Handler() {}
-	virtual std::shared_ptr<Node_Handler> set_next_handler(std::shared_ptr<Node_Handler> handler) = 0;
+	virtual void set_next_handler(std::shared_ptr<Node_Handler> handler, std::size_t type_hash) = 0;
+
+	template<typename T, typename... Args>
+	std::shared_ptr<T> create_next_handler(Args&& ...args)
+	{
+		auto handler = std::make_shared<T>(std::forward<Args>(args)...);
+		set_next_handler(handler, typeid(T).hash_code());
+		return handler;
+	}
+
+	virtual std::size_t hash_code() const = 0;
+	virtual Node_Handler* get(std::size_t type_hash) = 0;
+
+	template<typename T>
+	T* get()
+	{
+		Node_Handler* handler = get(typeid(T).hash_code());
+		if (handler)
+			return static_cast<T*>(handler);
+		return nullptr;
+	}
 };
 
 } // namespace Net

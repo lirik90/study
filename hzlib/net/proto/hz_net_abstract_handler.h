@@ -12,7 +12,7 @@ public:
 	Abstract_Handler() : _context{nullptr} {}
 	virtual ~Abstract_Handler() {}
 
-	std::shared_ptr<Handler> set_next_handler(std::shared_ptr<Handler> handler) override
+	std::shared_ptr<Handler> set_next_handler(std::shared_ptr<Handler> handler, Handler* prev = nullptr) override
 	{
 		if (_next)
 			return _next->set_next_handler(handler);

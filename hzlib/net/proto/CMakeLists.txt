@@ -14,10 +14,12 @@ set(SOURCES
 	hz_net_defs.h
 	hz_net_dtls_credentials_manager.cpp
 	hz_net_dtls_credentials_manager.h
+	hz_net_dtls_node.h
 	hz_net_dtls_server.h
 	hz_net_dtls_tools.cpp
 	hz_net_dtls_tools.h
 	hz_net_handler.h
+	hz_net_node_data_packet.h
 	hz_net_node.h
 	hz_net_node_handler.h
 	hz_net_server.h

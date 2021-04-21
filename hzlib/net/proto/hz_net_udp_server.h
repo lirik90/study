@@ -12,7 +12,7 @@
 #include "hz_net_defs.h"
 #include "hz_net_abstract_handler.h"
 #include "hz_net_node.h"
-#include "hz_net_data_packet.h"
+#include "hz_net_node_data_packet.h"
 
 namespace hz {
 namespace Net {
@@ -118,7 +118,7 @@ private:
 	{
 		std::shared_ptr<Node_Handler> node = get_node(msg_context._remote_endpoint);
 
-		Data_Packet data_packet{std::move(node), msg_context._recv_buffer.data(), size};
+		Node_Data_Packet data_packet{std::move(node), msg_context._recv_buffer.data(), size};
 
 		std::lock_guard lock(_data_mutex);
 
@@ -157,7 +157,7 @@ private:
 
 	void rebase_pending_data()
 	{
-		std::map<uint16_t, Data_Packet> pending;
+		std::map<uint16_t, Node_Data_Packet> pending;
 		for (auto it = _pending_data.begin(); it != _pending_data.end(); ++it)
 		{
 			uint8_t id = static_cast<uint8_t>(it->first);
@@ -167,7 +167,7 @@ private:
 		_pending_data = std::move(pending);
 	}
 
-	void add_pending_data(uint8_t id, Data_Packet&& data_packet)
+	void add_pending_data(uint8_t id, Node_Data_Packet&& data_packet)
 	{
 		uint16_t big_id = id;
 		if (big_id < _next_msg_id)
@@ -176,7 +176,7 @@ private:
 		_pending_data.emplace(big_id, std::move(data_packet));
 	}
 
-	void push_data_to_queue(Data_Packet&& data_packet)
+	void push_data_to_queue(Node_Data_Packet&& data_packet)
 	{
 		_data.push(std::move(data_packet));
 		++_next_msg_id;
@@ -205,7 +205,7 @@ private:
 				break;
 			}
 
-			Data_Packet item = std::move(_data.front());
+			Node_Data_Packet item = std::move(_data.front());
 			_data.pop();
 
 			lock.unlock();
@@ -227,8 +227,8 @@ private:
 
 	std::mutex _msg_id_mutex;
 	std::mutex _data_mutex;
-	std::map<uint16_t, Data_Packet> _pending_data;
-	std::queue<Data_Packet> _data;
+	std::map<uint16_t, Node_Data_Packet> _pending_data;
+	std::queue<Node_Data_Packet> _data;
 };
 
 } // namespace Net

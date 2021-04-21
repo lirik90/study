@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 	// server.add_handler<hz::DTLS>();
 	server
 		.create_next_handler<hz::Net::Udp_Server>(12345)
-		->create_next_handler<hz::Net::Dtls::Server>()
+		->create_next_handler<hz::Net::Dtls::Server>("tls_policy.conf", "dtls.pem", "dtls.key")
 		->create_next_handler<hz::Net::Proto>()
 		->create_next_handler<My_Proto>();
 

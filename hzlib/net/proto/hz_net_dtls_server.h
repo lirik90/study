@@ -6,8 +6,11 @@
 #include <thread> // temp
 #include <mutex> // temp
 
+#include <botan-2/botan/tls_server.h>
+
 #include "hz_net_abstract_handler.h"
 #include "hz_net_dtls_tools.h"
+#include "hz_net_dtls_node.h"
 
 namespace hz {
 namespace Net {
@@ -18,28 +21,54 @@ inline int th_id() { return (std::hash<std::thread::id>{}(std::this_thread::get_
 class Server final : public Abstract_Handler
 {
 public:
-	void init() override
+	Server(const std::string &tls_policy_file_name, const std::string &crt_file_name, const std::string &key_file_name) :
+		_tools{tls_policy_file_name, crt_file_name, key_file_name}
 	{
-		std::cout << "DTLS Server initialized\n";
 	}
 
-	void build_node(Node_Handler& node) override
+	~Server()
 	{
-		std::cout << "DTLS: Build node\n";
-		Abstract_Handler::build_node(node);
+	}
+
+	void init() override
+	{
+	}
+
+	void build_node(Node_Handler& raw_node) override
+	{
+		auto node = raw_node.create_next_handler<Dtls::Node>(this);
+		node->create_channel<Botan::TLS::Server>(*_tools.session_manager_, *_tools.creds_, *_tools.policy_, *_tools.rng_, /*is_datagram*/true);
 	}
 
 	void process_node(Node_Handler& raw_node, uint8_t* data, std::size_t size) override
 	{
-		std::shared_ptr<Dtls::Node> node = raw_node.get<Dtls::Node>();
+		Dtls::Node* node = raw_node.get<Dtls::Node>();
 		if (!node)
 			throw std::runtime_error("Dtls Server: Node hasn't dtls meta.");
 
-		Dtls::Data_Packet data_packet = node->push_data(data, size);
-		if (data_packet._size)
-		{
+		bool connected = node->is_connected();
 
-			Abstract_Handler::process_node(raw_node, data_packet._data.get(), data_packet._size);
+		node->push_data(data, size);
+
+		while (node->transmit_data().size())
+		{
+			// TODO: send
+		}
+
+		if (!node->receive_data().empty())
+		{
+			if (!connected && node->is_connected())
+			{
+				Abstract_Handler::build_node(raw_node);
+				// TODO: send event Dtls established
+			}
+			
+			while (!node->receive_data().empty())
+			{
+				Data_Packet& item = node->receive_data().front();
+				Abstract_Handler::process_node(raw_node, item._data.get(), item._size);
+				node->receive_data().pop();
+			}
 		}
 
 
@@ -59,6 +88,10 @@ public:
 		}
 
 	}
+
+private:
+
+	Tools _tools;
 };
 
 } // namespace Dtls
