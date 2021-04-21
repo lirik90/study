@@ -52,7 +52,9 @@ public:
 
 		while (node->transmit_data().size())
 		{
-			// TODO: send
+			Data_Packet& item = node->transmit_data().front();
+			send(raw_node, item._data.get(), item._size);
+			node->transmit_data().pop();
 		}
 
 		if (!node->receive_data().empty())
