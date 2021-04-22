@@ -18,7 +18,7 @@ namespace Dtls {
 
 inline int th_id() { return (std::hash<std::thread::id>{}(std::this_thread::get_id()) % 1000); } // temp
 
-class Server final : public Abstract_Handler
+class Server final : public Abstract_Handler, public Controller_Handler
 {
 public:
 	Server(const std::string &tls_policy_file_name, const std::string &crt_file_name, const std::string &key_file_name) :

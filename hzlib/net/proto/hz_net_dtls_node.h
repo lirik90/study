@@ -9,18 +9,18 @@
 
 #include "hz_net_abstract_node_handler.h"
 #include "hz_net_data_packet.h"
+#include "hz_net_dtls_controller_handler.h"
 
 namespace hz {
 namespace Net {
-	class Handler;
 namespace Dtls {
 
 class Node : public Abstract_Node_Handler, public Botan::TLS::Callbacks
 {
 public:
-	Node(Handler* handler) :
+	Node(Controller_Handler* controller) :
 		Abstract_Node_Handler{typeid(Node).hash_code()},
-		_handler{handler}
+		_ctrl{controller}
 	{}
 
 	template<typename T, typename... Args>
@@ -39,19 +39,10 @@ public:
 		_channel->received_data(data, size);
 	}
 
-	std::queue<Data_Packet>& receive_data()
-	{
-		return _receive_data;
-	}
-
-	std::queue<Data_Packet>& transmit_data()
-	{
-		return _transmit_data;
-	}
-
 private:
 	void tls_record_received(Botan::u64bit, const uint8_t data[], size_t size) override
 	{
+		_ctrl->process_node();
 		// To next proto
 		_receive_data.emplace(data, size);
 	}
@@ -118,7 +109,7 @@ private:
 	}
 
 	std::shared_ptr<Botan::TLS::Channel> _channel;
-	Handler* _handler;
+	Controller_Handler* _ctrl;
 
 	std::queue<Data_Packet> _receive_data, _transmit_data;
 };
