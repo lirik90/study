@@ -19,6 +19,8 @@ public:
 	virtual void set_previous(Handler* prev) = 0;
 	virtual Handler* prev() = 0;
 	virtual Handler* next() = 0;
+	virtual Handler* get_root() = 0;
+
 	virtual std::shared_ptr<Handler> set_next_handler(std::shared_ptr<Handler> handler) = 0;
 
 	template<typename T, typename... Args>

@@ -16,6 +16,13 @@ public:
 
 	Handler* prev() override { return _prev; }
 	Handler* next() override { return _next.get(); }
+	Handler* get_root() override
+	{
+		if (_prev)
+			return _prev->get_root();
+		return this;
+	}
+
 	std::shared_ptr<Handler> set_next_handler(std::shared_ptr<Handler> handler) override
 	{
 		if (_next)
