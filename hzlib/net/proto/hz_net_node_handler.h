@@ -10,6 +10,12 @@ class Node_Handler
 {
 public:
 	virtual ~Node_Handler() {}
+
+	virtual void set_previous(Node_Handler* prev) = 0;
+	virtual Node_Handler* prev() = 0;
+	virtual Node_Handler* next() = 0;
+	virtual Node_Handler* get_root() = 0;
+
 	virtual void set_next_handler(std::shared_ptr<Node_Handler> handler, std::size_t type_hash) = 0;
 
 	template<typename T, typename... Args>

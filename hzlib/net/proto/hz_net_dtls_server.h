@@ -6,8 +6,12 @@
 #include <thread> // temp
 #include <mutex> // temp
 
-#include <botan-2/botan/tls_server.h>
+#include <boost/algorithm/string/join.hpp> // temp
 
+#include <botan-2/botan/tls_server.h>
+#include <botan-2/botan/hex.h>
+
+#include "hz_net_node_init_payload.h"
 #include "hz_net_abstract_handler.h"
 #include "hz_net_dtls_tools.h"
 #include "hz_net_dtls_node.h"
@@ -25,6 +29,7 @@ public:
 
 	Server(const std::string &tls_policy_file_name, const std::string &crt_file_name, const std::string &key_file_name,
 			User_App_Chooser_Func user_app_chooser_func = nullptr) :
+		Abstract_Handler{typeid(Server).hash_code()},
 		_tools{tls_policy_file_name, crt_file_name, key_file_name},
 		_user_app_chooser{std::move(user_app_chooser_func)}
 	{
@@ -42,7 +47,7 @@ public:
 			throw std::runtime_error("Dtls handler can't be last");
 	}
 
-	void build_node(Node_Handler& raw_node) override
+	void node_build(Node_Handler& raw_node, std::shared_ptr<Node_Init_Payload> /*payload*/) override
 	{
 		auto node = raw_node.create_next_handler<Dtls::Node>(this);
 		node->create_channel<Botan::TLS::Server>(*_tools.session_manager_, *_tools.creds_, *_tools.policy_, *_tools.rng_, /*is_datagram*/true);
@@ -50,24 +55,25 @@ public:
 
 	void node_connected(Node_Handler& /*raw_node*/) override {}
 
-	void process_node(Node_Handler& raw_node, uint8_t* data, std::size_t size) override
+	void node_process(Node_Handler& raw_node, const uint8_t* data, std::size_t size) override
 	{
 		Dtls::Node* node = raw_node.get<Dtls::Node>();
 		if (!node)
 			throw std::runtime_error("Dtls Server: Node hasn't dtls meta.");
 
-		bool connected = node->is_connected();
+		const bool connected = node->is_connected();
 
-		node->push_data(data, size);
+		try {
+			node->push_received_data(data, size);
+		} catch (const std::exception& e) {
+			emit_event(Event_Type::ERROR, Event::RECEIVED_DATA_ERROR, &raw_node, { e.what() });
+		}
 
 		if (!connected && node->is_connected())
 			Abstract_Handler::node_connected(raw_node);
-		{
-			// TODO: send event Dtls established
-		}
 
 		std::string text{reinterpret_cast<const char*>(data), size};
-		std::cout << "DTLS: Process node: " << text << " TH: " << th_id() << std::endl;
+		// std::cout << "DTLS: Process node: " << text << " TH: " << th_id() << std::endl;
 
 		{
 			static std::mutex m;
@@ -85,40 +91,44 @@ public:
 
 private:
 
-	void tls_record_reveived(Node_Handler& node, uint8_t* data, std::size_t size) override
+	void tls_record_received(Node_Handler& node, const uint8_t* data, std::size_t size) override
 	{
-		Abstract_Handler::process_node(node, data, size);
+		Abstract_Handler::node_process(node, data, size);
 	}
 
-	void tls_emit_data(Node_Handler& node, uint8_t* data, std::size_t size) override
+	void tls_emit_data(Node_Handler& node, const uint8_t* data, std::size_t size) override
 	{
-		Abstract_Handler::send(node.prev(), data, size);
+		Abstract_Handler::send_node_data(*node.prev(), data, size);
 	}
 
 	void tls_alert(Node_Handler& node, Botan::TLS::Alert alert) override
 	{
-		emit_event(Event_Type::WARNING, alert, &node);
+		emit_event(Event_Type::WARNING, Event::ALERT, &node, [&alert]() -> std::vector<std::string>
+		{
+			return { alert.type_string() };
+		});
+
 		if (alert.type() == Botan::TLS::Alert::CLOSE_NOTIFY)
-			Abstract_Handler::close_node(node.prev());
+			Abstract_Handler::close_node(*node.prev());
 	}
 
 	bool tls_session_established(Node_Handler& node, const Botan::TLS::Session &session) override
 	{
-		emit_event(Event_Type::INFO, Event::HANDSHAKE_COMPLETE, &node, [&session]()
+		emit_event(Event_Type::INFO, Event::HANDSHAKE_COMPLETE, &node, [&session]() -> std::vector<std::string>
 		{
-			return "Handshake complete," + session.version().to_string() + " using " + session.ciphersuite().to_string();
+			return { session.version().to_string(), session.ciphersuite().to_string() };
 		});
 
 		if (!session.session_id().empty())
-			emit_event(Event_Type::DEBUG, Event::SESSION_ID, &node, [&session]()
+			emit_event(Event_Type::DEBUG, Event::SESSION_ID, &node, [&session]() -> std::vector<std::string>
 			{
-				return "Session ID " + Botan::hex_encode(session.session_id());
+				return { Botan::hex_encode(session.session_id()) };
 			});
 
 		if (!session.session_ticket().empty())
-			emit_event(Event_Type::DEBUG, Event::SESSION_TICKET, &node, [&session]()
+			emit_event(Event_Type::DEBUG, Event::SESSION_TICKET, &node, [&session]() -> std::vector<std::string>
 			{
-				return "Session ticket " + Botan::hex_encode(session.session_ticket());
+				return { Botan::hex_encode(session.session_ticket()) };
 			});
 
 		return true;
@@ -136,15 +146,15 @@ private:
 			app_protocol = client_protos.front();
 
 		if (app_protocol.empty())
-			Abstract_Handler::close_node(node.prev());
+			Abstract_Handler::close_node(*node.prev());
 		else
 		{
-			_ctrl->emit_event(Event_Type::DEBUG, Event::PROTOCOL_CHOOSEN, this, [&client_protos, &app_protocol]()
+			emit_event(Event_Type::DEBUG, Event::PROTOCOL_CHOOSEN, &node, [&client_protos, &app_protocol]() -> std::vector<std::string>
 			{
-				return "Protocol is " + app_protocol + " (" + boost::algorithm::join(client_protos, ", ") + ')';
+				return { app_protocol, boost::algorithm::join(client_protos, ", ") };
 			});
 
-			Abstract_Handler::build_node(raw_node, std::move(init_data));
+			Abstract_Handler::node_build(node, std::move(init_data));
 		}
 
 		return app_protocol;

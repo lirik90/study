@@ -28,6 +28,7 @@ class Udp_Server final : public Abstract_Handler
 {
 public:
 	Udp_Server(uint16_t port) :
+		Abstract_Handler{typeid(Udp_Server).hash_code()},
 		_is_queue_handler_running{false},
 		_msg_id{0}, _next_msg_id{0},
 		_port{port}
@@ -47,8 +48,6 @@ private:
 		start_receive(std::make_shared<Udp_Message_Context>());
 		Abstract_Handler::start();
 	}
-
-	void handle() override {}
 
 	void start_receive(std::shared_ptr<Udp_Message_Context> msg_context)
 	{
@@ -104,7 +103,7 @@ private:
 		std::shared_ptr<Node> node = std::make_shared<Node>();
 		node->set_endpoint(remote_endpoint);
 
-		build_node(*node);
+		node_build(*node);
 
 		std::lock_guard lock(_nodes_mutex);
 		auto it = _nodes.find(remote_endpoint);
@@ -210,11 +209,23 @@ private:
 
 			lock.unlock();
 
-			process_node(*item._node, item._data.get(), item._size);
+			node_process(*item._node, item._data.get(), item._size);
 		}
 		while (true);
 
 		start_receive(std::move(msg_context));
+	}
+
+	std::string node_get_identifier(Node_Handler& node) override
+	{
+		auto n = node.get<Node>();
+		if (n)
+		{
+			std::stringstream title_s;
+			title_s << n->endpoint();
+			return title_s.str() + Abstract_Handler::node_get_identifier(node);
+		}
+		return Abstract_Handler::node_get_identifier(node);
 	}
 
 	bool _is_queue_handler_running;

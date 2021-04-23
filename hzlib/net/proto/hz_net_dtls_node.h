@@ -1,9 +1,6 @@
 #ifndef HZ_NET_DTLS_NODE_H
 #define HZ_NET_DTLS_NODE_H
 
-#include <queue>
-
-// #include <bits/c++config.h>
 #include <botan-2/botan/tls_channel.h>
 #include <botan-2/botan/tls_callbacks.h>
 
@@ -35,7 +32,7 @@ public:
 		return _channel->is_active();
 	}
 
-	void push_data(uint8_t* data, std::size_t size)
+	void push_received_data(const uint8_t* data, std::size_t size)
 	{
 		_channel->received_data(data, size);
 	}

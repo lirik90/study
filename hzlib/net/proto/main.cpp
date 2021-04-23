@@ -10,9 +10,13 @@
 #include <mutex>
 #include <thread>
 
+#include "hz_net_event_formatter_handler.h"
+#include "hz_net_node_handler.h"
 #include "hz_net_server.h"
 #include "hz_net_udp_server.h"
 #include "hz_net_dtls_server.h"
+#include "hz_net_server_event_formatter.h"
+#include "hz_net_dtls_event_formatter.h"
 
 namespace hz {
 namespace Net {
@@ -20,61 +24,103 @@ namespace Net {
 class Data_Handler : public Abstract_Handler
 {
 public:
+	Data_Handler() : Abstract_Handler{typeid(Data_Handler).hash_code()} {}
 	void init() override {}
-	void handle() override {}
-};
-
-class Abstract_Event_Handler {};
-class Event_Handler : public Abstract_Event_Handler
-{
-public:
 };
 
 class Proto : public Abstract_Handler
 {
 public:
+	Proto() : Abstract_Handler{typeid(Proto).hash_code()} {}
 	void init() override {}
-	void handle() override {}
 };
 
 } // namespace Net
 } // namespace hz
 
 class My_Proto final :
-	public hz::Net::Data_Handler,
-	public hz::Net::Event_Handler
+	public hz::Net::Data_Handler
 {
 public:
 private:
 	void init() override {}
-	void handle() override {}
 };
 
-void thread_func(hz::Net::Server& server)
+class Event_Handler : public hz::Net::Abstract_Handler
 {
-	try
+public:
+	Event_Handler() : Abstract_Handler{typeid(Event_Handler).hash_code()} {}
+
+private:
+	void emit_event(std::size_t emiter_hash, Event_Type type, uint8_t code, hz::Net::Node_Handler* node,
+			std::shared_ptr<hz::Net::Event_Payload> payload) override
 	{
-		server.start();
-		server.context()->run();
-	} catch (const std::exception& e) {
-		std::cerr << "Another thread error: " << e.what() << std::endl;
+		auto formatter = get_formatter(emiter_hash);
+		if (!formatter)
+		{
+			std::cerr << "Can't find formatter for type: " << emiter_hash << " Event: " << static_cast<int>(code) << std::endl;
+			return;
+		}
+
+		std::cout << format_type(type) << format_node(node) << ' ' << formatter->format(code, node, std::move(payload)) << std::endl;
 	}
-}
+
+	std::string format_type(Event_Type type)
+	{
+		switch (type)
+		{
+			case Event_Type::DEBUG:		return "[D]";
+			case Event_Type::INFO:		return "[I]";
+			case Event_Type::WARNING:	return "[W]";
+			case Event_Type::ERROR:		return "[E]";
+		}
+
+		return "[UNKNOWN]";
+	}
+
+	std::string format_node(hz::Net::Node_Handler* node)
+	{
+		if (!node)
+			return {};
+		return '[' + get_root()->node_get_identifier(*node->get_root()) + ']';
+	}
+
+	std::shared_ptr<hz::Net::Event_Formatter_Handler> get_formatter(std::size_t type_hash)
+	{
+		auto it = _formatters.find(type_hash);
+		if (it != _formatters.cend())
+			return it->second;
+
+		auto formatter = create_formatter(type_hash);
+		_formatters.emplace(type_hash, formatter);
+		return formatter;
+	}
+
+	std::shared_ptr<hz::Net::Event_Formatter_Handler> create_formatter(std::size_t type_hash)
+	{
+		if (type_hash == typeid(hz::Net::Dtls::Server).hash_code())
+			return std::make_shared<hz::Net::Dtls::Event_Formatter>();
+		else if (type_hash == typeid(hz::Net::Server).hash_code())
+			return std::make_shared<hz::Net::Server_Event_Formatter>();
+
+		return nullptr;
+	}
+
+	std::map<std::size_t, std::shared_ptr<hz::Net::Event_Formatter_Handler>> _formatters;
+};
 
 int main(int argc, char* argv[])
 {
 	std::cout << "Begin app\n";
+	std::cout << "Begin app: " << typeid(hz::Net::Server).hash_code() << " " << typeid(hz::Net::Dtls::Server).hash_code() << std::endl;
 
-	// hz::Proto add to client or server as
-	// handler.
-	
 	hz::Net::Server server;
-	// server.add_handler<hz::DTLS>();
 	server
 		.create_next_handler<hz::Net::Udp_Server>(12345)
 		->create_next_handler<hz::Net::Dtls::Server>("tls_policy.conf", "dtls.pem", "dtls.key")
 		->create_next_handler<hz::Net::Proto>()
-		->create_next_handler<My_Proto>();
+		->create_next_handler<My_Proto>()
+		->create_next_handler<Event_Handler>();
 
 	int thread_count = 5;
 	try {
@@ -86,13 +132,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	std::vector<std::thread> threads;
-	for (int i = 1; i < thread_count; ++i)
-		threads.emplace_back(thread_func, std::ref(server));
-	thread_func(server);
-	for (std::thread& t: threads)
-		t.join();
-	return 0;
+	return server.exec(5);
 }
 
 /*

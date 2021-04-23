@@ -1,6 +1,14 @@
 #ifndef HZ_NET_DTLS_CONTROLLER_HANDLER_H
 #define HZ_NET_DTLS_CONTROLLER_HANDLER_H
 
+#include <botan/tls_session.h>
+#include <botan/tls_policy.h>
+#include <botan/tls_alert.h>
+//#include <botan/certstor.h>
+#include <botan/ocsp.h>
+
+#include "hz_net_node_handler.h"
+
 namespace hz {
 namespace Net {
 namespace Dtls {
@@ -10,8 +18,17 @@ class Controller_Handler
 public:
 	virtual ~Controller_Handler() {}
 
-	virtual void tls_record_reveived(Node_Handler& node, uint8_t* data, std::size_t size) = 0;
-	virtual void tls_emit_data(Node_Handler& node, uint8_t* data, std::size_t size) = 0;
+	enum Event : uint8_t {
+		RECEIVED_DATA_ERROR,
+		ALERT,
+		HANDSHAKE_COMPLETE,
+		SESSION_ID,
+		SESSION_TICKET,
+		PROTOCOL_CHOOSEN,
+	};
+
+	virtual void tls_record_received(Node_Handler& node, const uint8_t* data, std::size_t size) = 0;
+	virtual void tls_emit_data(Node_Handler& node, const uint8_t* data, std::size_t size) = 0;
 	virtual void tls_alert(Node_Handler& node, Botan::TLS::Alert alert) = 0;
 	virtual bool tls_session_established(Node_Handler& node, const Botan::TLS::Session &session) = 0;
 
