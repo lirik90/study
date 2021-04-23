@@ -27,6 +27,8 @@ set(SOURCES
 )
 add_executable(hzUdpServer ${SOURCES})
 
+target_include_directories(hzUdpServer PRIVATE "/usr/include/botan-2/")
+
 set(DEP_LIBS
 	pthread
 	boost_thread
