@@ -17,6 +17,7 @@
 #include "hz_net_dtls_server.h"
 #include "hz_net_server_event_formatter.h"
 #include "hz_net_dtls_event_formatter.h"
+#include "hz_net_udp_event_formatter.h"
 
 namespace hz {
 namespace Net {
@@ -98,10 +99,12 @@ private:
 
 	std::shared_ptr<hz::Net::Event_Formatter_Handler> create_formatter(std::size_t type_hash)
 	{
-		if (type_hash == typeid(hz::Net::Dtls::Server).hash_code())
-			return std::make_shared<hz::Net::Dtls::Event_Formatter>();
-		else if (type_hash == typeid(hz::Net::Server).hash_code())
+		if (type_hash == typeid(hz::Net::Server).hash_code())
 			return std::make_shared<hz::Net::Server_Event_Formatter>();
+		else if (type_hash == typeid(hz::Net::Udp_Server).hash_code())
+			return std::make_shared<hz::Net::Udp_Event_Formatter>();
+		else if (type_hash == typeid(hz::Net::Dtls::Server).hash_code())
+			return std::make_shared<hz::Net::Dtls::Event_Formatter>();
 
 		return nullptr;
 	}
@@ -111,13 +114,12 @@ private:
 
 int main(int argc, char* argv[])
 {
-	std::cout << "Begin app\n";
-	std::cout << "Begin app: " << typeid(hz::Net::Server).hash_code() << " " << typeid(hz::Net::Dtls::Server).hash_code() << std::endl;
+	std::cout << "Begin server\n";
 
 	hz::Net::Server server;
 	server
 		.create_next_handler<hz::Net::Udp_Server>(12345)
-		->create_next_handler<hz::Net::Dtls::Server>("tls_policy.conf", "dtls.pem", "dtls.key")
+		->create_next_handler<hz::Net::Dtls::Server>("tls_policy.conf", "server_cert.pem", "server_key.pem")
 		->create_next_handler<hz::Net::Proto>()
 		->create_next_handler<My_Proto>()
 		->create_next_handler<Event_Handler>();
@@ -128,7 +130,7 @@ int main(int argc, char* argv[])
 			thread_count = std::atoi(argv[1]);
 		server.init();
 	} catch (const std::exception& e) {
-		std::cerr << "Can' start server\n";
+		std::cerr << "Can't start server\n";
 		return 1;
 	}
 

@@ -10,13 +10,9 @@ namespace Net {
 
 using boost::asio::ip::udp;
 
-class Node : public Abstract_Node_Handler
+class Node : public Node_Handler_T<Node>
 {
 public:
-	Node() :
-		Abstract_Node_Handler{typeid(Node).hash_code()}
-	{}
-
 	void set_endpoint(const udp::endpoint& endpoint)
 	{
 		_endpoint = endpoint;

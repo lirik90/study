@@ -10,9 +10,11 @@
 #include <boost/asio/placeholders.hpp>
 
 #include "hz_net_defs.h"
+#include "hz_net_async_message_queue.h"
 #include "hz_net_abstract_handler.h"
 #include "hz_net_node.h"
 #include "hz_net_node_data_packet.h"
+#include "hz_net_udp_event.h"
 
 namespace hz {
 namespace Net {
@@ -38,7 +40,8 @@ private:
 	void init() override
 	{
 		std::cout << "Udp_Server initialized\n";
-		_socket.reset(new udp::socket{*context(), udp::endpoint{udp::v4(), _port}});
+		_strand.reset(new boost::asio::strand<boost::asio::io_context::executor_type>{ boost::asio::make_strand(*io()) });
+		_socket.reset(new udp::socket{*io(), udp::endpoint{udp::v4(), _port}});
 
 		Abstract_Handler::init();
 	}
@@ -56,22 +59,17 @@ private:
 
 		_socket->async_receive_from(
 				boost::asio::buffer(msg_context->_recv_buffer), msg_context->_remote_endpoint,
-				boost::bind(&Udp_Server::handle_receive, this,
+				boost::asio::bind_executor(*_strand, boost::bind(&Udp_Server::handle_receive, this,
 					msg_context,
 					boost::asio::placeholders::error,
-					boost::asio::placeholders::bytes_transferred));
+					boost::asio::placeholders::bytes_transferred)));
 	}
 
 	void handle_receive(std::shared_ptr<Udp_Message_Context>& msg_context,
 						const boost::system::error_code &err, std::size_t size)
 	{
-		// context()->post([th]() {
-		// });
 		if (err)
-		{
-			// TODO: Event_Handle::handle(std::string("RECV ERROR ") + err.category().name() + ": " + err.message())
-			std::cerr << (std::string("RECV ERROR ") + err.category().name() + ": " + err.message()) << std::endl;
-		}
+			emit_event(Event_Type::ERROR, static_cast<uint8_t>(Udp_Event::RECV_ERROR), nullptr, { err.category().name(), err.message() });
 		else
 		{
 			if (process_message(*msg_context, size))
@@ -187,7 +185,7 @@ private:
 			return;
 
 		_is_queue_handler_running = true;
-		context()->post(boost::bind(&Udp_Server::queue_handler, this, std::move(msg_context)));
+		io()->post(boost::bind(&Udp_Server::queue_handler, this, std::move(msg_context)));
 	}
 
 	void queue_handler(std::shared_ptr<Udp_Message_Context> msg_context)
@@ -235,6 +233,8 @@ private:
 
 	std::map<udp::endpoint, std::shared_ptr<Node>> _nodes;
 	mutable boost::shared_mutex _nodes_mutex;
+
+	std::unique_ptr<boost::asio::strand<boost::asio::io_context::executor_type>> _strand;
 
 	std::mutex _msg_id_mutex;
 	std::mutex _data_mutex;

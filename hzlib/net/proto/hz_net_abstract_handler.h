@@ -28,7 +28,7 @@ public:
 		if (_next)
 			return _next->set_next_handler(std::move(handler));
 
-		handler->set_context(_context);
+		handler->set_io_context(_context);
 		handler->set_previous(this);
 		return _next = std::move(handler);
 	}
@@ -82,7 +82,7 @@ public:
 			_next->node_connected(node);
 	}
 
-	boost::asio::io_context* context() override
+	boost::asio::io_context* io() override
 	{
 		return _context;
 	}
@@ -114,7 +114,7 @@ public:
 	}
 
 protected:
-	void set_context(boost::asio::io_context* context) override
+	void set_io_context(boost::asio::io_context* context) override
 	{
 		_context = context;
 	}

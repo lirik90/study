@@ -12,14 +12,11 @@ namespace hz {
 namespace Net {
 namespace Dtls {
 
-class Node : public Abstract_Node_Handler, public Botan::TLS::Callbacks
+class Node final : public Botan::TLS::Callbacks, public Node_Handler_T<Node>
 {
 public:
 	Node(Controller_Handler* controller) :
-		Abstract_Node_Handler{typeid(Node).hash_code()},
-		_ctrl{controller}
-	{
-	}
+		_ctrl{controller} {}
 
 	template<typename T, typename... Args>
 	void create_channel(Args&& ...args)

@@ -59,6 +59,19 @@ private:
 	std::shared_ptr<Node_Handler> _next;
 };
 
+template<typename T>
+class Node_Handler_T : public Abstract_Node_Handler, public std::enable_shared_from_this<T>
+{
+public:
+	Node_Handler_T() :
+		Abstract_Node_Handler{typeid(T).hash_code()} {}
+
+	std::shared_ptr<Node_Handler> get_ptr() override
+	{
+		return std::enable_shared_from_this<T>::shared_from_this();
+	}
+};
+
 } // namespace Net
 } // namespace hz
 

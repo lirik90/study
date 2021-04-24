@@ -11,7 +11,7 @@ namespace Net {
 
 struct Node_Data_Packet : public Data_Packet
 {
-	Node_Data_Packet(std::shared_ptr<Node_Handler>&& node, uint8_t* data, std::size_t size) :
+	Node_Data_Packet(std::shared_ptr<Node_Handler>&& node, const uint8_t* data, std::size_t size) :
 		Data_Packet{data, size},
 		_node{std::move(node)}
 	{

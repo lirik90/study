@@ -15,6 +15,7 @@ class Server_Event_Formatter : public Event_Formatter_Handler
 public:
 	std::string format(uint8_t code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) const override
 	{
+		(void)node;
 		using E = Server_Event;
 
 		switch (static_cast<E>(code))

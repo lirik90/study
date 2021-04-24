@@ -29,8 +29,8 @@ public:
 		return set_next_handler(std::make_shared<T>(std::forward<Args>(args)...));
 	}
 
-	virtual boost::asio::io_context* context() = 0;
-	virtual void set_context(boost::asio::io_context* context) = 0;
+	virtual boost::asio::io_context* io() = 0;
+	virtual void set_io_context(boost::asio::io_context* context) = 0;
 
 	virtual void init() = 0;
 	virtual void start() = 0;

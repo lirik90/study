@@ -11,6 +11,8 @@ class Node_Handler
 public:
 	virtual ~Node_Handler() {}
 
+	virtual std::shared_ptr<Node_Handler> get_ptr() = 0;
+
 	virtual void set_previous(Node_Handler* prev) = 0;
 	virtual Node_Handler* prev() = 0;
 	virtual Node_Handler* next() = 0;

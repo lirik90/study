@@ -16,6 +16,7 @@ class Event_Formatter : public Event_Formatter_Handler
 public:
 	std::string format(uint8_t code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) const override
 	{
+		(void)node;
 		using E = Controller_Handler::Event;
 
 		switch (code)

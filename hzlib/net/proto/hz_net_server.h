@@ -15,7 +15,7 @@ class Server final : public Abstract_Handler
 	Server(boost::asio::io_context* context, bool is_own_context) :
 		Abstract_Handler{typeid(Server).hash_code()}
 	{
-		set_context(context);
+		set_io_context(context);
 	}
 public:
 	Server() : Server{new boost::asio::io_context, true} {}
@@ -24,12 +24,12 @@ public:
 	~Server()
 	{
 		if (_own_context)
-			delete context();
+			delete io();
 	}
 
 	void stop()
 	{
-		context()->stop();
+		io()->stop();
 	}
 
 	void join()
@@ -58,7 +58,7 @@ public:
 		try
 		{
 			start();
-			context()->run();
+			io()->run();
 		} catch (const std::exception& e) {
 			emit_event(Event_Type::ERROR, static_cast<uint8_t>(Server_Event::RUNTIME_ERROR), nullptr, { e.what() });
 		}
