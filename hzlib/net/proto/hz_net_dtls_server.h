@@ -45,6 +45,8 @@ public:
 			throw std::runtime_error("Dtls handler can't be root");
 		if (!next())
 			throw std::runtime_error("Dtls handler can't be last");
+
+		Abstract_Handler::init();
 	}
 
 	void node_build(Node_Handler& raw_node, std::shared_ptr<Node_Init_Payload> /*payload*/) override

@@ -12,7 +12,7 @@ namespace Net {
 class Async_Message_Queue final : public Abstract_Handler
 {
 public:
-	Async_Message_Queue(uint16_t port) :
+	Async_Message_Queue() :
 		Abstract_Handler{typeid(Async_Message_Queue).hash_code()},
 		_is_queue_handler_running{false}
 	{}

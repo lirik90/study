@@ -117,6 +117,8 @@ protected:
 	void set_io_context(boost::asio::io_context* context) override
 	{
 		_context = context;
+		if (_next)
+			_next->set_io_context(context);
 	}
 private:
 	void set_previous(Handler* prev) override
