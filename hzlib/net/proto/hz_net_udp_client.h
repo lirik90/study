@@ -45,6 +45,10 @@ private:
 	void start() override
 	{
 		{
+			// call_once here?
+			// deadlock_timer ?
+			// Move Udp_Server inherit Udp::Controller
+			// Move Dtls::Server inherit Dtls::Controller
 			static std::mutex m;
 			std::lock_guard lock(m);
 			if (_nodes.empty())
