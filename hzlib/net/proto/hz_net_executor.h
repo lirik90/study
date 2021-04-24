@@ -9,10 +9,10 @@
 namespace hz {
 namespace Net {
 
-class Executor final : public Abstract_Handler
+class Executor final : public Handler_T<Executor>
 {
 	Executor(boost::asio::io_context* context, bool is_own_context) :
-		Abstract_Handler{typeid(Executor).hash_code()}
+		_own_context{is_own_context}
 	{
 		set_io_context(context);
 	}

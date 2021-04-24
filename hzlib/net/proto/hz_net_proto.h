@@ -9,10 +9,9 @@
 namespace hz {
 namespace Net {
 
-class Proto : public Abstract_Handler
+class Proto : public Handler_T<Proto>
 {
 public:
-	Proto() : Abstract_Handler{typeid(Proto).hash_code()} {}
 };
 
 } // namespace Net

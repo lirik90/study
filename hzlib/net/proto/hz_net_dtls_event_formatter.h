@@ -14,6 +14,7 @@ namespace Dtls {
 class Event_Formatter : public Event_Formatter_Handler
 {
 public:
+	std::string category() const override { return "dtls"; }
 	std::string format(uint8_t code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) const override
 	{
 		(void)node;
@@ -55,7 +56,7 @@ private:
 		auto data = static_cast<Text_Event_Payload*>(payload);
 		assert(data && data->data().size() == 2);
 
-		return "Handshake complete," + data->data().at(0) + " using " + data->data().at(1);
+		return "Handshake complete, " + data->data().at(0) + " using " + data->data().at(1);
 	}
 
 	std::string session_id(Event_Payload* payload) const

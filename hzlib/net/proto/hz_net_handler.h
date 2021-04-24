@@ -16,6 +16,8 @@ class Handler
 public:
 	virtual ~Handler() {}
 
+	virtual std::shared_ptr<Handler> get_ptr() = 0;
+
 	virtual void set_previous(Handler* prev) = 0;
 	virtual Handler* prev() = 0;
 	virtual Handler* next() = 0;

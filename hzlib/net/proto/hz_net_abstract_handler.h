@@ -47,14 +47,14 @@ public:
 
 	virtual void close_node(Node_Handler& node) override
 	{
-		if (_next)
-			_next->close_node(node);
+		if (_prev)
+			_prev->close_node(node);
 	}
 
 	virtual void send_node_data(Node_Handler& node, const uint8_t* data, std::size_t size) override
 	{
-		if (_next)
-			_next->send_node_data(node, data, size);
+		if (_prev)
+			_prev->send_node_data(node, data, size);
 	}
 
 	virtual std::string node_get_identifier(Node_Handler& node) override
@@ -131,6 +131,19 @@ private:
 
 	Handler* _prev;
 	std::shared_ptr<Handler> _next;
+};
+
+template<typename T>
+class Handler_T : public Abstract_Handler, public std::enable_shared_from_this<T>
+{
+public:
+	Handler_T() :
+		Abstract_Handler{typeid(T).hash_code()} {}
+
+	std::shared_ptr<Handler> get_ptr() override
+	{
+		return std::enable_shared_from_this<T>::shared_from_this();
+	}
 };
 
 } // namespace Net

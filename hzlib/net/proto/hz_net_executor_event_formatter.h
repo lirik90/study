@@ -13,6 +13,7 @@ namespace Net {
 class Executor_Event_Formatter : public Event_Formatter_Handler
 {
 public:
+	std::string category() const override { return "net_exec"; }
 	std::string format(uint8_t code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) const override
 	{
 		(void)node;
@@ -33,7 +34,7 @@ private:
 		auto data = static_cast<Text_Event_Payload*>(payload);
 		assert(data && data->data().size() == 1);
 
-		return "Executor Fail: " + data->data().at(0);
+		return "Fail: " + data->data().at(0);
 	}
 };
 

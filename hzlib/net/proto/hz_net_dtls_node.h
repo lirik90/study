@@ -34,6 +34,11 @@ public:
 		_channel->received_data(data, size);
 	}
 
+	void send(const uint8_t* data, std::size_t size)
+	{
+		_channel->send(data, size);
+	}
+
 private:
 	void tls_record_received(Botan::u64bit, const uint8_t data[], std::size_t size) override
 	{

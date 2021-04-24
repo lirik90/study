@@ -2,6 +2,9 @@
 #define HZ_NET_ASYNC_MESSAGE_QUEUE_H
 
 #include <queue>
+#include <mutex>
+
+#include <boost/bind/bind.hpp>
 
 #include "hz_net_abstract_handler.h"
 #include "hz_net_node_data_packet.h"
@@ -9,11 +12,10 @@
 namespace hz {
 namespace Net {
 
-class Async_Message_Queue final : public Abstract_Handler
+class Async_Message_Queue final : public Handler_T<Async_Message_Queue>
 {
 public:
 	Async_Message_Queue() :
-		Abstract_Handler{typeid(Async_Message_Queue).hash_code()},
 		_is_queue_handler_running{false}
 	{}
 

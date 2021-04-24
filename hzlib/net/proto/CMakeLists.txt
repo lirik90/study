@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 project(hzUdpServer)
 
 set(LIB_SOURCES
+	hz_net_abstract_event_handler.h
 	hz_net_abstract_handler.h
 	hz_net_abstract_node_handler.h
 	hz_net_async_message_queue.h
@@ -22,15 +23,20 @@ set(LIB_SOURCES
 	hz_net_dtls_tools.h
 	hz_net_event_formatter_handler.h
 	hz_net_event_payload.h
+	hz_net_executor_event_formatter.h
+	hz_net_executor_event.h
+	hz_net_executor.h
 	hz_net_handler.h
 	hz_net_node_data_packet.h
 	hz_net_node.h
 	hz_net_node_handler.h
 	hz_net_node_init_payload.h
-	hz_net_server_event_formatter.h
-	hz_net_server_event.h
-	hz_net_server.h
+	hz_net_proto_event.h
+	hz_net_proto.h
 	hz_net_text_event_payload.h
+	hz_net_udp_client.h
+	hz_net_udp_event_formatter.h
+	hz_net_udp_event.h
 	hz_net_udp_server.h
 )
 

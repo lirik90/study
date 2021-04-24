@@ -37,8 +37,16 @@ public:
 		Node_Handler* handler = get(typeid(T).hash_code());
 		if (handler)
 			return static_cast<T*>(handler);
-		return nullptr;
+		return next() ? next()->get<T>() : nullptr;
 	}
+
+	template<typename T>
+	T* get_from_root()
+	{
+		T* p = get<T>();
+		return p ? p : get_root()->get<T>();
+	}
+
 };
 
 } // namespace Net

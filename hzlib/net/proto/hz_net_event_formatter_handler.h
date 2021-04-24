@@ -15,6 +15,7 @@ class Event_Formatter_Handler
 public:
 	virtual ~Event_Formatter_Handler() {}
 
+	virtual std::string category() const = 0;
 	virtual std::string format(uint8_t code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) const = 0;
 };
 

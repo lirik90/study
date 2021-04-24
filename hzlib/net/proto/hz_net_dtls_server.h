@@ -22,14 +22,13 @@ namespace Dtls {
 
 inline int th_id() { return (std::hash<std::thread::id>{}(std::this_thread::get_id()) % 1000); } // temp
 
-class Server final : public Abstract_Handler, public Controller_Handler
+class Server final : public Controller_Handler, public Handler_T<Server>
 {
 public:
 	using User_App_Chooser_Func = std::function<std::shared_ptr<Node_Init_Payload>(const std::vector<std::string>&, std::string&)>;
 
 	Server(const std::string &tls_policy_file_name, const std::string &crt_file_name, const std::string &key_file_name,
 			User_App_Chooser_Func user_app_chooser_func = nullptr) :
-		Abstract_Handler{typeid(Server).hash_code()},
 		_tools{tls_policy_file_name, crt_file_name, key_file_name},
 		_user_app_chooser{std::move(user_app_chooser_func)}
 	{
@@ -47,6 +46,13 @@ public:
 			throw std::runtime_error("Dtls handler can't be last");
 
 		Abstract_Handler::init();
+	}
+
+	void send_node_data(Node_Handler& raw_node, const uint8_t* data, std::size_t size) override
+	{
+		auto node = raw_node.get_from_root<Dtls::Node>();
+		if (node)
+			node->send(data, size);
 	}
 
 	void node_build(Node_Handler& raw_node, std::shared_ptr<Node_Init_Payload> /*payload*/) override
@@ -73,22 +79,6 @@ public:
 
 		if (!connected && node->is_connected())
 			Abstract_Handler::node_connected(raw_node);
-
-		std::string text{reinterpret_cast<const char*>(data), size};
-		// std::cout << "DTLS: Process node: " << text << " TH: " << th_id() << std::endl;
-
-		{
-			static std::mutex m;
-			std::lock_guard l(m);
-		if (text == "Hello")
-		{
-
-		}
-		else
-		{
-		}
-		}
-
 	}
 
 private:

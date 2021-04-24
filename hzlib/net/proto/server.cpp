@@ -1,15 +1,17 @@
 #include <atomic>
 #include <bits/c++config.h>
-#include <boost/asio/placeholders.hpp>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <set>
-
-#include <boost/asio.hpp>
 #include <mutex>
 #include <thread>
 
+#include <boost/asio.hpp>
+#include <boost/asio/placeholders.hpp>
+#include <boost/algorithm/hex.hpp>
+
+#include "hz_net_abstract_handler.h"
 #include "hz_net_event_formatter_handler.h"
 #include "hz_net_node_handler.h"
 #include "hz_net_executor.h"
@@ -21,31 +23,24 @@
 #include "hz_net_udp_event_formatter.h"
 #include "hz_net_proto.h"
 
-namespace hz {
-namespace Net {
-
-class Data_Handler : public Abstract_Handler
-{
-public:
-	Data_Handler() : Abstract_Handler{typeid(Data_Handler).hash_code()} {}
-};
-
-} // namespace Net
-} // namespace hz
-
 class My_Proto final :
-	public hz::Net::Data_Handler
+	public hz::Net::Handler_T<My_Proto>
 {
 public:
 private:
+	void node_process(hz::Net::Node_Handler& node, const uint8_t* data, std::size_t size) override
+	{
+		emit_event(Event_Type::INFO, 1, &node, {"Client send: " + boost::algorithm::hex(std::string{reinterpret_cast<const char*>(data), size})});
+		send_node_data(node, data, size);
+	}
 };
 
-class Event_Handler : public hz::Net::Abstract_Event_Handler
+class Event_Handler : public hz::Net::Abstract_Event_Handler<Event_Handler>
 {
 private:
 	void handle(const std::string& text) override
 	{
-		std:::cout << text << std::endl;
+		std::cout << text << std::endl;
 	}
 
 	std::shared_ptr<hz::Net::Event_Formatter_Handler> create_formatter(std::size_t type_hash) override
@@ -79,7 +74,7 @@ int main(int argc, char* argv[])
 			thread_count = std::atoi(argv[1]);
 		server.init();
 	} catch (const std::exception& e) {
-		std::cerr << "Can't start server\n";
+		std::cerr << "Can't start server: " << e.what() << std::endl;
 		return 1;
 	}
 
