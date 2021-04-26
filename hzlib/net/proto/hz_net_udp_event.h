@@ -5,13 +5,16 @@
 
 namespace hz {
 namespace Net {
+namespace Udp {
 
-enum class Udp_Event : uint8_t {
+enum class Event : uint8_t {
+	CONNECTING,
 	RECV_ERROR,
 	SEND_ERROR,
 	SEND_ERROR_WRONG_SIZE,
 };
 
+} // namespace Udp
 } // namespace Net
 } // namespace hz
 

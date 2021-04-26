@@ -47,8 +47,8 @@ private:
 	{
 		if (type_hash == typeid(hz::Net::Executor).hash_code())
 			return std::make_shared<hz::Net::Executor_Event_Formatter>();
-		else if (type_hash == typeid(hz::Net::Udp_Server).hash_code())
-			return std::make_shared<hz::Net::Udp_Event_Formatter>();
+		else if (type_hash == typeid(hz::Net::Udp::Server).hash_code())
+			return std::make_shared<hz::Net::Udp::Event_Formatter>();
 		else if (type_hash == typeid(hz::Net::Dtls::Server).hash_code())
 			return std::make_shared<hz::Net::Dtls::Event_Formatter>();
 
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 
 	hz::Net::Executor server;
 	server
-		.create_next_handler<hz::Net::Udp_Server>(12345)
+		.create_next_handler<hz::Net::Udp::Server>(12345)
 		->create_next_handler<hz::Net::Dtls::Server>("tls_policy.conf", "server_cert.pem", "server_key.pem")
 		->create_next_handler<hz::Net::Proto>()
 		->create_next_handler<My_Proto>()

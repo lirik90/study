@@ -21,19 +21,20 @@
 
 namespace hz {
 namespace Net {
+namespace Udp {
 
-struct Udp_Message_Context
+struct Message_Context
 {
 	udp::endpoint _remote_endpoint;
 	boost::array<uint8_t, HZ_MAX_UDP_PACKET_SIZE> _recv_buffer;
 };
 
 template<typename T>
-class Udp_Controller : public Handler_T<T>
+class Controller : public Handler_T<T>
 {
 	using Base = Handler_T<T>;
 public:
-	Udp_Controller(const std::string& host, uint16_t port) :
+	Controller(const std::string& host, uint16_t port) :
 		_info{std::make_shared<Server_Info>(host, port)}
 	{
 		Base::template create_next_handler<Async_Message_Queue>();
@@ -50,7 +51,7 @@ protected:
 
 	virtual void start() override
 	{
-		start_receive(std::make_shared<Udp_Message_Context>());
+		start_receive(std::make_shared<Message_Context>());
 		Abstract_Handler::start();
 	}
 
@@ -62,7 +63,7 @@ protected:
 			auto packet = std::make_shared<Node_Data_Packet>(node->get_ptr(), data, size);
 			_socket->async_send_to(
 				boost::asio::buffer(packet->_data.get(), size), node->endpoint(),
-				boost::asio::bind_executor(*_strand, boost::bind(&Udp_Controller::handle_send, this,
+				boost::asio::bind_executor(*_strand, boost::bind(&Controller::handle_send, this,
 					packet,
 					boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred)));
@@ -72,27 +73,27 @@ protected:
 	void handle_send(std::shared_ptr<Node_Data_Packet>& packet, const boost::system::error_code &err, const std::size_t &bytes_transferred)
 	{
 		if (err.value() != 0)
-			Base::emit_event(Base::Event_Type::ERROR, static_cast<uint8_t>(Udp_Event::SEND_ERROR), nullptr, { err.category().name(), err.message() });
+			Base::emit_event(Base::Event_Type::ERROR, static_cast<uint8_t>(Event::SEND_ERROR), nullptr, { err.category().name(), err.message() });
 		else if (packet->_size != bytes_transferred)
-			Base::emit_event(Base::Event_Type::ERROR, static_cast<uint8_t>(Udp_Event::SEND_ERROR_WRONG_SIZE), nullptr,
+			Base::emit_event(Base::Event_Type::ERROR, static_cast<uint8_t>(Event::SEND_ERROR_WRONG_SIZE), nullptr,
 					{ std::to_string(packet->_size), std::to_string(bytes_transferred) });
 	}
 
-	void start_receive(std::shared_ptr<Udp_Message_Context> msg_context)
+	void start_receive(std::shared_ptr<Message_Context> msg_context)
 	{
 		_socket->async_receive_from(
 				boost::asio::buffer(msg_context->_recv_buffer), msg_context->_remote_endpoint,
-				boost::asio::bind_executor(*_strand, boost::bind(&Udp_Controller::handle_receive, this,
+				boost::asio::bind_executor(*_strand, boost::bind(&Controller::handle_receive, this,
 					msg_context,
 					boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred)));
 	}
 
-	void handle_receive(std::shared_ptr<Udp_Message_Context>& msg_context,
+	void handle_receive(std::shared_ptr<Message_Context>& msg_context,
 						const boost::system::error_code &err, std::size_t size)
 	{
 		if (err)
-			Base::emit_event(Base::Event_Type::ERROR, static_cast<uint8_t>(Udp_Event::RECV_ERROR), nullptr, { err.category().name(), err.message() });
+			Base::emit_event(Base::Event_Type::ERROR, static_cast<uint8_t>(Event::RECV_ERROR), nullptr, { err.category().name(), err.message() });
 		else
 		{
 			process_message(*msg_context, size);
@@ -132,7 +133,13 @@ protected:
 		return node;
 	}
 
-	void process_message(Udp_Message_Context& msg_context, std::size_t size)
+	void clear_nodes()
+	{
+		std::lock_guard lock(_nodes_mutex);
+		_nodes.clear();
+	}
+
+	void process_message(Message_Context& msg_context, std::size_t size)
 	{
 		std::shared_ptr<Node_Handler> node = get_node(msg_context._remote_endpoint);
 		Abstract_Handler::node_process(*node, msg_context._recv_buffer.data(), size);
@@ -159,6 +166,7 @@ protected:
 	std::unique_ptr<boost::asio::strand<boost::asio::io_context::executor_type>> _strand;
 };
 
+} // namespace Udp
 } // namespace Net
 } // namespace hz
 

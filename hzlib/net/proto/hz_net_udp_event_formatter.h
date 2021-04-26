@@ -9,15 +9,16 @@
 
 namespace hz {
 namespace Net {
+namespace Udp {
 
-class Udp_Event_Formatter : public Event_Formatter_Handler
+class Event_Formatter : public Event_Formatter_Handler
 {
 public:
 	std::string category() const override { return "udp"; }
 	std::string format(uint8_t code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) const override
 	{
 		(void)node;
-		using E = Udp_Event;
+		using E = Event;
 
 		switch (static_cast<E>(code))
 		{
@@ -56,6 +57,7 @@ private:
 	}
 };
 
+} // namespace Udp
 } // namespace Net
 } // namespace hz
 

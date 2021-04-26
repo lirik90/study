@@ -1,9 +1,10 @@
 #ifndef HZ_NET_ABSTRACT_HANDLER_H
 #define HZ_NET_ABSTRACT_HANDLER_H
 
+// #include <bits/c++config.h>
+
 #include "hz_net_handler.h"
 #include "hz_net_text_event_payload.h"
-#include <bits/c++config.h>
 
 namespace hz {
 namespace Net {
@@ -82,32 +83,39 @@ public:
 			_next->node_connected(node);
 	}
 
+	virtual bool node_is_connected(Node_Handler& node)
+	{
+		if (_next)
+			return _next->node_is_connected(node);
+		return true; // If this is ok, ask next. If no one is not bad, that is ok, return true.
+	}
+
 	boost::asio::io_context* io() override
 	{
 		return _context;
 	}
 
-	void emit_event(Event_Type type, uint8_t code, Node_Handler* node = nullptr) override final
+	void emit_event(Event_Type type, Event_Code code, Node_Handler* node = nullptr) override final
 	{
 		emit_event(type, code, node, std::shared_ptr<Event_Payload>{});
 	}
 
-	void emit_event(Event_Type type, uint8_t code, Node_Handler* node, const std::vector<std::string>& payload) override final
+	void emit_event(Event_Type type, Event_Code code, Node_Handler* node, const std::vector<std::string>& payload) override final
 	{
 		emit_event(type, code, node, std::make_shared<Text_Event_Payload>(payload));
 	}
 
-	void emit_event(Event_Type type, uint8_t code, Node_Handler* node, std::function<std::vector<std::string>()> payload_getter) override final
+	void emit_event(Event_Type type, Event_Code code, Node_Handler* node, std::function<std::vector<std::string>()> payload_getter) override final
 	{
 		emit_event(type, code, node, std::make_shared<Text_Event_Payload>(payload_getter));
 	}
 
-	void emit_event(Event_Type type, uint8_t code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) override final
+	void emit_event(Event_Type type, Event_Code code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) override final
 	{
 		emit_event(_type_hash, type, code, node, payload);
 	}
 
-	virtual void emit_event(std::size_t emiter_hash, Event_Type type, uint8_t code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) override
+	virtual void emit_event(std::size_t emiter_hash, Event_Type type, Event_Code code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) override
 	{
 		if (_next)
 			_next->emit_event(emiter_hash, type, code, node, payload);

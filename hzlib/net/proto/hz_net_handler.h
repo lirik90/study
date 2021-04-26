@@ -3,6 +3,7 @@
 
 #include <boost/asio/io_context.hpp>
 
+#include "hz_net_event_code.h"
 #include "hz_net_node_handler.h"
 
 namespace hz {
@@ -44,14 +45,15 @@ public:
 	virtual void node_build(Node_Handler& node, std::shared_ptr<Node_Init_Payload> payload = nullptr) = 0;
 	virtual void node_process(Node_Handler& node, const uint8_t* data, std::size_t size) = 0;
 	virtual void node_connected(Node_Handler& node) = 0;
+	virtual bool node_is_connected(Node_Handler& node) = 0;
 
 	enum class Event_Type : uint8_t { DEBUG, INFO, WARNING, ERROR };
 
-	virtual void emit_event(Event_Type type, uint8_t code, Node_Handler* node = nullptr) = 0;
-	virtual void emit_event(Event_Type type, uint8_t code, Node_Handler* node, const std::vector<std::string>& payload) = 0;
-	virtual void emit_event(Event_Type type, uint8_t code, Node_Handler* node, std::function<std::vector<std::string>()> payload_getter) = 0;
-	virtual void emit_event(Event_Type type, uint8_t code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) = 0;
-	virtual void emit_event(std::size_t emiter_hash, Event_Type type, uint8_t code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) = 0;
+	virtual void emit_event(Event_Type type, Event_Code code, Node_Handler* node = nullptr) = 0;
+	virtual void emit_event(Event_Type type, Event_Code code, Node_Handler* node, const std::vector<std::string>& payload) = 0;
+	virtual void emit_event(Event_Type type, Event_Code code, Node_Handler* node, std::function<std::vector<std::string>()> payload_getter) = 0;
+	virtual void emit_event(Event_Type type, Event_Code code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) = 0;
+	virtual void emit_event(std::size_t emiter_hash, Event_Type type, Event_Code code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) = 0;
 };
 
 } // namespace Net
