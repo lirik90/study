@@ -1,59 +1,29 @@
 #ifndef HZ_NET_UDP_EVENT_FORMATTER_H
 #define HZ_NET_UDP_EVENT_FORMATTER_H
 
-#include <cassert>
-
-#include "hz_net_text_event_payload.h"
 #include "hz_net_udp_event.h"
-#include "hz_net_event_formatter_handler.h"
+#include "hz_net_abstract_event_formatter_handler.h"
 
 namespace hz {
 namespace Net {
 namespace Udp {
 
-class Event_Formatter : public Event_Formatter_Handler
+class Event_Formatter : public Abstract_Event_Formatter_Handler
 {
-public:
 	std::string category() const override { return "udp"; }
-	std::string format(uint8_t code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) const override
+	std::string get_format_str(uint8_t code, Node_Handler* /*node*/) const override
 	{
-		(void)node;
-		using E = Event;
-
-		switch (static_cast<E>(code))
+		switch (static_cast<Event>(code))
 		{
-			case E::RECV_ERROR:	return recv_error(payload.get());
-			case E::SEND_ERROR:	return send_error(payload.get());
-			case E::SEND_ERROR_WRONG_SIZE:	return send_error_ws(payload.get());
+			case Event::BIND:		return "Bind {}:{}";
+			case Event::CONNECTING:	return "Connecting to {}:{}";
+			case Event::RECV_ERROR:	return "Recv fail {}: {}";
+			case Event::SEND_ERROR:	return "Send fail {}: {}";
+			case Event::SEND_ERROR_WRONG_SIZE:	return "Send fail: wrond size. Send: {} Transfered: {}";
+			case Event::TIMER:		return "Timer error: {}";
 		}
 
 		return {};
-	}
-
-private:
-
-	std::string recv_error(Event_Payload* payload) const
-	{
-		auto data = static_cast<Text_Event_Payload*>(payload);
-		assert(data && data->data().size() == 2);
-
-		return "Recv Fail " + data->data().at(0) + ": " + data->data().at(1);
-	}
-
-	std::string send_error(Event_Payload* payload) const
-	{
-		auto data = static_cast<Text_Event_Payload*>(payload);
-		assert(data && data->data().size() == 2);
-
-		return "Send Fail " + data->data().at(0) + ": " + data->data().at(1);
-	}
-
-	std::string send_error_ws(Event_Payload* payload) const
-	{
-		auto data = static_cast<Text_Event_Payload*>(payload);
-		assert(data && data->data().size() == 2);
-
-		return "Send Fail: Wrong size. Send: " + data->data().at(0) + " Transfered: " + data->data().at(1);
 	}
 };
 

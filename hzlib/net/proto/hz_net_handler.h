@@ -17,8 +17,6 @@ class Handler
 public:
 	virtual ~Handler() {}
 
-	virtual std::shared_ptr<Handler> get_ptr() = 0;
-
 	virtual void set_previous(Handler* prev) = 0;
 	virtual Handler* prev() = 0;
 	virtual Handler* next() = 0;
@@ -38,6 +36,7 @@ public:
 	virtual void init() = 0;
 	virtual void start() = 0;
 
+	virtual void find_node(std::function<bool(Node_Handler&)> cb) = 0;
 	virtual void close_node(Node_Handler& node) = 0;
 	virtual void send_node_data(Node_Handler& node, const uint8_t* data, std::size_t size) = 0;
 

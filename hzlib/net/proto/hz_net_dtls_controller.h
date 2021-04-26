@@ -1,20 +1,15 @@
 #ifndef HZ_NET_DTLS_CONTROLLER_H
 #define HZ_NET_DTLS_CONTROLLER_H
 
-#include <iostream> // temp
-#include <stdexcept>
-#include <thread> // temp
-#include <mutex> // temp
+#include <mutex>
 
-#include <boost/algorithm/string/join.hpp> // temp
-
-#include <botan-2/botan/tls_server.h>
 #include <botan-2/botan/hex.h>
 
 #include "hz_net_node_init_payload.h"
 #include "hz_net_abstract_handler.h"
 #include "hz_net_dtls_tools.h"
 #include "hz_net_dtls_node.h"
+#include "hz_net_dtls_event.h"
 #include "hz_net_node_data_packet.h"
 #include "hz_net_async_message_queue.h"
 
@@ -22,16 +17,17 @@ namespace hz {
 namespace Net {
 namespace Dtls {
 
-inline int th_id() { return (std::hash<std::thread::id>{}(std::this_thread::get_id()) % 1000); } // temp
-
 class Controller : public Controller_Handler, public Handler_T<Controller>
 {
 public:
 	Controller(const std::string &tls_policy_file_name, const std::string &crt_file_name, const std::string &key_file_name,
 			const std::vector<std::string> &cert_paths = { "/usr/share/ca-certificates", "/etc/ssl/certs" },
 			std::chrono::milliseconds ocsp_timeout = std::chrono::milliseconds{100}) :
-		_tools{tls_policy_file_name, crt_file_name, key_file_name, ocsp_timeout, cert_paths}
+		_tools{ocsp_timeout}
 	{
+		std::string rnd_type = _tools.init(tls_policy_file_name, crt_file_name, key_file_name, cert_paths);
+		(void)rnd_type; // TODO: init tools in init funciton and send debug event
+
 		create_next_handler<Async_Message_Queue>();
 	}
 

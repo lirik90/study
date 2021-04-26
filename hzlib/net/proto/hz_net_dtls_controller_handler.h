@@ -18,15 +18,6 @@ class Controller_Handler
 public:
 	virtual ~Controller_Handler() {}
 
-	enum Event : uint8_t {
-		RECEIVED_DATA_ERROR,
-		ALERT,
-		HANDSHAKE_COMPLETE,
-		SESSION_ID,
-		SESSION_TICKET,
-		PROTOCOL_CHOOSEN,
-	};
-
 	virtual void tls_record_received(Node_Handler& node, const uint8_t* data, std::size_t size) = 0;
 	virtual void tls_emit_data(Node_Handler& node, const uint8_t* data, std::size_t size) = 0;
 	virtual void tls_alert(Node_Handler& node, Botan::TLS::Alert alert) = 0;

@@ -12,6 +12,8 @@ struct Event_Code
 	Event_Code(T code) :
 		_code{static_cast<uint8_t>(code)} {}
 
+	operator uint8_t() const { return _code; }
+
 	uint8_t _code;
 };
 

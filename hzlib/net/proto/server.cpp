@@ -12,9 +12,11 @@
 #include <boost/algorithm/hex.hpp>
 
 #include "hz_net_abstract_handler.h"
+#include "hz_net_dtls_controller.h"
 #include "hz_net_event_formatter_handler.h"
 #include "hz_net_node_handler.h"
 #include "hz_net_executor.h"
+#include "hz_net_udp_controller.h"
 #include "hz_net_udp_server.h"
 #include "hz_net_dtls_server.h"
 #include "hz_net_abstract_event_handler.h"
@@ -35,21 +37,15 @@ private:
 	}
 };
 
-class Event_Handler : public hz::Net::Abstract_Event_Handler<Event_Handler>
+class Event_Handler : public hz::Net::Abstract_Event_Handler
 {
-private:
-	void handle(const std::string& text) override
-	{
-		std::cout << text << std::endl;
-	}
-
 	std::shared_ptr<hz::Net::Event_Formatter_Handler> create_formatter(std::size_t type_hash) override
 	{
 		if (type_hash == typeid(hz::Net::Executor).hash_code())
 			return std::make_shared<hz::Net::Executor_Event_Formatter>();
-		else if (type_hash == typeid(hz::Net::Udp::Server).hash_code())
+		else if (type_hash == typeid(hz::Net::Udp::Controller).hash_code())
 			return std::make_shared<hz::Net::Udp::Event_Formatter>();
-		else if (type_hash == typeid(hz::Net::Dtls::Server).hash_code())
+		else if (type_hash == typeid(hz::Net::Dtls::Controller).hash_code())
 			return std::make_shared<hz::Net::Dtls::Event_Formatter>();
 
 		return nullptr;
@@ -58,8 +54,6 @@ private:
 
 int main(int argc, char* argv[])
 {
-	std::cout << "Begin server\n";
-
 	hz::Net::Executor server;
 	server
 		.create_next_handler<hz::Net::Udp::Server>(12345)

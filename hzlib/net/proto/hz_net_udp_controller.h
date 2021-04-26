@@ -29,23 +29,19 @@ struct Message_Context
 	boost::array<uint8_t, HZ_MAX_UDP_PACKET_SIZE> _recv_buffer;
 };
 
-template<typename T>
-class Controller : public Handler_T<T>
+class Controller : public Handler_T<Controller>
 {
-	using Base = Handler_T<T>;
 public:
 	Controller(const std::string& host, uint16_t port) :
 		_info{std::make_shared<Server_Info>(host, port)}
 	{
-		Base::template create_next_handler<Async_Message_Queue>();
+		create_next_handler<Async_Message_Queue>();
 	}
 
 protected:
 	virtual void init() override
 	{
-		std::cout << "Udp_Controller initialized\n";
-		_strand.reset(new boost::asio::strand<boost::asio::io_context::executor_type>{ boost::asio::make_strand(*Base::io()) });
-
+		_strand.reset(new boost::asio::strand<boost::asio::io_context::executor_type>{ boost::asio::make_strand(*io()) });
 		Abstract_Handler::init();
 	}
 
@@ -73,9 +69,9 @@ protected:
 	void handle_send(std::shared_ptr<Node_Data_Packet>& packet, const boost::system::error_code &err, const std::size_t &bytes_transferred)
 	{
 		if (err.value() != 0)
-			Base::emit_event(Base::Event_Type::ERROR, static_cast<uint8_t>(Event::SEND_ERROR), nullptr, { err.category().name(), err.message() });
+			emit_event(Event_Type::ERROR, Event::SEND_ERROR, nullptr, { err.category().name(), err.message() });
 		else if (packet->_size != bytes_transferred)
-			Base::emit_event(Base::Event_Type::ERROR, static_cast<uint8_t>(Event::SEND_ERROR_WRONG_SIZE), nullptr,
+			emit_event(Event_Type::ERROR, Event::SEND_ERROR_WRONG_SIZE, nullptr,
 					{ std::to_string(packet->_size), std::to_string(bytes_transferred) });
 	}
 
@@ -93,12 +89,20 @@ protected:
 						const boost::system::error_code &err, std::size_t size)
 	{
 		if (err)
-			Base::emit_event(Base::Event_Type::ERROR, static_cast<uint8_t>(Event::RECV_ERROR), nullptr, { err.category().name(), err.message() });
+			emit_event(Event_Type::ERROR, Event::RECV_ERROR, nullptr, { err.category().name(), err.message() });
 		else
 		{
 			process_message(*msg_context, size);
 			start_receive(std::move(msg_context));
 		}
+	}
+
+	void find_node(std::function<bool(Node_Handler&)> cb) override
+	{
+		boost::shared_lock lock(_nodes_mutex);
+		for (auto it = _nodes.cbegin(); it != _nodes.cend(); ++it)
+			if (cb(*it->second))
+				break;
 	}
 
 	std::shared_ptr<Node> get_node(const udp::endpoint& remote_endpoint)
@@ -123,7 +127,7 @@ protected:
 		std::shared_ptr<Node> node = std::make_shared<Node>();
 		node->set_endpoint(remote_endpoint);
 
-		Base::node_build(*node, _info);
+		node_build(*node, _info);
 
 		std::lock_guard lock(_nodes_mutex);
 		auto it = _nodes.find(remote_endpoint);
@@ -145,6 +149,22 @@ protected:
 		Abstract_Handler::node_process(*node, msg_context._recv_buffer.data(), size);
 	}
 
+	void close_node(Node_Handler& raw_node) override
+	{
+		auto node = raw_node.get_from_root<Node>();
+		if (node)
+		{
+			udp::endpoint remote_endpoint = node->endpoint();
+			io()->post([this, remote_endpoint]() { close_node(remote_endpoint); });
+		}
+	}
+
+	void close_node(udp::endpoint remote_endpoint)
+	{
+		std::lock_guard lock(_nodes_mutex);
+		_nodes.erase(remote_endpoint);
+	}
+
 	std::string node_get_identifier(Node_Handler& node) override
 	{
 		auto n = node.get<Node>();
@@ -155,6 +175,13 @@ protected:
 			return title_s.str() + Abstract_Handler::node_get_identifier(node);
 		}
 		return Abstract_Handler::node_get_identifier(node);
+	}
+
+	udp::endpoint resolve_endpoint()
+	{
+		udp::resolver resolver(*io());
+		udp::resolver::query query(udp::v4(), _info->host(), std::to_string(_info->port()));
+		return *resolver.resolve(query).begin();
 	}
 
 	std::shared_ptr<Server_Info> _info;

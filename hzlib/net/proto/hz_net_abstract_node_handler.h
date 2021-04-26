@@ -26,7 +26,7 @@ public:
 	void set_next_handler(std::shared_ptr<Node_Handler> handler, std::size_t type_hash) override
 	{
 		if (_next)
-			_next->set_next_handler(handler, type_hash);
+			_next->set_next_handler(std::move(handler), type_hash);
 		else
 		{
 			handler->set_previous(this);

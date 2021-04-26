@@ -8,6 +8,7 @@ namespace Net {
 namespace Udp {
 
 enum class Event : uint8_t {
+	BIND,
 	CONNECTING,
 	RECV_ERROR,
 	SEND_ERROR,

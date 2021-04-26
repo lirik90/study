@@ -46,6 +46,12 @@ public:
 			_next->start();
 	}
 
+	virtual void find_node(std::function<bool(Node_Handler&)> cb) override
+	{
+		if (_prev)
+			_prev->find_node(std::move(cb));
+	}
+
 	virtual void close_node(Node_Handler& node) override
 	{
 		if (_prev)
@@ -83,7 +89,7 @@ public:
 			_next->node_connected(node);
 	}
 
-	virtual bool node_is_connected(Node_Handler& node)
+	virtual bool node_is_connected(Node_Handler& node) override
 	{
 		if (_next)
 			return _next->node_is_connected(node);
@@ -142,16 +148,11 @@ private:
 };
 
 template<typename T>
-class Handler_T : public Abstract_Handler, public std::enable_shared_from_this<T>
+class Handler_T : public Abstract_Handler
 {
 public:
 	Handler_T() :
 		Abstract_Handler{typeid(T).hash_code()} {}
-
-	std::shared_ptr<Handler> get_ptr() override
-	{
-		return std::enable_shared_from_this<T>::shared_from_this();
-	}
 };
 
 } // namespace Net

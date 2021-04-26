@@ -43,6 +43,7 @@ set(LIB_SOURCES
 set(DEP_LIBS
 	pthread
 	boost_thread
+	fmt
 	botan-2
 )
 

@@ -14,18 +14,21 @@ namespace Dtls {
 class Tools
 {
 public:
-    Tools(const std::string& tls_policy_file_name,
-          const std::string& crt_file_name = std::string(),
-          const std::string& key_file_name = std::string(),
-          const std::chrono::milliseconds ocsp_timeout = std::chrono::milliseconds{50},
-          const std::vector<std::string>& cert_paths = {});
+	Tools(const std::chrono::milliseconds ocsp_timeout = std::chrono::milliseconds{50});
+	std::string init(const std::string& tls_policy_file_name,
+		const std::string& crt_file_name = std::string(),
+		const std::string& key_file_name = std::string(),
+		const std::vector<std::string>& cert_paths = {});
 
-    std::chrono::milliseconds _ocsp_timeout;
+	std::string init_rnd(const std::string drbg_seed = {});
+	void init_policy(const std::string &tls_policy_file_name);
 
-    std::unique_ptr<Botan::RandomNumberGenerator> rng_;
-    std::unique_ptr<Credentials_Manager> creds_;
-    std::unique_ptr<Botan::TLS::Session_Manager_In_Memory> session_manager_;
-    std::unique_ptr<Botan::TLS::Text_Policy> policy_; // TODO: read policy from file
+	std::chrono::milliseconds _ocsp_timeout;
+
+	std::unique_ptr<Botan::RandomNumberGenerator> _rng;
+	std::unique_ptr<Credentials_Manager> _creds;
+	std::unique_ptr<Botan::TLS::Session_Manager_In_Memory> _session_manager;
+	std::unique_ptr<Botan::TLS::Text_Policy> _policy;
 };
 
 } // namespace Dtls

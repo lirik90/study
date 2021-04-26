@@ -46,7 +46,6 @@ public:
 		T* p = get<T>();
 		return p ? p : get_root()->get<T>();
 	}
-
 };
 
 } // namespace Net

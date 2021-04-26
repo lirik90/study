@@ -22,19 +22,13 @@ private:
 	}
 };
 
-class Event_Handler : public hz::Net::Abstract_Event_Handler<Event_Handler>
+class Event_Handler : public hz::Net::Abstract_Event_Handler
 {
-private:
-	void handle(const std::string& text) override
-	{
-		std::cout << text << std::endl;
-	}
-
 	std::shared_ptr<hz::Net::Event_Formatter_Handler> create_formatter(std::size_t type_hash) override
 	{
 		if (type_hash == typeid(hz::Net::Executor).hash_code())
 			return std::make_shared<hz::Net::Executor_Event_Formatter>();
-		else if (type_hash == typeid(hz::Net::Udp::Client).hash_code())
+		else if (type_hash == typeid(hz::Net::Udp::Controller).hash_code())
 			return std::make_shared<hz::Net::Udp::Event_Formatter>();
 		else if (type_hash == typeid(hz::Net::Dtls::Controller).hash_code())
 			return std::make_shared<hz::Net::Dtls::Event_Formatter>();
@@ -45,8 +39,6 @@ private:
 
 int main(int argc, char* argv[])
 {
-	std::cout << "Begin client\n";
-
 	std::vector<std::string>
 		protos{"hz/1.0"}, cert_paths{"certdir"};
 
