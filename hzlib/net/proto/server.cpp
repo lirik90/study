@@ -16,8 +16,8 @@
 #include "hz_net_event_formatter_handler.h"
 #include "hz_net_node_handler.h"
 #include "hz_net_executor.h"
-#include "hz_net_udp_controller.h"
 #include "hz_net_udp_server.h"
+#include "hz_net_udp_clean_timer.h"
 #include "hz_net_dtls_server.h"
 #include "hz_net_abstract_event_handler.h"
 #include "hz_net_executor_event_formatter.h"
@@ -54,9 +54,12 @@ class Event_Handler : public hz::Net::Abstract_Event_Handler
 
 int main(int argc, char* argv[])
 {
+	using namespace std::chrono_literals;
+
 	hz::Net::Executor server;
 	server
 		.create_next_handler<hz::Net::Udp::Server>(12345)
+		->create_next_handler<hz::Net::Udp::Clean_Timer>(15s)
 		->create_next_handler<hz::Net::Dtls::Server>("tls_policy.conf", "server_cert.pem", "server_key.pem")
 		->create_next_handler<hz::Net::Proto>()
 		->create_next_handler<My_Proto>()

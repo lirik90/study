@@ -1,6 +1,8 @@
 #ifndef HZ_NET_UDP_CLIENT_H
 #define HZ_NET_UDP_CLIENT_H
 
+#include <boost/asio/steady_timer.hpp>
+#include <chrono>
 #include <iostream> // temp
 #include <memory>
 #include <queue>
@@ -11,7 +13,6 @@
 #include <boost/asio/placeholders.hpp>
 #include <boost/asio/strand.hpp>
 #include <boost/asio/bind_executor.hpp>
-#include <boost/asio/deadline_timer.hpp>
 
 #include "hz_net_defs.h"
 #include "hz_net_async_message_queue.h"
@@ -28,32 +29,45 @@ namespace Udp {
 class Client final : public Controller
 {
 public:
-	using Controller::Controller;
+	Client(const std::string& host, uint16_t port, std::chrono::milliseconds reconnect_timeout) :
+		Controller{host, port},
+		_reconnect_timeout{reconnect_timeout}
+	{}
 
 private:
 	void init() override
 	{
-		_timer.reset(new boost::asio::deadline_timer{*io()});
-		_timer->expires_at(boost::posix_time::pos_infin);
+		_timer.reset(new boost::asio::steady_timer{*io()});
 
 		_socket.reset(new udp::socket{*io()});
 		_socket->open(udp::v4());
 
 		Controller::init();
+
+		connect();
 	}
 
 	void start() override
 	{
-		std::call_once(_connect_at_start_flag, [this]() { connect(); });
+		Controller::start();
+	}
+
+	void reconnect(const boost::system::error_code &err = {})
+	{
+		if (err)
+			return;
+
+		_socket->open(udp::v4());
+		connect();
 		Controller::start();
 	}
 
 	void connect()
 	{
+
 		// deadlock_timer ?
 		// Move Server inherit Udp::Controller
 		// Move Dtls::Server inherit Dtls::Controller
-		clear_nodes();
 
 		emit_event(Event_Type::DEBUG, Event::CONNECTING, nullptr, [this]() -> std::vector<std::string>
 		{
@@ -62,56 +76,23 @@ private:
 
 		udp::endpoint receiver_endpoint = resolve_endpoint();
 		create_node(receiver_endpoint);
-
-		_timer->expires_from_now(boost::posix_time::seconds(10));
-		check_deadline();
 	}
 
-	void check_deadline(const boost::system::error_code& err = {})
+	void close_node(Node_Handler& raw_node) override
 	{
-		// Check whether the deadline has passed. We compare the deadline against
-		// the current time since a new asynchronous operation may have moved the
-		// deadline before this actor had a chance to run.
-		if (err != boost::asio::error::operation_aborted && // Changing the expiry time
-			_timer->expires_at() <= boost::asio::deadline_timer::traits_type::now())
+		clear_nodes();
+
+		_socket->close();
+
+		if (_reconnect_timeout.count())
 		{
-			std::cout << "Deadline: " << is_reconnect_needed() << std::endl;
-			if (is_reconnect_needed())
-			{
-				// The deadline has passed. The outstanding asynchronous operation needs
-				// to be cancelled so that the blocked receive() function will return.
-				//
-				// Please note that cancel() has portability issues on some versions of
-				// Microsoft Windows, and it may be necessary to use close() instead.
-				// Consult the documentation for cancel() for further information.
-				_socket->cancel(); // TODO: Check the note below
-
-				// There is no longer an active deadline. The expiry is set to positive
-				// infinity so that the actor takes no action until a new deadline is set.
-				_timer->expires_at(boost::posix_time::pos_infin);
-			}
-			else
-				_timer->expires_from_now(boost::posix_time::seconds(10));
+			_timer->expires_at(std::chrono::steady_clock::now() + _reconnect_timeout);
+			_timer->async_wait(boost::bind(&Client::reconnect, this, boost::placeholders::_1));
 		}
-
-		// Put the actor back to sleep.
-		_timer->async_wait(boost::bind(&Client::check_deadline, this, boost::placeholders::_1));
-	}
-	
-	bool is_reconnect_needed()
-	{
-		auto node = get_first_node();
-		return node ? !node_is_connected(*node) : true;
 	}
 
-	std::shared_ptr<Node_Handler> get_first_node()
-	{
-		boost::shared_lock lock(_nodes_mutex);
-		return _nodes.empty() ? nullptr : _nodes.begin()->second;
-	}
-
-	std::once_flag _connect_at_start_flag;
-	std::unique_ptr<boost::asio::deadline_timer> _timer;
+	std::chrono::milliseconds _reconnect_timeout;
+	std::unique_ptr<boost::asio::steady_timer> _timer;
 };
 
 } // namespace Udp

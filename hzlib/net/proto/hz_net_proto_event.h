@@ -5,9 +5,11 @@
 
 namespace hz {
 namespace Net {
+namespace Proto {
 
-enum class Proto_Event : uint8_t {};
+enum class Event : uint8_t {};
 
+} // namespace Proto
 } // namespace Net
 } // namespace hz
 

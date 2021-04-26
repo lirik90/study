@@ -1,9 +1,11 @@
+#include <chrono>
 #include <iostream>
 
 #include "hz_net_abstract_handler.h"
 #include "hz_net_dtls_controller.h"
 #include "hz_net_executor.h"
 #include "hz_net_udp_client.h"
+#include "hz_net_udp_clean_timer.h"
 #include "hz_net_dtls_client.h"
 #include "hz_net_proto.h"
 #include "hz_net_abstract_event_handler.h"
@@ -42,10 +44,13 @@ int main(int argc, char* argv[])
 	std::vector<std::string>
 		protos{"hz/1.0"}, cert_paths{"certdir"};
 
+	using namespace std::chrono_literals;
+
 	hz::Net::Executor client;
 	client
-		.create_next_handler<hz::Net::Udp::Client>("localhost", 12345)
-		->create_next_handler<hz::Net::Dtls::Client>(protos, "tls_policy.conf", cert_paths, std::chrono::milliseconds{10})
+		.create_next_handler<hz::Net::Udp::Client>("localhost", 12345, /*reconnect*/5s)
+		->create_next_handler<hz::Net::Udp::Clean_Timer>(10s)
+		->create_next_handler<hz::Net::Dtls::Client>(protos, "tls_policy.conf", cert_paths, 10ms)
 		->create_next_handler<hz::Net::Proto>()
 		->create_next_handler<My_Proto>()
 		->create_next_handler<Event_Handler>();
@@ -60,5 +65,5 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	return client.exec(5);
+	return client.exec(thread_count);
 }

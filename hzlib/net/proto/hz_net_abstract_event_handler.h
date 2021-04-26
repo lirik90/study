@@ -8,6 +8,8 @@
 
 #include <boost/algorithm/string/join.hpp>
 
+#include <fmt/color.h>
+
 #include "hz_net_executor_event.h"
 #include "hz_net_abstract_handler.h"
 #include "hz_net_event_formatter_handler.h"
@@ -36,7 +38,7 @@ private:
 		auto formatter = get_formatter(emiter_hash);
 		if (formatter)
 		{
-			std::string text = formatter->format(code, node, std::move(payload));
+			std::string text = formatter->format(code, node, payload);
 			if (text.empty())
 				text = "Unknown event code: " + std::to_string(static_cast<int>(code));
 			ss << '[' << formatter->category() << "] " << text;
@@ -53,7 +55,12 @@ private:
 			}
 		}
 
-		handle(ss.str());
+		fmt::basic_memory_buffer<char> buf;
+		fmt::detail::vformat_to(buf, get_style(type), fmt::to_string_view(ss.str()), {});
+		buf.push_back(char(0));
+		handle(buf.data());
+
+		Abstract_Handler::emit_event(emiter_hash, type, code, node, payload);
 	}
 
 	virtual std::string format_type(Handler::Event_Type type)
@@ -67,6 +74,19 @@ private:
 		}
 
 		return "[UNKNOWN]";
+	}
+
+	virtual fmt::text_style get_style(Handler::Event_Type type)
+	{
+		switch (type)
+		{
+			case Handler::Event_Type::INFO:		return fg(fmt::color::cornflower_blue);
+			case Handler::Event_Type::WARNING:	return fg(fmt::color::yellow);
+			case Handler::Event_Type::ERROR:	return fg(fmt::color::crimson);
+			default: break;
+		}
+
+		return {};
 	}
 
 	virtual std::string format_node(Node_Handler* node)

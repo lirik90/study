@@ -20,7 +20,6 @@ class Event_Formatter : public Abstract_Event_Formatter_Handler
 			case Event::RECV_ERROR:	return "Recv fail {}: {}";
 			case Event::SEND_ERROR:	return "Send fail {}: {}";
 			case Event::SEND_ERROR_WRONG_SIZE:	return "Send fail: wrond size. Send: {} Transfered: {}";
-			case Event::TIMER:		return "Timer error: {}";
 		}
 
 		return {};

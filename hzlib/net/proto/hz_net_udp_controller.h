@@ -149,7 +149,7 @@ protected:
 		Abstract_Handler::node_process(*node, msg_context._recv_buffer.data(), size);
 	}
 
-	void close_node(Node_Handler& raw_node) override
+	virtual void close_node(Node_Handler& raw_node) override
 	{
 		auto node = raw_node.get_from_root<Node>();
 		if (node)

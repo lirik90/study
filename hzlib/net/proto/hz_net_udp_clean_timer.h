@@ -1,5 +1,5 @@
-#ifndef HZ_NET_UDP_EVENT_H
-#define HZ_NET_UDP_EVENT_H
+#ifndef HZ_NET_UDP_CLEAN_TIMER_H
+#define HZ_NET_UDP_CLEAN_TIMER_H
 
 #include <boost/bind/bind.hpp>
 #include <boost/asio/steady_timer.hpp>
@@ -97,4 +97,4 @@ private:
 } // namespace Net
 } // namespace hz
 
-#endif // HZ_NET_UDP_EVENT_H
+#endif // HZ_NET_UDP_CLEAN_TIMER_H
