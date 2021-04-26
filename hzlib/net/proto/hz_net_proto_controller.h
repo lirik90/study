@@ -1,9 +1,10 @@
-#ifndef HZ_NET_PROTO_H
-#define HZ_NET_PROTO_H
+#ifndef HZ_NET_PROTO_CONTROLLER_H
+#define HZ_NET_PROTO_CONTROLLER_H
 
 #include <thread>
 
 #include "hz_net_proto_event.h"
+#include "hz_net_proto_node.h"
 #include "hz_net_abstract_handler.h"
 
 namespace hz {
@@ -25,4 +26,4 @@ public:
 } // namespace Net
 } // namespace hz
 
-#endif // HZ_NET_PROTO_H
+#endif // HZ_NET_PROTO_CONTROLLER_H
