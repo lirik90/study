@@ -3,15 +3,16 @@
 
 #include "hz_net_abstract_handler.h"
 #include "hz_net_dtls_controller.h"
+#include "hz_net_abstract_event_handler.h"
 #include "hz_net_executor.h"
+#include "hz_net_executor_event_formatter.h"
 #include "hz_net_udp_client.h"
 #include "hz_net_udp_clean_timer.h"
-#include "hz_net_dtls_client.h"
-#include "hz_net_proto.h"
-#include "hz_net_abstract_event_handler.h"
-#include "hz_net_executor_event_formatter.h"
 #include "hz_net_udp_event_formatter.h"
+#include "hz_net_dtls_client.h"
 #include "hz_net_dtls_event_formatter.h"
+#include "hz_net_proto_controller.h"
+#include "hz_net_proto_event_formatter.h"
 
 class My_Proto final :
 	public hz::Net::Handler_T<My_Proto>
@@ -34,6 +35,8 @@ class Event_Handler : public hz::Net::Abstract_Event_Handler
 			return std::make_shared<hz::Net::Udp::Event_Formatter>();
 		else if (type_hash == typeid(hz::Net::Dtls::Controller).hash_code())
 			return std::make_shared<hz::Net::Dtls::Event_Formatter>();
+		else if (type_hash == typeid(hz::Net::Proto::Controller).hash_code())
+			return std::make_shared<hz::Net::Proto::Event_Formatter>();
 
 		return nullptr;
 	}
@@ -51,7 +54,7 @@ int main(int argc, char* argv[])
 		.create_next_handler<hz::Net::Udp::Client>("localhost", 12345, /*reconnect*/5s)
 		->create_next_handler<hz::Net::Udp::Clean_Timer>(10s)
 		->create_next_handler<hz::Net::Dtls::Client>(protos, "tls_policy.conf", cert_paths, 10ms)
-		->create_next_handler<hz::Net::Proto>()
+		->create_next_handler<hz::Net::Proto::Controller>()
 		->create_next_handler<My_Proto>()
 		->create_next_handler<Event_Handler>();
 

@@ -7,19 +7,17 @@
 //#include <botan/certstor.h>
 #include <botan/ocsp.h>
 
-#include "hz_net_node_handler.h"
+#include "hz_net_node_controller_handler.h"
 
 namespace hz {
 namespace Net {
 namespace Dtls {
 
-class Controller_Handler
+class Controller_Handler : public Node_Controller_Handler
 {
 public:
 	virtual ~Controller_Handler() {}
 
-	virtual void tls_record_received(Node_Handler& node, const uint8_t* data, std::size_t size) = 0;
-	virtual void tls_emit_data(Node_Handler& node, const uint8_t* data, std::size_t size) = 0;
 	virtual void tls_alert(Node_Handler& node, Botan::TLS::Alert alert) = 0;
 	virtual bool tls_session_established(Node_Handler& node, const Botan::TLS::Session &session) = 0;
 

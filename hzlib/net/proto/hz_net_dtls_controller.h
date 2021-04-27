@@ -43,8 +43,13 @@ protected:
 			auto node = packet->_node->get<Dtls::Node>();
 			if (node)
 			{
-				std::lock_guard lock(_mutex);
-				node->send(packet->_data.get(), packet->_size);
+				try {
+					std::lock_guard lock(_mutex);
+					node->send(packet->_data.get(), packet->_size);
+				}
+				catch (const std::exception& e) {
+					emit_event(Event_Type::ERROR, Event::TRANSMITED_DATA_ERROR, packet->_node.get(), { e.what() });
+				}
 			}
 		});
 	}
@@ -75,12 +80,12 @@ protected:
 		return !connected && node->is_connected();
 	}
 
-	void tls_record_received(Node_Handler& node, const uint8_t* data, std::size_t size) override
+	void record_received(Node_Handler& node, const uint8_t* data, std::size_t size) override
 	{
 		Abstract_Handler::node_process(node, data, size);
 	}
 
-	void tls_emit_data(Node_Handler& node, const uint8_t* data, std::size_t size) override
+	void emit_data(Node_Handler& node, const uint8_t* data, std::size_t size) override
 	{
 		Abstract_Handler::send_node_data(*node.prev(), data, size);
 	}

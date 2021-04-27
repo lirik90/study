@@ -8,6 +8,7 @@ namespace Net {
 namespace Dtls {
 
 enum class Event : uint8_t {
+	TRANSMITED_DATA_ERROR,
 	RECEIVED_DATA_ERROR,
 	ALERT,
 	HANDSHAKE_COMPLETE,

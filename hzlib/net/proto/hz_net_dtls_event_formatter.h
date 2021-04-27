@@ -16,12 +16,13 @@ public:
 	{
 		switch (static_cast<Event>(code))
 		{
-			case Event::RECEIVED_DATA_ERROR:return "Fail: {}";
-			case Event::ALERT:				return "Alert: {}";
-			case Event::HANDSHAKE_COMPLETE:	return "Handshake complete, {} using {}";
-			case Event::SESSION_ID:			return "Session ID {}";
-			case Event::SESSION_TICKET:		return "Session ticket {}";
-			case Event::PROTOCOL_CHOOSEN:	return "Protocol is {} ({})";
+			case Event::TRANSMITED_DATA_ERROR:	return "Transmit fail: {}";
+			case Event::RECEIVED_DATA_ERROR:	return "Receive fail: {}";
+			case Event::ALERT:					return "Alert: {}";
+			case Event::HANDSHAKE_COMPLETE:		return "Handshake complete, {} using {}";
+			case Event::SESSION_ID:				return "Session ID {}";
+			case Event::SESSION_TICKET:			return "Session ticket {}";
+			case Event::PROTOCOL_CHOOSEN:		return "Protocol is {} ({})";
 		}
 
 		return {};

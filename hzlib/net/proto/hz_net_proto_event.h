@@ -7,7 +7,10 @@ namespace hz {
 namespace Net {
 namespace Proto {
 
-enum class Event : uint8_t {};
+enum class Event : uint8_t {
+	TRANSMITED_DATA_ERROR,
+	RECEIVED_DATA_ERROR,
+};
 
 } // namespace Proto
 } // namespace Net

@@ -32,7 +32,7 @@ set(LIB_SOURCES
 	hz_net_node_handler.h
 	hz_net_node_init_payload.h
 	hz_net_proto_event.h
-	hz_net_proto.h
+	hz_net_proto_controller.h
 	hz_net_text_event_payload.h
 	hz_net_udp_client.h
 	hz_net_udp_event_formatter.h
