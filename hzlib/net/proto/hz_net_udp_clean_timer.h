@@ -33,9 +33,7 @@ private:
 
 	void node_build(Node_Handler& raw_node, std::shared_ptr<Node_Init_Payload> payload) override
 	{
-		auto node = raw_node.create_next_handler<Clean_Timer_Node>();
-		node->set_recv_time(std::chrono::system_clock::now());
-
+		raw_node.create_next_handler<Clean_Timer_Node>();
 		Abstract_Handler::node_build(raw_node, std::move(payload));
 	}
 

@@ -13,6 +13,8 @@ namespace Udp {
 class Clean_Timer_Node : public Node_Handler_T<Clean_Timer_Node>
 {
 public:
+	Clean_Timer_Node() : _recv_time{std::chrono::system_clock::now()} {}
+
 	std::chrono::system_clock::time_point recv_time() const { return _recv_time; }
 	void set_recv_time(std::chrono::system_clock::time_point recv_time) { _recv_time = recv_time; }
 

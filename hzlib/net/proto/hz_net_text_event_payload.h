@@ -6,6 +6,11 @@
 #include <functional>
 
 #include <fmt/core.h>
+#if FMT_VERSION <= 60102
+namespace fmt {
+namespace detail = v6::internal;
+} // namespace fmt
+#endif
 
 #include "hz_net_event_payload.h"
 
