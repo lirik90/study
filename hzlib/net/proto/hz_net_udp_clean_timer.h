@@ -37,13 +37,13 @@ private:
 		Abstract_Handler::node_build(raw_node, std::move(payload));
 	}
 
-	void node_process(Node_Handler& raw_node, const uint8_t* data, std::size_t size) override
+	void node_process(Node_Handler& raw_node, Message_Handler& msg) override
 	{
 		auto node = raw_node.get_from_root<Clean_Timer_Node>();
 		if (node)
 			node->set_recv_time(std::chrono::system_clock::now());
 
-		Abstract_Handler::node_process(raw_node, data, size);
+		Abstract_Handler::node_process(raw_node, msg);
 	}
 
 	bool node_is_connected(Node_Handler& raw_node) override

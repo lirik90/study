@@ -70,6 +70,11 @@ private:
 		Abstract_Handler::send_node_data(*node.prev(), msg);
 	}
 
+	void lost_msg_detected(uint8_t msg_id, uint8_t expected) override
+	{
+		std::cout << "Lost " << (int)msg_id << ' ' << (int)expected << "\n";
+	}
+
 	std::mutex _mutex;
 };
 

@@ -11,6 +11,8 @@ class Controller_Handler : public Node_Controller_Handler
 {
 public:
 	virtual ~Controller_Handler() {}
+
+	virtual void lost_msg_detected(uint8_t msg_id, uint8_t expected) = 0;
 };
 
 } // namespace Proto
