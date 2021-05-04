@@ -386,12 +386,12 @@ private:
 		}
 	}
 
-	void process_fragment_answer(uint8_t answer_id, std::shared_ptr<asd> data)
+	void process_fragment_answer(uint8_t answer_id, uint8_t msg_id, uint8_t cmd, std::shared_ptr<asd> data)
 	{
-		apply_parse(*data, &Node::process_fragment, this, msg_id, data, true, answer_id);
+		apply_parse(*data, &Node::process_fragment, this, msg_id, cmd, data, true, answer_id);
 	}
 
-	void process_fragment(uint32_t full_size, uint32_t pos, uint8_t msg_id, std::shared_ptr<asd> data, bool is_answer, uint8_t answer_id)
+	void process_fragment(uint32_t full_size, uint32_t pos, uint8_t msg_id, uint8_t cmd, std::shared_ptr<asd> data, bool is_answer, uint8_t answer_id)
 	{
 		std::map<uint8_t, Fragmented_Message>::iterator it = _fragmented_messages.find(msg_id);
 
