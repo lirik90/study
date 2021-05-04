@@ -489,7 +489,6 @@ private:
 			if (value == FRAGMENT)
 			{
 				Time_Point now = std::chrono::system_clock::now();
-				auto writer_ptr = writer();
 	
 				for (auto& it: fragmented_messages_)
 				{
@@ -501,17 +500,16 @@ private:
 						if (msg.max_fragment_size_ < 128)
 							msg.max_fragment_size_ = 128;
 	
-						lost_msg_list_.emplace(msg.id_, now);
+						_lost_msg_list.emplace(msg.id_, now);
 						msg.last_part_time_ = now;
 	
-						const QPair<uint32_t, uint32_t> next_part = msg.get_next_part();
+						const std::pair<uint32_t, uint32_t> next_part = msg.get_next_part();
 	
 						auto msg_out = send(msg.cmd_);
 						msg_out.msg_.set_flags(msg_out.msg_.flags() | FRAGMENT_QUERY, Message_Item::Only_Protocol());
 						msg_out << msg.id_ << next_part;
 	
-						if (writer_ptr)
-							writer_ptr->add_timeout_at(now + std::chrono::milliseconds(1505), reinterpret_cast<void*>(value));
+						_ctrl->add_timeout_at(this, now + std::chrono::milliseconds(1505), reinterpret_cast<void*>(value));
 					}
 				}
 				return;
