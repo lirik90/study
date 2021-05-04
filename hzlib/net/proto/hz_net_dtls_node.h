@@ -42,7 +42,8 @@ public:
 private:
 	void tls_record_received(Botan::u64bit, const uint8_t data[], std::size_t size) override
 	{
-		_ctrl->record_received(*this, data, size);
+		auto msg = std::make_shared<Data_Packet>(data, size);
+		_ctrl->record_received(*this, *msg);
 	}
 
 	void tls_alert(Botan::TLS::Alert alert) override
@@ -52,7 +53,8 @@ private:
 
 	void tls_emit_data(const uint8_t data[], size_t size) override
 	{
-		_ctrl->emit_data(*this, data, size);
+		auto msg = std::make_shared<Data_Packet>(data, size);
+		_ctrl->emit_data(*this, *msg);
 	}
 
 	void tls_verify_cert_chain(

@@ -21,10 +21,10 @@ public:
 
 private:
 
-	void node_process(Node_Handler& node, const uint8_t* data, std::size_t size)
+	void node_process(Node_Handler& node, Message_Handler& msg)
 	{
 		std::lock_guard lock(_data_mutex);
-		_data.emplace(node.get_root()->get_ptr(), data, size);
+		_data.emplace(node.get_root()->get_ptr(), msg.get_root()->get_ptr());
 		start_queue_handler();
 	}
 
@@ -56,7 +56,7 @@ private:
 
 			lock.unlock();
 
-			Abstract_Handler::node_process(*item._node, item._data.get(), item._size);
+			Abstract_Handler::node_process(*item._node, *item._msg);
 		}
 		while (!io()->stopped());
 	}

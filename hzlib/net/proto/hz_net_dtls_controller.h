@@ -35,35 +35,40 @@ public:
 
 protected:
 
-	void send_node_data(Node_Handler& node, const uint8_t* data, std::size_t size) override
+	void send_node_data(Node_Handler& node, Message_Handler& msg) override
 	{
-		auto packet = std::make_shared<Node_Data_Packet>(node.get_root()->get_ptr(), data, size);
+		auto packet = std::make_shared<Node_Data_Packet>(node.get_root()->get_ptr(), msg.get_root()->get_ptr());
 		io()->post([this, packet]()
 		{
 			auto node = packet->_node->get<Dtls::Node>();
-			if (node)
-			{
-				try {
-					std::lock_guard lock(_mutex);
-					node->send(packet->_data.get(), packet->_size);
-				}
-				catch (const std::exception& e) {
-					emit_event(Event_Type::ERROR, Event::TRANSMITED_DATA_ERROR, packet->_node.get(), { e.what() });
-				}
+			if (!node) return;
+
+			auto data = packet->_msg->get_from_root<Data_Packet>();
+			if (!data) return;
+
+			try {
+				std::lock_guard lock(_mutex);
+				node->send(data->_data.get(), data->_size);
+			}
+			catch (const std::exception& e) {
+				emit_event(Event_Type::ERROR, Event::TRANSMITED_DATA_ERROR, packet->_node.get(), { e.what() });
 			}
 		});
 	}
 
 	void node_connected(Node_Handler& /*raw_node*/) override {}
 
-	void node_process(Node_Handler& raw_node, const uint8_t* data, std::size_t size) override
+	void node_process(Node_Handler& raw_node, Message_Handler& msg) override
 	{
 		Dtls::Node* node = raw_node.get_from_root<Dtls::Node>();
 		if (!node)
 			throw std::runtime_error("Dtls Controller: Node hasn't dtls meta.");
 
+		auto data = msg.get_from_root<Data_Packet>();
+		if (!data) return;
+
 		try {
-			if (add_data_to_channel(node, data, size))
+			if (add_data_to_channel(node, data->_data.get(), data->_size))
 				Abstract_Handler::node_connected(raw_node); // now mutex is unlocked
 		} catch (const std::exception& e) {
 			emit_event(Event_Type::ERROR, Event::RECEIVED_DATA_ERROR, &raw_node, { e.what() });
@@ -80,14 +85,14 @@ protected:
 		return !connected && node->is_connected();
 	}
 
-	void record_received(Node_Handler& node, const uint8_t* data, std::size_t size) override
+	void record_received(Node_Handler& node, Message_Handler& msg) override
 	{
-		Abstract_Handler::node_process(node, data, size);
+		Abstract_Handler::node_process(node, msg);
 	}
 
-	void emit_data(Node_Handler& node, const uint8_t* data, std::size_t size) override
+	void emit_data(Node_Handler& node, Message_Handler& msg) override
 	{
-		Abstract_Handler::send_node_data(*node.prev(), data, size);
+		Abstract_Handler::send_node_data(*node.prev(), msg);
 	}
 
 	void tls_alert(Node_Handler& node, Botan::TLS::Alert alert) override

@@ -2,12 +2,13 @@
 #define HZ_NET_DATA_PACKET_H
 
 #include <cstring>
-#include <memory>
+
+#include "hz_net_abstract_message_handler.h"
 
 namespace hz {
 namespace Net {
 
-struct Data_Packet
+struct Data_Packet final : Message_Handler_T<Data_Packet>
 {
 	Data_Packet(const uint8_t* data, std::size_t size) :
 		_data{new uint8_t[size]}, _size{size}

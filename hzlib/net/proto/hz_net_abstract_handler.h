@@ -4,25 +4,18 @@
 // #include <bits/c++config.h>
 
 #include "hz_net_handler.h"
+#include "hz_net_abstract_base_handler.h"
 #include "hz_net_text_event_payload.h"
 
 namespace hz {
 namespace Net {
 
-class Abstract_Handler : public Handler
+class Abstract_Handler : public Abstract_Base_Handler<Handler>
 {
 public:
-	Abstract_Handler(std::size_t hash_code) : _type_hash{hash_code}, _context{nullptr}, _prev{nullptr} {}
+	Abstract_Handler(std::size_t hash_code) : 
+		Abstract_Base_Handler<Handler>{hash_code}, _context{nullptr} {}
 	virtual ~Abstract_Handler() {}
-
-	Handler* prev() override { return _prev; }
-	Handler* next() override { return _next.get(); }
-	Handler* get_root() override
-	{
-		if (_prev)
-			return _prev->get_root();
-		return this;
-	}
 
 	std::shared_ptr<Handler> set_next_handler(std::shared_ptr<Handler> handler) override
 	{
@@ -30,8 +23,7 @@ public:
 			return _next->set_next_handler(std::move(handler));
 
 		handler->set_io_context(_context);
-		handler->set_previous(this);
-		return _next = std::move(handler);
+		return Abstract_Base_Handler<Handler>::set_next_handler(std::move(handler));
 	}
 
 	virtual void init() override
@@ -58,10 +50,16 @@ public:
 			_prev->close_node(node);
 	}
 
-	virtual void send_node_data(Node_Handler& node, const uint8_t* data, std::size_t size) override
+	// virtual void send_node_data(Node_Handler& node, const uint8_t* data, std::size_t size)
+	// {
+	// 	if (_prev)
+	// 		_prev->send_node_data(node, data, size);
+	// }
+
+	virtual void send_node_data(Node_Handler& node, Message_Handler& msg) override
 	{
 		if (_prev)
-			_prev->send_node_data(node, data, size);
+			_prev->send_node_data(node, msg);
 	}
 
 	virtual std::string node_get_identifier(Node_Handler& node) override
@@ -77,10 +75,16 @@ public:
 			_next->node_build(node, std::move(payload));
 	}
 
-	virtual void node_process(Node_Handler& node, const uint8_t* data, std::size_t size) override
+	// virtual void node_process(Node_Handler& node, const uint8_t* data, std::size_t size)
+	// {
+	// 	if (_next)
+	// 		_next->node_process(node, data, size);
+	// }
+
+	virtual void node_process(Node_Handler& node, Message_Handler& msg) override
 	{
 		if (_next)
-			_next->node_process(node, data, size);
+			_next->node_process(node, msg);
 	}
 
 	virtual void node_connected(Node_Handler& node) override
@@ -135,25 +139,11 @@ protected:
 			_next->set_io_context(context);
 	}
 private:
-	void set_previous(Handler* prev) override
-	{
-		_prev = prev;
-	}
-
-	std::size_t _type_hash;
 	boost::asio::io_context* _context;
-
-	Handler* _prev;
-	std::shared_ptr<Handler> _next;
 };
 
 template<typename T>
-class Handler_T : public Abstract_Handler
-{
-public:
-	Handler_T() :
-		Abstract_Handler{typeid(T).hash_code()} {}
-};
+class Handler_T : public Base_Handler_T<Abstract_Handler, T> {};
 
 } // namespace Net
 } // namespace hz

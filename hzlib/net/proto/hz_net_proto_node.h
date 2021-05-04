@@ -7,6 +7,7 @@
 #include <cstring>
 #include <vector>
 #include <queue>
+#include <chrono>
 
 #include "hz_net_defs.h"
 #include "hz_net_abstract_node_handler.h"
@@ -158,7 +159,7 @@ private:
 			if (msg_id > _next_rx_msg_id
 				|| (_next_rx_msg_id - msg_id) > 100)
 			{
-				lost_msg_detected(msg_id, _next_rx_msg_id);
+				_ctrl->lost_msg_detected(msg_id, _next_rx_msg_id);
 				fill_lost_msg(msg_id);
 			}
 

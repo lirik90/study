@@ -51,22 +51,23 @@ protected:
 		Abstract_Handler::start();
 	}
 
-	void send_node_data(Node_Handler& raw_node, const uint8_t* data, std::size_t size) override
+	void send_node_data(Node_Handler& raw_node, Message_Handler& msg) override
 	{
 		auto node = raw_node.get_from_root<Node>();
-		if (node)
-		{
-			auto packet = std::make_shared<Node_Data_Packet>(node->get_ptr(), data, size);
-			_socket->async_send_to(
-				boost::asio::buffer(packet->_data.get(), size), node->endpoint(),
-				boost::asio::bind_executor(*_strand, boost::bind(&Controller::handle_send, this,
-					packet,
-					boost::asio::placeholders::error,
-					boost::asio::placeholders::bytes_transferred)));
-		}
+		if (!node) return;
+
+		auto packet = msg.get_from_root<Data_Packet>();
+		if (!packet) return;
+
+		_socket->async_send_to(
+			boost::asio::buffer(packet->_data.get(), packet->_size), node->endpoint(),
+			boost::asio::bind_executor(*_strand, boost::bind(&Controller::handle_send, this,
+				packet->get_ptr(),
+				boost::asio::placeholders::error,
+				boost::asio::placeholders::bytes_transferred)));
 	}
 
-	void handle_send(std::shared_ptr<Node_Data_Packet>& packet, const boost::system::error_code &err, const std::size_t &bytes_transferred)
+	void handle_send(std::shared_ptr<Data_Packet>& packet, const boost::system::error_code &err, const std::size_t &bytes_transferred)
 	{
 		if (err.value() != 0)
 			emit_event(Event_Type::ERROR, Event::SEND_ERROR, nullptr, { err.category().name(), err.message() });
@@ -146,7 +147,8 @@ protected:
 	void process_message(Message_Context& msg_context, std::size_t size)
 	{
 		std::shared_ptr<Node_Handler> node = get_node(msg_context._remote_endpoint);
-		Abstract_Handler::node_process(*node, msg_context._recv_buffer.data(), size);
+		auto msg = std::make_shared<Data_Packet>(msg_context._recv_buffer.data(), size);
+		Abstract_Handler::node_process(*node, *msg);
 	}
 
 	virtual void close_node(Node_Handler& raw_node) override
