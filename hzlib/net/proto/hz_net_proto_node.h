@@ -437,7 +437,7 @@ private:
 
 			msg.data_device_->seek(0);
 
-			if (flags & ANSWER)
+			if (is_answer)
 				process_answer(answer_id, cmd, *msg._data_device);
 			else
 				process_message(msg_id, cmd, *msg.data_device_);
