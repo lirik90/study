@@ -373,8 +373,6 @@ private:
 		std::shared_ptr<Message_Item> msg = pop_waiting_fragment(fragmanted_msg_id);
 		if (msg && msg->data_device_ && pos < msg->data_device_->size())
 		{
-			qCDebug(DetailLog).noquote() << title() << "Process fragment query msg" << fragmanted_msg_id << "full" << msg->data_device_->size() << "pos" << pos << "size" << fragmanted_size;
-	
 			msg->set_fragment_size(fragmanted_size);
 			msg->data_device_->seek(pos);
 			send_message(std::move(msg));
@@ -384,7 +382,6 @@ private:
 			if (msg && msg->answer_func_)
 				add_to_waiting(msg->end_time_, msg);
 	
-			qCDebug(DetailLog).noquote() << title() << "Send remove unknown fragment" << fragmanted_msg_id;
 			send(Cmd::REMOVE_FRAGMENT) << fragmanted_msg_id;
 		}
 	}
@@ -515,8 +512,6 @@ private:
 	
 						if (writer_ptr)
 							writer_ptr->add_timeout_at(now + std::chrono::milliseconds(1505), reinterpret_cast<void*>(value));
-	
-						qCDebug(DetailLog).noquote() << title() << "Send fragment query msg" << msg.id_ << "part" << next_part;
 					}
 				}
 				return;
@@ -537,13 +532,8 @@ private:
 				msg->set_flags(msg->flags() | REPEATED, Message_Item::Only_Protocol());
 				send_message(std::move(msg));
 			}
-			else
-			{
-				qCDebug(DetailLog).noquote() << title() << "Message timeout. msg" << msg->id_.value_or(0);
-	
-				if (msg->timeout_func_)
-					msg->timeout_func_();
-			}
+			else if (msg->timeout_func_)
+				msg->timeout_func_();
 		}
 	}
 	
