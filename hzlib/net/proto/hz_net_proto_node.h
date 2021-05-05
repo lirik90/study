@@ -18,6 +18,8 @@
 #include "hz_net_defs.h"
 #include "hz_net_abstract_node_handler.h"
 #include "hz_net_proto_controller_handler.h"
+#include "hz_net_proto_fragmented_message.h"
+#include "hz_net_proto_message_item.h"
 
 namespace hz {
 namespace Net {
@@ -113,8 +115,6 @@ namespace Cmd {
 } // namespace Cmd
 
 class asd {};
-class Message_Item {};
-class Fragmented_Message {};
 
 using Time_Point = std::chrono::system_clock::time_point;
 
@@ -363,26 +363,26 @@ private:
 			send_answer(Cmd::PING, msg_id);
 	}
 
-	void process_fragment_remove(uint8_t fragment_id)
+	void process_fragment_remove(uint8_t msg_id)
 	{
-		_fragmented_messages.erase(fragment_id);
+		_fragmented_messages.erase(msg_id);
 	}
 
-	void process_fragment_query(uint8_t fragmanted_msg_id, uint32_t pos, uint32_t fragmanted_size)
+	void process_fragment_query(uint8_t msg_id, uint32_t pos, uint32_t fragmanted_size)
 	{
-		std::shared_ptr<Message_Item> msg = pop_waiting_fragment(fragmanted_msg_id);
-		if (msg && msg->data_device_ && pos < msg->data_device_->size())
+		std::shared_ptr<Message_Item> msg = pop_waiting_message(msg_id);
+		if (msg && !msg->_data.empty())
 		{
 			msg->set_fragment_size(fragmanted_size);
-			msg->data_device_->seek(pos);
+			msg->_pos = pos;
 			send_message(std::move(msg));
 		}
 		else
 		{
-			if (msg && msg->answer_func_)
-				add_to_waiting(msg->end_time_, msg);
+			if (msg && msg->_answer_func)
+				add_to_waiting(msg->_end_time, msg);
 	
-			send(Cmd::REMOVE_FRAGMENT) << fragmanted_msg_id;
+			send(Cmd::REMOVE_FRAGMENT) << msg_id;
 		}
 	}
 
@@ -409,17 +409,10 @@ private:
 			if (max_fragment_size == 0 || max_fragment_size > HZ_MAX_PACKET_DATA_SIZE)
 				max_fragment_size = HZ_MAX_MESSAGE_DATA_SIZE;
 
-			Fragmented_Message msg{msg_id, cmd, max_fragment_size, full_size};
+			Fragmented_Message msg{cmd, max_fragment_size, full_size};
 			it = _fragmented_messages.emplace(msg_id, std::move(msg)).first;
 		}
 		Fragmented_Message &msg = it->second;
-
-		if (!msg.data_device_->open(QIODevice::ReadWrite))
-		{
-			std::string err = msg.data_device_->errorString();
-			_fragmented_messages.erase(it);
-			throw std::runtime_error("Failed open tempriorary device: " + err);
-		}
 
 		if (!ds.atEnd())
 		{
@@ -428,37 +421,35 @@ private:
 		}
 
 		auto msg_out = send(cmd);
-		msg_out.msg_.set_flags(msg_out.msg_.flags() | FRAGMENT_QUERY, Message_Item::Only_Protocol());
+		msg_out._msg.set_flags(msg_out._msg.flags() | FRAGMENT_QUERY, Message_Item::Only_Protocol());
 		msg_out << msg_id;
 
 		if (msg.is_parts_empty())
 		{
-			msg_out << full_size << msg.max_fragment_size_;
+			msg_out << full_size << msg._max_fragment_size;
 
-			msg.data_device_->seek(0);
+			std::vector<uint8_t> msg_data = msg.get_data();
 
 			if (is_answer)
-				process_answer(answer_id, cmd, *msg._data_device);
+				process_answer(answer_id, cmd, msg_data);
 			else
-				process_message(msg_id, cmd, *msg.data_device_);
+				process_message(msg_id, cmd, msg_data);
 
 			_fragmented_messages.erase(it);
 		}
 		else
 		{
-			msg.data_device_->close();
-
 			Time_Point now = std::chrono::system_clock::now();
 			auto emp_it = _lost_msg_list.emplace(msg_id, now);
 			if (!emp_it.second)
 				emp_it.first->second = now;
-			msg.last_part_time_ = now;
+			msg._last_part_time = now;
 
-			if (msg.max_fragment_size_ < HZ_MAX_MESSAGE_DATA_SIZE)
+			if (msg._max_fragment_size < HZ_MAX_MESSAGE_DATA_SIZE)
 			{
-				msg.max_fragment_size_ += msg.max_fragment_size_ / 5;
-				if (msg.max_fragment_size_ > HZ_MAX_MESSAGE_DATA_SIZE)
-					msg.max_fragment_size_ = HZ_MAX_MESSAGE_DATA_SIZE;
+				msg._max_fragment_size += msg._max_fragment_size / 5;
+				if (msg._max_fragment_size > HZ_MAX_MESSAGE_DATA_SIZE)
+					msg._max_fragment_size = HZ_MAX_MESSAGE_DATA_SIZE;
 			}
 
 			const std::pair<uint32_t, uint32_t> next_part = msg.get_next_part();
@@ -471,11 +462,11 @@ private:
 
 	void process_answer(uint8_t answer_id, uint8_t cmd, std::shared_ptr<asd> data)
 	{
-		std::shared_ptr<Message_Item> msg = pop_waiting_answer(answer_id, cmd);
-		if (msg && msg->answer_func_)
+		std::shared_ptr<Message_Item> msg = pop_waiting_message(answer_id, cmd);
+		if (msg && msg->_answer_func)
 		{
-			msg->answer_func_(data->data(), data->remained());
-			msg->answer_func_ = nullptr;
+			msg->_answer_func(data->data(), data->remained());
+			msg->_answer_func = nullptr;
 		}
 		else
 			process_answer_message(answer_id, cmd, std::move(data));
@@ -490,24 +481,25 @@ private:
 			{
 				Time_Point now = std::chrono::system_clock::now();
 	
-				for (auto& it: fragmented_messages_)
+				for (auto& it: _fragmented_messages)
 				{
 					Fragmented_Message& msg = it.second;
 					if (!msg.is_parts_empty()
-						&& now - msg.last_part_time_ >= std::chrono::milliseconds(1500))
+						&& now - msg._last_part_time >= std::chrono::milliseconds(1500))
 					{
-						msg.max_fragment_size_ /= 2;
-						if (msg.max_fragment_size_ < 128)
-							msg.max_fragment_size_ = 128;
+						uint8_t msg_id = it.first;
+						msg._max_fragment_size /= 2;
+						if (msg._max_fragment_size < 128)
+							msg._max_fragment_size = 128;
 	
-						_lost_msg_list.emplace(msg.id_, now);
-						msg.last_part_time_ = now;
+						_lost_msg_list.emplace(msg_id, now);
+						msg._last_part_time = now;
 	
 						const std::pair<uint32_t, uint32_t> next_part = msg.get_next_part();
 	
-						auto msg_out = send(msg.cmd_);
-						msg_out.msg_.set_flags(msg_out.msg_.flags() | FRAGMENT_QUERY, Message_Item::Only_Protocol());
-						msg_out << msg.id_ << next_part;
+						auto msg_out = send(msg._cmd);
+						msg_out._msg.set_flags(msg_out._msg.flags() | FRAGMENT_QUERY, Message_Item::Only_Protocol());
+						msg_out << msg_id << next_part;
 	
 						_ctrl->add_timeout_at(this, now + std::chrono::milliseconds(1505), reinterpret_cast<void*>(value));
 					}
@@ -524,21 +516,21 @@ private:
 			if (!msg)
 				continue;
 	
-			if (msg->end_time_ > now && msg->data_device_)
+			if (msg->_end_time > now/* && msg->_data_device*/)
 			{
 				msg->set_fragment_size(msg->fragment_size() / 2);
-				msg->set_flags(msg->flags() | REPEATED, Message_Item::Only_Protocol());
+				msg->set_flags(msg->flags() | REPEATED, Message_Item::Only_Protocol{});
 				send_message(std::move(msg));
 			}
-			else if (msg->timeout_func_)
-				msg->timeout_func_();
+			else if (msg->_timeout_func)
+				msg->_timeout_func();
 		}
 	}
 	
 	void add_to_waiting(Time_Point time_point, std::shared_ptr<Message_Item> message)
 	{
-		uint8_t msg_id = message->id_.value_or(0);
-		pop_waiting_message([msg_id](const Message_Item &item) { return item.id_.value_or(0) == msg_id; });
+		uint8_t msg_id = message->_id.value_or(0);
+		pop_waiting_message(msg_id);
 	
 		_waiting_messages.emplace(std::move(time_point), std::move(message));
 	}
@@ -558,28 +550,16 @@ private:
 		}
 		return messages;
 	}
-	
-	std::shared_ptr<Message_Item> pop_waiting_answer(uint8_t answer_id, uint8_t cmd)
-	{
-		return pop_waiting_message([answer_id, cmd](const Message_Item &item){ return item.id_.value_or(0) == answer_id && item.cmd() == cmd; });
-	}
-	
-	std::shared_ptr<Message_Item> pop_waiting_fragment(uint8_t fragmanted_msg_id)
-	{
-		return pop_waiting_message([fragmanted_msg_id](const Message_Item &item){ return item.id_.value_or(0) == fragmanted_msg_id; });
-	}
-	
-	std::shared_ptr<Message_Item> pop_waiting_message(std::function<bool (const Message_Item &)> check_func)
+
+	std::shared_ptr<Message_Item> pop_waiting_message(uint8_t msg_id, uint8_t cmd = 0)
 	{
 		for (auto it = _waiting_messages.begin(); it != _waiting_messages.end(); ++it)
-		{
-			if (check_func(*it->second))
+			if (it->second->_id.value_or(0) == msg_id && (cmd == 0 || cmd == it->second->cmd()))
 			{
 				std::shared_ptr<Message_Item> msg = std::move(it->second);
 				_waiting_messages.erase(it);
 				return msg;
 			}
-		}
 		return {};
 	}
 
