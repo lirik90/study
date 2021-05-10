@@ -60,7 +60,7 @@ protected:
 		if (!packet) return;
 
 		_socket->async_send_to(
-			boost::asio::buffer(packet->_data.get(), packet->_size), node->endpoint(),
+			boost::asio::buffer(packet->_data.data(), packet->_data.size()), node->endpoint(),
 			boost::asio::bind_executor(*_strand, boost::bind(&Controller::handle_send, this,
 				packet->get_ptr(),
 				boost::asio::placeholders::error,
@@ -71,9 +71,9 @@ protected:
 	{
 		if (err.value() != 0)
 			emit_event(Event_Type::ERROR, Event::SEND_ERROR, nullptr, { err.category().name(), err.message() });
-		else if (packet->_size != bytes_transferred)
+		else if (packet->_data.size() != bytes_transferred)
 			emit_event(Event_Type::ERROR, Event::SEND_ERROR_WRONG_SIZE, nullptr,
-					{ std::to_string(packet->_size), std::to_string(bytes_transferred) });
+					{ std::to_string(packet->_data.size()), std::to_string(bytes_transferred) });
 	}
 
 	void start_receive(std::shared_ptr<Message_Context> msg_context)

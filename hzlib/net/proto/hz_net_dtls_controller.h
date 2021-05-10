@@ -48,7 +48,7 @@ protected:
 
 			try {
 				std::lock_guard lock(_mutex);
-				node->send(data->_data.get(), data->_size);
+				node->send(data->_data.data(), data->_data.size());
 			}
 			catch (const std::exception& e) {
 				emit_event(Event_Type::ERROR, Event::TRANSMITED_DATA_ERROR, packet->_node.get(), { e.what() });
@@ -68,7 +68,7 @@ protected:
 		if (!data) return;
 
 		try {
-			if (add_data_to_channel(node, data->_data.get(), data->_size))
+			if (add_data_to_channel(node, data->_data.data(), data->_data.size()))
 				Abstract_Handler::node_connected(raw_node); // now mutex is unlocked
 		} catch (const std::exception& e) {
 			emit_event(Event_Type::ERROR, Event::RECEIVED_DATA_ERROR, &raw_node, { e.what() });

@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include <cstring>
+#include <memory>
 #include <stdexcept>
 #include <vector>
 #include <queue>
@@ -24,8 +25,38 @@
 #include "hz_net_proto_message_item.h"
 
 namespace hz {
+
+class Data_Stream
+{
+public:
+	Data_Stream(std::vector<uint8_t>& data) :
+		_data{data} {}
+
+private:
+	std::vector<uint8_t>& _data;
+};
+
+template<typename T>
+Data_Stream& operator<< (Data_Stream& ds, T elem)
+{
+	return ds;
+}
+
 namespace Net {
 namespace Proto {
+
+static std::vector<uint8_t> asd_vect;
+class Asd : public Data_Stream
+{
+public:
+	Asd() : Data_Stream{asd_vect} {}
+
+	template<typename T>
+	Data_Stream& operator<< (T elem)
+	{
+		return *this << elem;
+	}
+};
 
 std::vector<uint8_t> compress(const uint8_t* data, std::size_t size, int level = -1)
 {
@@ -274,7 +305,7 @@ private:
 						apply_parse(data_s, &Node::process_fragment, this, msg_id, cmd, &data_s, std::move(msg_data), /*is_answer*/false, /*answer_id*/0);
 				}
 				else if (flags & ANSWER)
-					apply_parse(data_s, &Node::process_answer, this, cmd, &data_s, std::move(msg_data));
+					apply_parse(data_s, &Node::process_answer, this, msg_id, cmd, &data_s, std::move(msg_data));
 			}
 			else
 				process_message(msg_id, cmd, std::move(msg_data));
@@ -362,7 +393,7 @@ private:
 	void process_ping(uint8_t msg_id, uint8_t flags)
 	{
 		if ((flags & ANSWER) == 0)
-			send_answer(Cmd::PING, msg_id);
+			send(Cmd::PING, msg_id);
 	}
 
 	void process_fragment_remove(uint8_t msg_id)
@@ -402,12 +433,12 @@ private:
 		{
 			if (_fragmented_messages.end() != it)
 				_fragmented_messages.erase(it);
-			throw std::runtime_error("try to receive too big message: " + std::to_string(full_size) + " max: " + std::to_string(HZ_PROTOCOL_MAX_MESSAGE_SIZE);
+			throw std::runtime_error("try to receive too big message: " + std::to_string(full_size) + " max: " + std::to_string(HZ_PROTOCOL_MAX_MESSAGE_SIZE));
 		}
 
 		if (it == _fragmented_messages.end())
 		{
-			uint32_t max_fragment_size = full_size == pos ? Helpz::parse<uint32_t>(ds) : 0;
+			uint32_t max_fragment_size = full_size == pos ? hz::parse<uint32_t>(ds) : 0;
 
 			if (max_fragment_size == 0 || max_fragment_size > HZ_MAX_PACKET_DATA_SIZE)
 				max_fragment_size = HZ_MAX_MESSAGE_DATA_SIZE;
@@ -420,7 +451,7 @@ private:
 		if (!ds.atEnd())
 		{
 			uint32_t data_pos = static_cast<uint32_t>(ds.device()->pos());
-			msg.add_data(pos, data->_data.get() + data_pos, data->_size - data_pos);
+			msg.add_data(pos, data->_data.data() + data_pos, data->_data.size() - data_pos);
 		}
 
 		auto msg_out = send(cmd);
@@ -434,7 +465,7 @@ private:
 			std::shared_ptr<Data_Packet> msg_data = std::make_shared<Data_Packet>(msg.get_data());
 
 			if (is_answer)
-				process_answer(answer_id, cmd, std::move(msg_data));
+				process_answer(answer_id, msg_id, cmd, ds, std::move(msg_data));
 			else
 				process_message(msg_id, cmd, std::move(msg_data));
 
@@ -459,20 +490,21 @@ private:
 			msg_out << next_part;
 
 			intptr_t value = FRAGMENT;
-			_ctrl->add_timeout_at(this, now + std::chrono::milliseconds(1505), reinterpret_cast<void*>(value));
+			_ctrl->add_timeout_at(*this, now + std::chrono::milliseconds(1505), reinterpret_cast<void*>(value));
 		}
 	}
 
-	void process_answer(uint8_t answer_id, uint8_t cmd, Data_Stream* ds, std::shared_ptr<Data_Packet> data)
+	void process_answer(uint8_t answer_id, uint8_t msg_id, uint8_t cmd, Data_Stream* ds, std::shared_ptr<Data_Packet> data)
 	{
 		std::shared_ptr<Message_Item> msg = pop_waiting_message(answer_id, cmd);
-		if (msg && msg->_answer_func)
-		{
-			msg->_answer_func(data->data(), data->remained());
-			msg->_answer_func = nullptr;
-		}
-		else
-			process_answer_message(answer_id, cmd, std::move(data));
+		// if (msg && msg->_answer_func)
+		// {
+		// 	msg->_answer_func(data->data(), data->remained());
+		// 	msg->_answer_func = nullptr;
+		// }
+
+		data->set_next_handler(std::move(msg));
+		process_message(msg_id, cmd, std::move(data));
 	}
 
 	void process_wait_list(void *data)
@@ -504,7 +536,7 @@ private:
 						msg_out._msg.set_flags(msg_out._msg.flags() | FRAGMENT_QUERY, Message_Item::Only_Protocol());
 						msg_out << msg_id << next_part;
 	
-						_ctrl->add_timeout_at(this, now + std::chrono::milliseconds(1505), reinterpret_cast<void*>(value));
+						_ctrl->add_timeout_at(*this, now + std::chrono::milliseconds(1505), reinterpret_cast<void*>(value));
 					}
 				}
 				return;
@@ -563,6 +595,16 @@ private:
 				_waiting_messages.erase(it);
 				return msg;
 			}
+		return {};
+	}
+
+	void process_message(uint8_t msg_id, uint8_t cmd, std::shared_ptr<Data_Packet> data)
+	{
+		// TODO: send to next proto
+	}
+
+	Asd send(uint8_t cmd, const std::optional<uint8_t>& answer_id = {})
+	{
 		return {};
 	}
 

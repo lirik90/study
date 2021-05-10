@@ -34,7 +34,7 @@ public:
 
 			try {
 				std::lock_guard lock(_mutex);
-				node->send(data->_data.get(), data->_size);
+				node->send(data->_data.data(), data->_data.size());
 			}
 			catch (const std::exception& e) {
 				emit_event(Event_Type::ERROR, Event::TRANSMITED_DATA_ERROR, packet->_node.get(), { e.what() });
@@ -53,7 +53,7 @@ public:
 
 		try {
 			std::lock_guard lock(_mutex);
-			node->push_received_data(data->_data.get(), data->_size);
+			node->push_received_data(data->_data.data(), data->_data.size());
 		} catch (const std::exception& e) {
 			emit_event(Event_Type::ERROR, Event::RECEIVED_DATA_ERROR, &raw_node, { e.what() });
 		}
@@ -73,6 +73,10 @@ private:
 	void lost_msg_detected(uint8_t msg_id, uint8_t expected) override
 	{
 		std::cout << "Lost " << (int)msg_id << ' ' << (int)expected << "\n";
+	}
+
+	void add_timeout_at(Node_Handler& node, std::chrono::system_clock::time_point tp, void* data) override
+	{
 	}
 
 	std::mutex _mutex;

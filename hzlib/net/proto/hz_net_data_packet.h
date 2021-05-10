@@ -15,7 +15,7 @@ struct Data_Packet final : Message_Handler_T<Data_Packet>
 		_data{std::move(data)} {}
 
 	Data_Packet(const std::vector<uint8_t>& data) :
-		Data_Packet{data.data(), data.size()} {}
+		_data{data} {}
 
 	Data_Packet(const uint8_t* data, std::size_t size)
 	{
