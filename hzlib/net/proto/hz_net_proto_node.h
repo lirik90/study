@@ -11,11 +11,13 @@
 #include <map>
 #include <chrono>
 #include <functional>
+#include <optional>
 
 #include <zconf.h>
 #include <zlib.h>
 
 #include "hz_net_defs.h"
+#include "hz_net_data_packet.h"
 #include "hz_net_abstract_node_handler.h"
 #include "hz_net_proto_controller_handler.h"
 #include "hz_net_proto_fragmented_message.h"
@@ -113,8 +115,6 @@ namespace Cmd {
 		USER_COMMAND = 16
 	};
 } // namespace Cmd
-
-class asd {};
 
 using Time_Point = std::chrono::system_clock::time_point;
 
@@ -261,21 +261,23 @@ private:
 			apply_parse(data, size, &Node::process_fragment_query, this);
 		else
 		{
-			std::shared_ptr<asd> normalized_data = process_compressed_flag(flags, data, size);
+			std::shared_ptr<Data_Packet> msg_data = process_compressed_flag(flags, data, size);
+			if (flags & (FRAGMENT | ANSWER))
+			{
+				Data_Stream data_s{msg_data->_data};
 
-			if (flags & FRAGMENT)
-			{
-				if (flags & ANSWER)
-					apply_parse(*normalized_data, size, &Node::process_fragment_answer, this, msg_id, cmd, normalized_data);
-				else
-					apply_parse(*normalized_data, size, &Node::process_fragment, this, msg_id, cmd, normalized_data, /*is_answer*/false, /*answer_id*/0);
+				if (flags & FRAGMENT)
+				{
+					if (flags & ANSWER)
+						apply_parse(data_s, &Node::process_fragment_answer, this, msg_id, cmd, &data_s, std::move(msg_data));
+					else
+						apply_parse(data_s, &Node::process_fragment, this, msg_id, cmd, &data_s, std::move(msg_data), /*is_answer*/false, /*answer_id*/0);
+				}
+				else if (flags & ANSWER)
+					apply_parse(data_s, &Node::process_answer, this, cmd, &data_s, std::move(msg_data));
 			}
-			else if (flags & ANSWER)
-				apply_parse(*normalized_data, size, &Node::process_answer, this, cmd, normalized_data);
 			else
-			{
-				process_message(msg_id, cmd, std::move(normalized_data));
-			}
+				process_message(msg_id, cmd, std::move(msg_data));
 		}
 	}
 
@@ -346,15 +348,15 @@ private:
 			_lost_msg_list.emplace(_next_rx_msg_id++, now);
 	}
 
-	std::shared_ptr<asd> process_compressed_flag(uint8_t flags, const uint8_t* data, std::size_t size)
+	std::shared_ptr<Data_Packet> process_compressed_flag(uint8_t flags, const uint8_t* data, std::size_t size)
 	{
 		if (flags & COMPRESSED)
 		{
 			std::vector<uint8_t> norm = decompress(data, size);
-			return std::make_shared<asd>(norm);
+			return std::make_shared<Data_Packet>(std::move(norm));
 		}
 
-		return std::make_shared<asd>(data, size);
+		return std::make_shared<Data_Packet>(data, size);
 	}
 
 	void process_ping(uint8_t msg_id, uint8_t flags)
@@ -386,12 +388,13 @@ private:
 		}
 	}
 
-	void process_fragment_answer(uint8_t answer_id, uint8_t msg_id, uint8_t cmd, std::shared_ptr<asd> data)
+	void process_fragment_answer(uint8_t answer_id, uint8_t msg_id, uint8_t cmd, Data_Stream* ds, std::shared_ptr<Data_Packet> data)
 	{
-		apply_parse(*data, &Node::process_fragment, this, msg_id, cmd, data, true, answer_id);
+		// TODO: data -> data_stream or ptr and size without parsed data
+		apply_parse(*ds, &Node::process_fragment, this, msg_id, cmd, ds, std::move(data), true, answer_id);
 	}
 
-	void process_fragment(uint32_t full_size, uint32_t pos, uint8_t msg_id, uint8_t cmd, std::shared_ptr<asd> data, bool is_answer, uint8_t answer_id)
+	void process_fragment(uint32_t full_size, uint32_t pos, uint8_t msg_id, uint8_t cmd, Data_Stream* ds, std::shared_ptr<Data_Packet> data, bool is_answer, uint8_t answer_id)
 	{
 		std::map<uint8_t, Fragmented_Message>::iterator it = _fragmented_messages.find(msg_id);
 
@@ -417,7 +420,7 @@ private:
 		if (!ds.atEnd())
 		{
 			uint32_t data_pos = static_cast<uint32_t>(ds.device()->pos());
-			msg.add_data(pos, data.constData() + data_pos, data.size() - data_pos);
+			msg.add_data(pos, data->_data.get() + data_pos, data->_size - data_pos);
 		}
 
 		auto msg_out = send(cmd);
@@ -428,12 +431,12 @@ private:
 		{
 			msg_out << full_size << msg._max_fragment_size;
 
-			std::vector<uint8_t> msg_data = msg.get_data();
+			std::shared_ptr<Data_Packet> msg_data = std::make_shared<Data_Packet>(msg.get_data());
 
 			if (is_answer)
-				process_answer(answer_id, cmd, msg_data);
+				process_answer(answer_id, cmd, std::move(msg_data));
 			else
-				process_message(msg_id, cmd, msg_data);
+				process_message(msg_id, cmd, std::move(msg_data));
 
 			_fragmented_messages.erase(it);
 		}
@@ -460,7 +463,7 @@ private:
 		}
 	}
 
-	void process_answer(uint8_t answer_id, uint8_t cmd, std::shared_ptr<asd> data)
+	void process_answer(uint8_t answer_id, uint8_t cmd, Data_Stream* ds, std::shared_ptr<Data_Packet> data)
 	{
 		std::shared_ptr<Message_Item> msg = pop_waiting_message(answer_id, cmd);
 		if (msg && msg->_answer_func)

@@ -2,6 +2,7 @@
 #define HZ_NET_DATA_PACKET_H
 
 #include <cstring>
+#include <vector>
 
 #include "hz_net_abstract_message_handler.h"
 
@@ -10,18 +11,23 @@ namespace Net {
 
 struct Data_Packet final : Message_Handler_T<Data_Packet>
 {
-	Data_Packet(const uint8_t* data, std::size_t size) :
-		_data{new uint8_t[size]}, _size{size}
+	Data_Packet(std::vector<uint8_t>&& data) :
+		_data{std::move(data)} {}
+
+	Data_Packet(const std::vector<uint8_t>& data) :
+		Data_Packet{data.data(), data.size()} {}
+
+	Data_Packet(const uint8_t* data, std::size_t size)
 	{
-		memcpy(_data.get(), data, size);
+		_data.resize(size);
+		memcpy(_data.data(), data, size);
 	}
 	Data_Packet(Data_Packet&&) = default;
 	Data_Packet& operator=(Data_Packet&&) = default;
 	Data_Packet(const Data_Packet&) = delete;
 	Data_Packet& operator=(const Data_Packet&) = delete;
 
-	std::unique_ptr<uint8_t[]> _data;
-	std::size_t _size;
+	std::vector<uint8_t> _data;
 };
 
 } // namespace Net
