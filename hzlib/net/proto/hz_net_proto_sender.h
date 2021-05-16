@@ -9,6 +9,10 @@ namespace Proto {
 
 class Sender : public Data_Stream
 {
+public:
+
+	template<typename T>
+	Data_Stream& operator <<(const T& item) { return static_cast<Data_Stream&>(*this) << item; }
 };
 
 } // namespace Proto

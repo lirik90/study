@@ -23,24 +23,9 @@
 #include "hz_net_proto_controller_handler.h"
 #include "hz_net_proto_fragmented_message.h"
 #include "hz_net_proto_message_item.h"
+#include "hz_net_proto_sender.h"
 
 namespace hz {
-
-class Data_Stream
-{
-public:
-	Data_Stream(std::vector<uint8_t>& data) :
-		_data{data} {}
-
-private:
-	std::vector<uint8_t>& _data;
-};
-
-template<typename T>
-Data_Stream& operator<< (Data_Stream& ds, T elem)
-{
-	return ds;
-}
 
 namespace Net {
 namespace Proto {
