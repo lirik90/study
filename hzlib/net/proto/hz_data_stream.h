@@ -42,7 +42,7 @@ private:
 
 // TODO: check is not pointer
 template<typename T,
-	typename = std::enable_if<std::is_trivially_copy_constructible<T>::value>::type>
+	typename = typename std::enable_if<std::is_trivially_copy_constructible<T>::value>::type>
 Data_Stream& operator<< (Data_Stream& ds, T elem)
 {
 	ds.write(reinterpret_cast<void*>(&elem), sizeof(T));

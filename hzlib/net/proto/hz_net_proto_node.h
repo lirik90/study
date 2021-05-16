@@ -30,19 +30,6 @@ namespace hz {
 namespace Net {
 namespace Proto {
 
-static std::vector<uint8_t> asd_vect;
-class Asd : public Data_Stream
-{
-public:
-	Asd() : Data_Stream{asd_vect} {}
-
-	template<typename T>
-	Data_Stream& operator<< (T elem)
-	{
-		return *this << elem;
-	}
-};
-
 std::vector<uint8_t> compress(const uint8_t* data, std::size_t size, int level = -1)
 {
 	if (level < -1 || level > 9)
@@ -588,9 +575,13 @@ private:
 		// TODO: send to next proto
 	}
 
-	Asd send(uint8_t cmd, const std::optional<uint8_t>& answer_id = {})
+	Sender send(uint8_t cmd, const std::optional<uint8_t>& answer_id = {})
 	{
 		return {};
+	}
+
+	void send(std::shared_ptr<Message_Item> msg)
+	{
 	}
 
 	enum Flags {
