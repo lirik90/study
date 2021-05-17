@@ -1,6 +1,13 @@
 #ifndef HZ_DATA_STREAM_H
 #define HZ_DATA_STREAM_H
 
+// TODO:
+// get byte swap https://en.cppreference.com/w/cpp/language/fold
+
+#if __cplusplus > 201703L
+#include <bit>
+#endif
+
 #include <cstring>
 #include <vector>
 
@@ -43,9 +50,21 @@ private:
 // TODO: check is not pointer
 template<typename T,
 	typename = typename std::enable_if<std::is_trivially_copy_constructible<T>::value>::type>
-Data_Stream& operator<< (Data_Stream& ds, T elem)
+Data_Stream& operator<< (Data_Stream& ds, const T& elem)
 {
-	ds.write(reinterpret_cast<void*>(&elem), sizeof(T));
+	if constexpr (std::endian::native == std::endian::big)
+	{
+	}
+
+	ds.write(reinterpret_cast<uint8_t*>(&elem), sizeof(T));
+	return ds;
+}
+
+template<typename T,
+	typename = typename std::enable_if<std::is_trivially_copy_constructible<T>::value>::type>
+Data_Stream& operator>> (Data_Stream& ds, T& elem)
+{
+	ds.read(reinterpret_cast<uint8_t*>(&elem), sizeof(T));
 	return ds;
 }
 

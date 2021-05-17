@@ -380,7 +380,7 @@ private:
 		{
 			msg->set_fragment_size(fragmanted_size);
 			msg->_pos = pos;
-			send_message(std::move(msg));
+			send(std::move(msg));
 		}
 		else
 		{
@@ -410,7 +410,9 @@ private:
 
 		if (it == _fragmented_messages.end())
 		{
-			uint32_t max_fragment_size = full_size == pos ? hz::parse<uint32_t>(ds) : 0;
+			uint32_t max_fragment_size = 0;
+			if (full_size == pos)
+				*ds >> max_fragment_size;
 
 			if (max_fragment_size == 0 || max_fragment_size > HZ_MAX_PACKET_DATA_SIZE)
 				max_fragment_size = HZ_MAX_MESSAGE_DATA_SIZE;
@@ -527,7 +529,7 @@ private:
 			{
 				msg->set_fragment_size(msg->fragment_size() / 2);
 				msg->set_flags(msg->flags() | REPEATED, Message_Item::Only_Protocol{});
-				send_message(std::move(msg));
+				send(std::move(msg));
 			}
 			else if (msg->_timeout_func)
 				msg->_timeout_func();
