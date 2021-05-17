@@ -29,12 +29,12 @@ public:
 			auto node = packet->_node->get<Node>();
 			if (!node) return;
 
-			auto data = packet->_msg->get_from_root<Data_Packet>();
-			if (!data) return;
+			auto msg = packet->_msg->get_from_root<Message_Item>();
+			if (!msg) return;
 
 			try {
 				std::lock_guard lock(_mutex);
-				node->send(data->_data.data(), data->_data.size());
+				node->send(*msg);
 			}
 			catch (const std::exception& e) {
 				emit_event(Event_Type::ERROR, Event::TRANSMITED_DATA_ERROR, packet->_node.get(), { e.what() });
@@ -60,6 +60,8 @@ public:
 	}
 
 private:
+	Handler& handler() override { return *this; }
+
 	void record_received(Node_Handler& node, Message_Handler& msg) override
 	{
 		Abstract_Handler::node_process(node, msg);

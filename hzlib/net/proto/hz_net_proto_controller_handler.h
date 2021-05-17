@@ -1,8 +1,9 @@
 #ifndef HZ_NET_PROTO_CONTROLLER_HANDLER_H
 #define HZ_NET_PROTO_CONTROLLER_HANDLER_H
 
-#include "hz_net_node_controller_handler.h"
 #include <chrono>
+
+#include "hz_net_node_controller_handler.h"
 
 namespace hz {
 namespace Net {

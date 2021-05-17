@@ -1,23 +1,26 @@
 #ifndef HZ_NET_PROTO_MESSAGE_ITEM_H
 #define HZ_NET_PROTO_MESSAGE_ITEM_H
 
+#include <memory>
 #include <chrono>
+#include <functional>
 
 #include "hz_net_defs.h"
+#include "hz_net_abstract_message_handler.h"
 
 namespace hz {
+
+class Data_Device;
+
 namespace Net {
 namespace Proto {
 
-struct Message_Item
+struct Message_Item : Message_Handler_T<Message_Item>
 {
-	Message_Item() :
-		_pos{0}, _cmd(0), _flags(0), _fragment_size(HZ_MAX_MESSAGE_DATA_SIZE), _min_compress_size(512) {}
+	Message_Item() = default;
 
-	Message_Item(uint8_t command, std::optional<uint8_t> answer_id, std::vector<uint8_t> &&data,
-				std::chrono::milliseconds resend_timeout = std::chrono::milliseconds{3000}) :
-		_answer_id{std::move(answer_id)}, _resend_timeout(resend_timeout),
-		_data{std::move(data)}, _pos{0}, _cmd(command), _flags(0), _fragment_size(HZ_MAX_MESSAGE_DATA_SIZE), _min_compress_size(512) {}
+	Message_Item(uint8_t cmd) : _cmd{cmd} {}
+	Message_Item(uint8_t cmd, uint8_t answer_id) : _answer_id{answer_id}, _cmd{cmd} {}
 
 	virtual ~Message_Item()
 	{
@@ -34,11 +37,10 @@ struct Message_Item
 	Message_Item& operator =(const Message_Item&) = delete;
 
 	std::optional<uint8_t> _id, _answer_id;
-	std::chrono::milliseconds _resend_timeout;
+	std::chrono::milliseconds _resend_timeout = std::chrono::milliseconds{3000};
 	std::chrono::time_point<std::chrono::system_clock> _begin_time, _end_time;
-	uint32_t _pos;
-	std::vector<uint8_t> _data;
-	std::function<void(std::vector<uint8_t>&)> _answer_func;
+	std::shared_ptr<Data_Device> _data;
+	std::function<void(Data_Device&)> _answer_func;
 	std::function<void()> _timeout_func;
 	std::function<void(bool)> _finally_func;
 
@@ -64,8 +66,9 @@ struct Message_Item
 	void set_min_compress_size(uint32_t min_compress_size) { _min_compress_size = min_compress_size; }
 
 private:
-	uint8_t _cmd, _flags;
-	uint32_t _fragment_size, _min_compress_size;
+	uint8_t _cmd = 0, _flags = 0;
+	uint32_t _fragment_size = HZ_MAX_MESSAGE_DATA_SIZE;
+	uint32_t _min_compress_size = 512;
 };
 
 } // namespace Proto

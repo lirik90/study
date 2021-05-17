@@ -165,6 +165,23 @@ public:
 	Node(Controller_Handler* ctrl) :
 		_ctrl{ctrl} {}
 
+	Sender send(uint8_t cmd) { return {*this, cmd}; }
+	Sender send(uint8_t cmd, uint8_t answer_id) { return {*this, cmd, answer_id}; }
+
+protected:
+	void send(Message_Handler& msg) override
+	{
+		_ctrl->send_node_data(*this, msg);
+	}
+
+	void send(std::shared_ptr<Message_Item> msg)
+	{
+		std::vector<uint8_t> data = prepare_packet_to_send(*msg);
+
+		auto msg = std::make_shared<Data_Packet>(std::move(data));
+		_ctrl->emit_data(*this, *msg);
+	}
+
 	void push_received_data(const uint8_t* data, std::size_t size)
 	{
 		if (_device._data.empty())
@@ -201,10 +218,7 @@ public:
 		_device.erase_data(_device.pos(data));
 	}
 
-	void send(const uint8_t* data, std::size_t size)
-	{
-		// _channel->send(data, size);
-	}
+	friend class Controller_Handler;
 
 private:
 	bool process_stream(const uint8_t*& data, std::size_t& size)
@@ -325,15 +339,15 @@ private:
 	void fill_lost_msg(uint8_t msg_id)
 	{
 		const Time_Point now = std::chrono::system_clock::now();
-	
+
 		const Time_Point max_tp = now - std::chrono::seconds(10);
 		const uint32_t min_id = std::numeric_limits<uint8_t>::max() + static_cast<uint8_t>(msg_id - 100);
 		const uint32_t max_id = std::numeric_limits<uint8_t>::max() + msg_id;
-	
+
 		for (auto it = _lost_msg_list.begin(); it != _lost_msg_list.end(); )
 		{
 			const uint32_t tmp_id = std::numeric_limits<uint8_t>::max() + it->first;
-	
+
 			if (max_tp > it->second
 				|| (min_id > tmp_id && tmp_id > max_id))
 			{
@@ -343,10 +357,10 @@ private:
 			else
 				++it;
 		}
-	
+
 		if (msg_id > (_next_rx_msg_id + 100))
 			_next_rx_msg_id = static_cast<uint8_t>(msg_id - 100);
-	
+
 		while (msg_id != _next_rx_msg_id)
 			_lost_msg_list.emplace(_next_rx_msg_id++, now);
 	}
@@ -386,7 +400,7 @@ private:
 		{
 			if (msg && msg->_answer_func)
 				add_to_waiting(msg->_end_time, msg);
-	
+
 			send(Cmd::REMOVE_FRAGMENT) << msg_id;
 		}
 	}
@@ -422,9 +436,9 @@ private:
 		}
 		Fragmented_Message &msg = it->second;
 
-		if (!ds.atEnd())
+		if (!ds->at_end())
 		{
-			uint32_t data_pos = static_cast<uint32_t>(ds.device()->pos());
+			uint32_t data_pos = static_cast<uint32_t>(ds->pos());
 			msg.add_data(pos, data->_data.data() + data_pos, data->_data.size() - data_pos);
 		}
 
@@ -473,8 +487,8 @@ private:
 		std::shared_ptr<Message_Item> msg = pop_waiting_message(answer_id, cmd);
 		// if (msg && msg->_answer_func)
 		// {
-		// 	msg->_answer_func(data->data(), data->remained());
-		// 	msg->_answer_func = nullptr;
+		//	msg->_answer_func(data->data(), data->remained());
+		//	msg->_answer_func = nullptr;
 		// }
 
 		data->set_next_handler(std::move(msg));
@@ -489,7 +503,7 @@ private:
 			if (value == FRAGMENT)
 			{
 				Time_Point now = std::chrono::system_clock::now();
-	
+
 				for (auto& it: _fragmented_messages)
 				{
 					Fragmented_Message& msg = it.second;
@@ -500,31 +514,31 @@ private:
 						msg._max_fragment_size /= 2;
 						if (msg._max_fragment_size < 128)
 							msg._max_fragment_size = 128;
-	
+
 						_lost_msg_list.emplace(msg_id, now);
 						msg._last_part_time = now;
-	
+
 						const std::pair<uint32_t, uint32_t> next_part = msg.get_next_part();
-	
+
 						auto msg_out = send(msg._cmd);
 						msg_out._msg.set_flags(msg_out._msg.flags() | FRAGMENT_QUERY, Message_Item::Only_Protocol());
 						msg_out << msg_id << next_part;
-	
+
 						_ctrl->add_timeout_at(*this, now + std::chrono::milliseconds(1505), reinterpret_cast<void*>(value));
 					}
 				}
 				return;
 			}
 		}
-	
+
 		std::vector<std::shared_ptr<Message_Item>> messages = pop_waiting_messages();
-	
+
 		Time_Point now = std::chrono::system_clock::now();
 		for (std::shared_ptr<Message_Item>& msg: messages)
 		{
 			if (!msg)
 				continue;
-	
+
 			if (msg->_end_time > now/* && msg->_data_device*/)
 			{
 				msg->set_fragment_size(msg->fragment_size() / 2);
@@ -535,25 +549,25 @@ private:
 				msg->_timeout_func();
 		}
 	}
-	
+
 	void add_to_waiting(Time_Point time_point, std::shared_ptr<Message_Item> message)
 	{
 		uint8_t msg_id = message->_id.value_or(0);
 		pop_waiting_message(msg_id);
-	
+
 		_waiting_messages.emplace(std::move(time_point), std::move(message));
 	}
-	
+
 	std::vector<std::shared_ptr<Message_Item>> pop_waiting_messages()
 	{
 		std::vector<std::shared_ptr<Message_Item>> messages;
-	
+
 		Time_Point now = std::chrono::system_clock::now() + std::chrono::milliseconds(20);
 		for (auto it = _waiting_messages.begin(); it != _waiting_messages.end(); )
 		{
 			if (it->first > now)
 				break;
-	
+
 			messages.push_back(std::move(it->second));
 			it = _waiting_messages.erase(it);
 		}
@@ -577,13 +591,85 @@ private:
 		// TODO: send to next proto
 	}
 
-	Sender send(uint8_t cmd, const std::optional<uint8_t>& answer_id = {})
+	std::vector<uint8_t> prepare_packet_to_send(Message_Item& msg)
 	{
-		return {};
+		if (!msg._dev)
+			return {};
+
+		Time_Point tt = msg._end_time;
+
+		std::vector<uint8_t> packet, data;
+		uint8_t flags = msg.flags();
+
+		if (msg._answer_id || msg._dev->size() > msg.fragment_size())
+		{
+			Data_Stream ds{std::make_shared<Byte_Array_Device>(data)};
+
+			if (msg._answer_id)
+			{
+				flags |= ANSWER;
+				ds << *msg._answer_id;
+			}
+
+			if (msg._data_device->size() > msg.fragment_size())
+			{
+				flags |= FRAGMENT;
+				ds << static_cast<uint32_t>(msg._data_device->size());
+				ds << static_cast<uint32_t>(msg._data_device->pos());
+
+				if (msg._dev->at_end())
+					ds << msg.fragment_size();
+				else
+					add_raw_data_to_packet(data, msg._dev->pos(), msg.fragment_size(), msg._dev.get());
+
+				msg._end_time = std::chrono::system_clock::now() + std::chrono::seconds(10);
+			}
+			else
+				add_raw_data_to_packet(data, 0, msg.fragment_size(), msg._dev.get());
+		}
+		else
+			add_raw_data_to_packet(data, 0, msg.fragment_size(), msg._dev.get());
+
+		if (static_cast<uint32_t>(data.size()) > msg.min_compress_size())
+		{
+			flags |= COMPRESSED;
+			data = compress(data.data(), data.size());
+		}
+
+		if (!msg._id)
+			msg._id = _next_tx_msg_id++;
+
+		Data_Stream ds(std::make_shared<Byte_Array_Device>(packet));
+		ds << uint16_t(0) << *msg._id << msg.cmd() << flags << data;
+
+		ds->seek(0);
+		ds << get_checksum(packet.data() + 2, 7);
+
+		Time_Point now = std::chrono::system_clock::now();
+		_last_msg_send_time = now;
+
+		if (msg._end_time > now)
+		{
+			// Если время до повторной посылки меньше чем до таймаута, то используем его
+			Time_Point time_point = msg._resend_timeout < (msg._end_time - now) ?
+						now + msg._resend_timeout :
+						msg._end_time;
+
+			int msg_cmd = msg.cmd();
+			add_to_waiting(time_point, msg.get_ptr());
+			_ctrl->add_timeout_at(*this, std::move(time_point));
+		}
+
+		return packet;
 	}
 
-	void send(std::shared_ptr<Message_Item> msg)
+	void add_raw_data_to_packet(std::vector<uint8_t>& data, uint32_t pos, uint32_t max_data_size, Data_Device* device)
 	{
+		uint32_t raw_size = std::min<uint32_t>(max_data_size, static_cast<uint32_t>(device->size() - pos));
+		uint32_t header_pos = data.size();
+		data.resize(header_pos + raw_size);
+		device->seek(pos);
+		device->read(data.data() + header_pos, raw_size);
 	}
 
 	enum Flags {
