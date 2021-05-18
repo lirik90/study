@@ -21,7 +21,8 @@ public:
 private:
 	void node_connected(hz::Net::Node_Handler& node) override
 	{
-		send_node_data(node, reinterpret_cast<const uint8_t*>("Hello"), 5);
+		auto data = std::make_shared<hz::Net::Data_Packet>(reinterpret_cast<const uint8_t*>("Hello"), 5);
+		send_node_data(node, *data);
 	}
 };
 

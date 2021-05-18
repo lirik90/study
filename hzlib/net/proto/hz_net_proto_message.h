@@ -1,7 +1,11 @@
 #ifndef HZ_NET_PROTO_MESSAGE_H
 #define HZ_NET_PROTO_MESSAGE_H
 
+#include <memory>
+#include <vector>
+
 #include "hz_net_abstract_message_handler.h"
+#include "hz_data_device.h"
 
 namespace hz {
 namespace Net {
@@ -9,10 +13,11 @@ namespace Proto {
 
 struct Message final : Message_Handler_T<Message>
 {
-	Message(uint8_t msg_id, uint8_t cmd) :
-		_msg_id{msg_id}, _cmd{cmd} {}
+	Message(uint8_t msg_id, uint8_t cmd, std::shared_ptr<Data_Device> data) :
+		_msg_id{msg_id}, _cmd{cmd}, _data{std::move(data)} {}
 
 	uint8_t _msg_id, _cmd;
+	std::shared_ptr<Data_Device> _data;
 };
 
 } // namespace Proto

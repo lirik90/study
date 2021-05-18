@@ -2,7 +2,9 @@
 #define HZ_NET_PROTO_FRAGMENTED_MESSAGE_H
 
 #include <cstdio>
+#include <cstring>
 #include <chrono>
+#include <vector>
 
 // #include "hz_data_device.h"
 

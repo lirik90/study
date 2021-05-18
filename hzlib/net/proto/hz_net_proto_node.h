@@ -23,6 +23,7 @@
 #include "hz_net_proto_controller_handler.h"
 #include "hz_net_proto_fragmented_message.h"
 #include "hz_net_proto_message_item.h"
+#include "hz_net_proto_message.h"
 #include "hz_net_proto_sender.h"
 
 namespace hz {
@@ -171,15 +172,15 @@ public:
 protected:
 	void send(Message_Handler& msg) override
 	{
-		_ctrl->send_node_data(*this, msg);
+		_ctrl->handler().send_node_data(*this, msg);
 	}
 
 	void send(std::shared_ptr<Message_Item> msg)
 	{
 		std::vector<uint8_t> data = prepare_packet_to_send(*msg);
 
-		auto msg = std::make_shared<Data_Packet>(std::move(data));
-		_ctrl->emit_data(*this, *msg);
+		auto packet = std::make_shared<Data_Packet>(std::move(data));
+		_ctrl->emit_data(*this, *packet);
 	}
 
 	void push_received_data(const uint8_t* data, std::size_t size)
@@ -218,7 +219,7 @@ protected:
 		_device.erase_data(_device.pos(data));
 	}
 
-	friend class Controller_Handler;
+	friend class Controller;
 
 private:
 	bool process_stream(const uint8_t*& data, std::size_t& size)
@@ -278,31 +279,31 @@ private:
 			apply_parse(data, size, &Node::process_fragment_query, this);
 		else
 		{
-			std::shared_ptr<Data_Packet> msg_data = process_compressed_flag(flags, data, size);
+			std::vector<uint8_t> msg_data = process_compressed_flag(flags, data, size);
 			if (flags & (FRAGMENT | ANSWER))
 			{
-				Data_Stream data_s{msg_data->_data};
+				Data_Stream data_s{std::make_shared<Byte_Array_Device>(msg_data)};
 
 				if (flags & FRAGMENT)
 				{
 					if (flags & ANSWER)
-						apply_parse(data_s, &Node::process_fragment_answer, this, msg_id, cmd, &data_s, std::move(msg_data));
+						apply_parse(data_s, &Node::process_fragment_answer, this, msg_id, cmd, &data_s, std::ref(msg_data));
 					else
-						apply_parse(data_s, &Node::process_fragment, this, msg_id, cmd, &data_s, std::move(msg_data), /*is_answer*/false, /*answer_id*/0);
+						apply_parse(data_s, &Node::process_fragment, this, msg_id, cmd, &data_s, std::ref(msg_data), /*is_answer*/false, /*answer_id*/0);
 				}
 				else if (flags & ANSWER)
-					apply_parse(data_s, &Node::process_answer, this, msg_id, cmd, &data_s, std::move(msg_data));
+					apply_parse(data_s, &Node::process_answer, this, msg_id, cmd, &data_s, std::ref(msg_data));
 			}
 			else
-				process_message(msg_id, cmd, std::move(msg_data));
+				process_message(msg_id, cmd, msg_data);
 		}
 	}
 
 	bool process_msg_id(uint8_t msg_id, uint8_t flags)
 	{
 		if (flags & REPEATED
-			|| (msg_id < _next_rx_msg_id
-				&& (_next_rx_msg_id - msg_id) < 100))
+			|| (msg_id < _next_msg_id._rx
+				&& (_next_msg_id._rx - msg_id) < 100))
 		{
 			// Если не потерян и повторный, отбрасываем.
 			if (!erase_lost(msg_id) && flags & REPEATED)
@@ -310,15 +311,15 @@ private:
 		}
 		else
 		{
-			if (msg_id > _next_rx_msg_id
-				|| (_next_rx_msg_id - msg_id) > 100)
+			if (msg_id > _next_msg_id._rx
+				|| (_next_msg_id._rx - msg_id) > 100)
 			{
-				_ctrl->lost_msg_detected(msg_id, _next_rx_msg_id);
+				_ctrl->lost_msg_detected(msg_id, _next_msg_id._rx);
 				fill_lost_msg(msg_id);
 			}
 
-			if ((msg_id + 1) >= (_next_rx_msg_id + 1))
-				_next_rx_msg_id = static_cast<uint8_t>(msg_id + 1);
+			if ((msg_id + 1) >= (_next_msg_id._rx + 1))
+				_next_msg_id._rx = static_cast<uint8_t>(msg_id + 1);
 		}
 
 		return true;
@@ -358,22 +359,21 @@ private:
 				++it;
 		}
 
-		if (msg_id > (_next_rx_msg_id + 100))
-			_next_rx_msg_id = static_cast<uint8_t>(msg_id - 100);
+		if (msg_id > (_next_msg_id._rx + 100))
+			_next_msg_id._rx = static_cast<uint8_t>(msg_id - 100);
 
-		while (msg_id != _next_rx_msg_id)
-			_lost_msg_list.emplace(_next_rx_msg_id++, now);
+		while (msg_id != _next_msg_id._rx)
+			_lost_msg_list.emplace(_next_msg_id._rx++, now);
 	}
 
-	std::shared_ptr<Data_Packet> process_compressed_flag(uint8_t flags, const uint8_t* data, std::size_t size)
+	std::vector<uint8_t> process_compressed_flag(uint8_t flags, const uint8_t* data, std::size_t size)
 	{
 		if (flags & COMPRESSED)
-		{
-			std::vector<uint8_t> norm = decompress(data, size);
-			return std::make_shared<Data_Packet>(std::move(norm));
-		}
+			return decompress(data, size);
 
-		return std::make_shared<Data_Packet>(data, size);
+		std::vector<uint8_t> packet{size};
+		memcpy(packet.data(), data, size);
+		return packet;
 	}
 
 	void process_ping(uint8_t msg_id, uint8_t flags)
@@ -390,16 +390,16 @@ private:
 	void process_fragment_query(uint8_t msg_id, uint32_t pos, uint32_t fragmanted_size)
 	{
 		std::shared_ptr<Message_Item> msg = pop_waiting_message(msg_id);
-		if (msg && !msg->_data.empty())
+		if (msg && pos < msg->_data->size())
 		{
 			msg->set_fragment_size(fragmanted_size);
-			msg->_pos = pos;
+			msg->_data->seek(pos);
 			send(std::move(msg));
 		}
 		else
 		{
 			if (msg && msg->_answer_func)
-				add_to_waiting(msg->_end_time, msg);
+				add_to_waiting(msg->_end_time, std::move(msg));
 
 			send(Cmd::REMOVE_FRAGMENT) << msg_id;
 		}
@@ -443,19 +443,19 @@ private:
 		}
 
 		auto msg_out = send(cmd);
-		msg_out._msg.set_flags(msg_out._msg.flags() | FRAGMENT_QUERY, Message_Item::Only_Protocol());
+		msg_out._msg->set_flags(msg_out._msg->flags() | FRAGMENT_QUERY, Message_Item::Only_Protocol());
 		msg_out << msg_id;
 
 		if (msg.is_parts_empty())
 		{
 			msg_out << full_size << msg._max_fragment_size;
 
-			std::shared_ptr<Data_Packet> msg_data = std::make_shared<Data_Packet>(msg.get_data());
+			std::vector<uint8_t> msg_data = msg.get_data();
 
 			if (is_answer)
-				process_answer(answer_id, msg_id, cmd, ds, std::move(msg_data));
+				process_answer(answer_id, msg_id, cmd, ds, msg_data);
 			else
-				process_message(msg_id, cmd, std::move(msg_data));
+				process_message(msg_id, cmd, msg_data);
 
 			_fragmented_messages.erase(it);
 		}
@@ -482,7 +482,7 @@ private:
 		}
 	}
 
-	void process_answer(uint8_t answer_id, uint8_t msg_id, uint8_t cmd, Data_Stream* ds, std::shared_ptr<Data_Packet> data)
+	void process_answer(uint8_t answer_id, uint8_t msg_id, uint8_t cmd, Data_Stream* ds, std::vector<uint8_t>& data)
 	{
 		std::shared_ptr<Message_Item> msg = pop_waiting_message(answer_id, cmd);
 		// if (msg && msg->_answer_func)
@@ -492,7 +492,7 @@ private:
 		// }
 
 		data->set_next_handler(std::move(msg));
-		process_message(msg_id, cmd, std::move(data));
+		process_message(msg_id, cmd, data);
 	}
 
 	void process_wait_list(void *data)
@@ -521,7 +521,7 @@ private:
 						const std::pair<uint32_t, uint32_t> next_part = msg.get_next_part();
 
 						auto msg_out = send(msg._cmd);
-						msg_out._msg.set_flags(msg_out._msg.flags() | FRAGMENT_QUERY, Message_Item::Only_Protocol());
+						msg_out._msg->set_flags(msg_out._msg->flags() | FRAGMENT_QUERY, Message_Item::Only_Protocol());
 						msg_out << msg_id << next_part;
 
 						_ctrl->add_timeout_at(*this, now + std::chrono::milliseconds(1505), reinterpret_cast<void*>(value));
@@ -586,14 +586,15 @@ private:
 		return {};
 	}
 
-	void process_message(uint8_t msg_id, uint8_t cmd, std::shared_ptr<Data_Packet> data)
+	void process_message(uint8_t msg_id, uint8_t cmd, std::vector<uint8_t>& data)
 	{
+		std::make_shared<Message>(msg_id, cmd, std::move(data));
 		// TODO: send to next proto
 	}
 
 	std::vector<uint8_t> prepare_packet_to_send(Message_Item& msg)
 	{
-		if (!msg._dev)
+		if (!msg._data)
 			return {};
 
 		Time_Point tt = msg._end_time;
@@ -601,7 +602,7 @@ private:
 		std::vector<uint8_t> packet, data;
 		uint8_t flags = msg.flags();
 
-		if (msg._answer_id || msg._dev->size() > msg.fragment_size())
+		if (msg._answer_id || msg._data->size() > msg.fragment_size())
 		{
 			Data_Stream ds{std::make_shared<Byte_Array_Device>(data)};
 
@@ -611,24 +612,24 @@ private:
 				ds << *msg._answer_id;
 			}
 
-			if (msg._data_device->size() > msg.fragment_size())
+			if (msg._data->size() > msg.fragment_size())
 			{
 				flags |= FRAGMENT;
-				ds << static_cast<uint32_t>(msg._data_device->size());
-				ds << static_cast<uint32_t>(msg._data_device->pos());
+				ds << static_cast<uint32_t>(msg._data->size());
+				ds << static_cast<uint32_t>(msg._data->pos());
 
-				if (msg._dev->at_end())
+				if (msg._data->at_end())
 					ds << msg.fragment_size();
 				else
-					add_raw_data_to_packet(data, msg._dev->pos(), msg.fragment_size(), msg._dev.get());
+					add_raw_data_to_packet(data, msg._data->pos(), msg.fragment_size(), msg._data.get());
 
 				msg._end_time = std::chrono::system_clock::now() + std::chrono::seconds(10);
 			}
 			else
-				add_raw_data_to_packet(data, 0, msg.fragment_size(), msg._dev.get());
+				add_raw_data_to_packet(data, 0, msg.fragment_size(), msg._data.get());
 		}
 		else
-			add_raw_data_to_packet(data, 0, msg.fragment_size(), msg._dev.get());
+			add_raw_data_to_packet(data, 0, msg.fragment_size(), msg._data.get());
 
 		if (static_cast<uint32_t>(data.size()) > msg.min_compress_size())
 		{
@@ -637,16 +638,15 @@ private:
 		}
 
 		if (!msg._id)
-			msg._id = _next_tx_msg_id++;
+			msg._id = _next_msg_id._tx++;
 
 		Data_Stream ds(std::make_shared<Byte_Array_Device>(packet));
 		ds << uint16_t(0) << *msg._id << msg.cmd() << flags << data;
 
-		ds->seek(0);
-		ds << get_checksum(packet.data() + 2, 7);
+		ds.seek(0);
+		ds << gen_checksum(packet.data() + 2, 7);
 
 		Time_Point now = std::chrono::system_clock::now();
-		_last_msg_send_time = now;
 
 		if (msg._end_time > now)
 		{
@@ -656,7 +656,7 @@ private:
 						msg._end_time;
 
 			int msg_cmd = msg.cmd();
-			add_to_waiting(time_point, msg.get_ptr());
+			add_to_waiting(time_point, msg.ptr());
 			_ctrl->add_timeout_at(*this, std::move(time_point));
 		}
 
@@ -719,7 +719,10 @@ private:
 		}
 	} _device;
 
-	uint8_t _next_rx_msg_id;
+	struct
+	{
+		uint8_t _rx = 0, _tx = 0;
+	} _next_msg_id;
 
 	std::map<Time_Point, std::shared_ptr<Message_Item>> _waiting_messages;
 	std::map<uint8_t, Time_Point> _lost_msg_list;

@@ -43,7 +43,7 @@ public:
 	template<typename T>
 	T* get_from_root()
 	{
-		T* p = get<T>();
+		T* p = this->template get<T>();
 		return p ? p : get_root()->template get<T>();
 	}
 };
@@ -53,6 +53,20 @@ class Base_Ptr_Handler : public Base_Handler<T>
 {
 public:
 	virtual std::shared_ptr<T> get_ptr() = 0;
+
+	template<typename U>
+	std::shared_ptr<U> find_ptr()
+	{
+		U* p = this->template get<U>();
+		return p ? std::static_pointer_cast<U>(p->get_ptr()) : nullptr;
+	}
+
+	template<typename U>
+	std::shared_ptr<U> find_ptr_from_root()
+	{
+		U* p = this->template get_from_root<U>();
+		return p ? std::static_pointer_cast<U>(p->get_ptr()) : nullptr;
+	}
 };
 
 } // namespace Net

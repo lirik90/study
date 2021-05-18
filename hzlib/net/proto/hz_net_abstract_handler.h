@@ -56,6 +56,16 @@ public:
 	// 		_prev->send_node_data(node, data, size);
 	// }
 
+	void async_prev_send_node_data(Node_Handler& raw_node, Message_Handler& raw_msg)
+	{
+		auto node = raw_node.get_root()->get_ptr();
+		auto msg = raw_msg.get_root()->get_ptr();
+		io()->post([this, node, msg]()
+		{
+			Abstract_Handler::send_node_data(*node, *msg);
+		});
+	}
+
 	virtual void send_node_data(Node_Handler& node, Message_Handler& msg) override
 	{
 		if (_prev)
@@ -80,6 +90,16 @@ public:
 	// 	if (_next)
 	// 		_next->node_process(node, data, size);
 	// }
+
+	void async_next_node_process(Node_Handler& raw_node, Message_Handler& raw_msg)
+	{
+		auto node = raw_node.get_root()->get_ptr();
+		auto msg = raw_msg.get_root()->get_ptr();
+		io()->post([this, node, msg]()
+		{
+			Abstract_Handler::node_process(*node, *msg);
+		});
+	}
 
 	virtual void node_process(Node_Handler& node, Message_Handler& msg) override
 	{

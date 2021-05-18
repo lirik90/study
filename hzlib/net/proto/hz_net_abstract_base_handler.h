@@ -77,6 +77,11 @@ public:
 	{
 		return std::enable_shared_from_this<T>::shared_from_this();
 	}
+
+	std::shared_ptr<T> ptr()
+	{
+		return std::enable_shared_from_this<T>::shared_from_this();
+	}
 };
 
 } // namespace Net

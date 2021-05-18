@@ -4,6 +4,8 @@
 #include <functional>
 
 #include "hz_data_stream.h"
+#include "hz_net_node_handler.h"
+#include "hz_net_proto_message_item.h"
 
 namespace hz {
 namespace Net {
@@ -34,7 +36,7 @@ public:
 	{
 		if (_node)
 		{
-			_msg->_dev->seek(_msg._data->size());
+			_msg->_data->seek(_msg->_data->size());
 			_node->send(*_msg);
 		}
 	}
@@ -46,8 +48,8 @@ public:
 		_node.reset();
 	}
 
-	void set_fragment_size(uint32_t fragment_size) { _msg.set_fragment_size(fragment_size); }
-	void set_min_compress_size(uint32_t min_compress_size) { _msg.set_min_compress_size(min_compress_size); }
+	void set_fragment_size(uint32_t fragment_size) { _msg->set_fragment_size(fragment_size); }
+	void set_min_compress_size(uint32_t min_compress_size) { _msg->set_min_compress_size(min_compress_size); }
 
 	void set_data_device(std::shared_ptr<Data_Device> dev, uint32_t fragment_size = HZ_MAX_MESSAGE_DATA_SIZE)
 	{
@@ -55,32 +57,32 @@ public:
 			return;
 
 		set_device(dev);
-		_msg.set_fragment_size(fragment_size);
-		_msg._data = std::move(dev);
+		_msg->set_fragment_size(fragment_size);
+		_msg->_data = std::move(dev);
 	}
 
 	Sender &answer(std::function<void(Data_Device &)> answer_func)
 	{
-		assert(!_msg._answer_id && "Attempt to wait answer to answer");
-		_msg._answer_func = std::move(answer_func);
+		assert(!_msg->_answer_id && "Attempt to wait answer to answer");
+		_msg->_answer_func = std::move(answer_func);
 		auto now = std::chrono::system_clock::now();
-		if (_msg._end_time < now)
-			_msg._end_time = now + std::chrono::seconds(10);
+		if (_msg->_end_time < now)
+			_msg->_end_time = now + std::chrono::seconds(10);
 		return *this;
 	}
 
 	Sender &timeout(std::function<void()> timeout_func, std::chrono::milliseconds timeout_duration,
 					std::chrono::milliseconds resend_timeout = std::chrono::milliseconds{3000})
 	{
-		_msg._timeout_func = std::move(timeout_func);
-		_msg._end_time = std::chrono::system_clock::now() + timeout_duration;
-		_msg._resend_timeout = resend_timeout;
+		_msg->_timeout_func = std::move(timeout_func);
+		_msg->_end_time = std::chrono::system_clock::now() + timeout_duration;
+		_msg->_resend_timeout = resend_timeout;
 		return *this;
 	}
 
 	Sender &finally(std::function<void(bool)> func)
 	{
-		_msg._finally_func = std::move(func);
+		_msg->_finally_func = std::move(func);
 		return *this;
 	}
 

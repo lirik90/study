@@ -35,23 +35,23 @@ public:
 
 protected:
 
-	void send_node_data(Node_Handler& node, Message_Handler& msg) override
+	void send_node_data(Node_Handler& raw_node, Message_Handler& raw_msg) override
 	{
-		auto packet = std::make_shared<Node_Data_Packet>(node.get_root()->get_ptr(), msg.get_root()->get_ptr());
-		io()->post([this, packet]()
+		auto node = raw_node.find_ptr_from_root<Dtls::Node>();
+		if (!node) return;
+
+		auto msg = raw_msg.find_ptr_from_root<Data_Packet>();
+		if (!msg) return;
+
+		io()->post([this, node, msg]()
 		{
-			auto node = packet->_node->get<Dtls::Node>();
-			if (!node) return;
-
-			auto data = packet->_msg->get_from_root<Data_Packet>();
-			if (!data) return;
-
 			try {
 				std::lock_guard lock(_mutex);
-				node->send(data->_data.data(), data->_data.size());
+				// if all ok this function call emit_data
+				node->send(msg->_data.data(), msg->_data.size());
 			}
 			catch (const std::exception& e) {
-				emit_event(Event_Type::ERROR, Event::TRANSMITED_DATA_ERROR, packet->_node.get(), { e.what() });
+				emit_event(Event_Type::ERROR, Event::TRANSMITED_DATA_ERROR, node.get(), { e.what() });
 			}
 		});
 	}
@@ -80,6 +80,7 @@ protected:
 		std::lock_guard lock(_mutex);
 		const bool connected = node->is_connected();
 
+		// if all ok this function call record_received
 		node->push_received_data(data, size);
 
 		return !connected && node->is_connected();
@@ -87,12 +88,14 @@ protected:
 
 	void record_received(Node_Handler& node, Message_Handler& msg) override
 	{
-		Abstract_Handler::node_process(node, msg);
+		// Now mutex still locking. Call async for unlock it.
+		async_next_node_process(node, msg);
 	}
 
 	void emit_data(Node_Handler& node, Message_Handler& msg) override
 	{
-		Abstract_Handler::send_node_data(*node.prev(), msg);
+		// Now mutex still locking. Call async for unlock it.
+		async_prev_send_node_data(node, msg);
 	}
 
 	void tls_alert(Node_Handler& node, Botan::TLS::Alert alert) override
@@ -130,6 +133,9 @@ protected:
 
 	Tools _tools;
 	std::mutex _mutex;
+
+private:
+	Handler& handler() override { return *this; }
 };
 
 } // namespace Dtls

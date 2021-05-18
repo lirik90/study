@@ -21,23 +21,22 @@ public:
 		Abstract_Handler::node_build(raw_node, std::move(payload));
 	}
 
-	void send_node_data(Node_Handler& node, Message_Handler& msg) override
+	void send_node_data(Node_Handler& raw_node, Message_Handler& raw_msg) override
 	{
-		auto packet = std::make_shared<Node_Data_Packet>(node.get_root()->get_ptr(), msg.get_root()->get_ptr());
-		io()->post([this, packet]()
+		auto node = raw_node.find_ptr_from_root<Node>();
+		if (!node) return;
+
+		auto msg = raw_msg.find_ptr_from_root<Message_Item>();
+		if (!msg) return;
+
+		io()->post([this, node, msg]()
 		{
-			auto node = packet->_node->get<Node>();
-			if (!node) return;
-
-			auto msg = packet->_msg->get_from_root<Message_Item>();
-			if (!msg) return;
-
 			try {
 				std::lock_guard lock(_mutex);
 				node->send(*msg);
 			}
 			catch (const std::exception& e) {
-				emit_event(Event_Type::ERROR, Event::TRANSMITED_DATA_ERROR, packet->_node.get(), { e.what() });
+				emit_event(Event_Type::ERROR, Event::TRANSMITED_DATA_ERROR, node.get(), { e.what() });
 			}
 		});
 	}
@@ -64,12 +63,14 @@ private:
 
 	void record_received(Node_Handler& node, Message_Handler& msg) override
 	{
-		Abstract_Handler::node_process(node, msg);
+		// Now mutex still locking. Call async for unlock it.
+		async_next_node_process(node, msg);
 	}
 
 	void emit_data(Node_Handler& node, Message_Handler& msg) override
 	{
-		Abstract_Handler::send_node_data(*node.prev(), msg);
+		// Now mutex still locking. Call async for unlock it.
+		async_prev_send_node_data(node, msg);
 	}
 
 	void lost_msg_detected(uint8_t msg_id, uint8_t expected) override

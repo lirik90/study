@@ -31,17 +31,19 @@ public:
 
 	void push_received_data(const uint8_t* data, std::size_t size)
 	{
+		// if all ok this function call tls_record_received
 		_channel->received_data(data, size);
 	}
 
 	void send(const uint8_t* data, std::size_t size)
 	{
+		// if all ok this function call tls_emit_data
 		_channel->send(data, size);
 	}
 
 	void send(Message_Handler& msg) override
 	{
-		_ctrl->send_node_data(*this, msg);
+		_ctrl->handler().send_node_data(*this, msg);
 	}
 
 private:

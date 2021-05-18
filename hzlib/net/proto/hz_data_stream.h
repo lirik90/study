@@ -1,12 +1,9 @@
 #ifndef HZ_DATA_STREAM_H
 #define HZ_DATA_STREAM_H
 
-#include <cstdint>
-#include <cstring>
-#include <climits>
-#include <utility>
-#include <type_traits>
-#include <vector>
+#include <memory>
+
+#include "hz_data_device.h"
 
 #if __cplusplus > 201703L
 #include <bit>
@@ -21,66 +18,6 @@
 #endif
 
 namespace hz {
-
-struct Device_Read_Past_End : std::runtime_error { using std::runtime_error::runtime_error; };
-
-class Data_Device
-{
-public:
-	virtual ~Data_Device() {}
-
-	virtual std::size_t pos() const = 0;
-	virtual std::size_t size() const = 0;
-	virtual void seek(std::size_t pos) = 0;
-	virtual void read(uint8_t* out, std::size_t size) = 0;
-	virtual void write(const uint8_t* data, std::size_t size) = 0;
-};
-
-class Byte_Array_Device : public Data_Device
-{
-public:
-	Byte_Array_Device() : _own{true}, _data{new std::vector<uint8_t>{}} {}
-	Byte_Array_Device(std::vector<uint8_t>& data) : _own{false}, _data{&data} {}
-	Byte_Array_Device(Byte_Array_Device&& o) : _own{std::move(o._own)}, _pos{std::move(o._pos)}, _data{std::move(o._data)}
-	{
-		o._own = false;
-	}
-
-	~Byte_Array_Device()
-	{
-		if (_own)
-			delete _data;
-	}
-
-	Byte_Array_Device(const Byte_Array_Device&) = delete;
-	Byte_Array_Device& operator=(const Byte_Array_Device&) = delete;
-
-	std::size_t pos() const override { return _pos; }
-	std::size_t size() const override { return _data->size(); }
-	void seek(std::size_t pos) override
-	{
-		_pos = pos >= 0 && pos < _data->size() ? _pos : _data->size();
-	}
-
-	void read(uint8_t* dest, std::size_t size) override
-	{
-		if (_pos + size > _data->size())
-			throw Device_Read_Past_End{"Hasn't enought data"};
-		std::memcpy(dest, _data->data() + _pos, size);
-		_pos += size;
-	}
-
-	void write(const uint8_t* data, std::size_t size) override
-	{
-		if (_data->size() < _pos + size)
-			_data->resize(_pos + size);
-		std::memcpy(_data->data() + _pos, data, size);
-	}
-private:
-	bool _own;
-	std::size_t _pos = 0;
-	std::vector<uint8_t>* _data;
-};
 
 class Data_Stream
 {
@@ -100,9 +37,9 @@ public:
 
 	std::size_t pos() const { return _dev->pos(); }
 	std::size_t size() const { return _dev->size(); }
-	std::size_t remained() const { return size() - pos(); }
+	std::size_t remained() const { return _dev->remained(); }
 
-	bool at_end() const { return _dev->pos() >= _dev->size(); }
+	bool at_end() const { return _dev->at_end(); }
 
 	void seek(std::size_t pos) { _dev->seek(pos); }
 	void read(uint8_t* dest, std::size_t size) { _dev->read(dest, size); }

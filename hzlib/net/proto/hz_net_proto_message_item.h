@@ -4,6 +4,7 @@
 #include <memory>
 #include <chrono>
 #include <functional>
+#include <optional>
 
 #include "hz_net_defs.h"
 #include "hz_net_abstract_message_handler.h"
