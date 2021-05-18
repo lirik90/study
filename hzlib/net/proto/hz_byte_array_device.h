@@ -14,6 +14,7 @@ class Byte_Array_Device : public Data_Device
 {
 public:
 	Byte_Array_Device() : _own{true}, _data{new std::vector<uint8_t>{}} {}
+	Byte_Array_Device(std::vector<uint8_t>&& data) : _own{true}, _data{new std::vector<uint8_t>(std::move(data))} {}
 	Byte_Array_Device(std::vector<uint8_t>& data) : _own{false}, _data{&data} {}
 	Byte_Array_Device(Byte_Array_Device&& o) : _own{std::move(o._own)}, _pos{std::move(o._pos)}, _data{std::move(o._data)}
 	{

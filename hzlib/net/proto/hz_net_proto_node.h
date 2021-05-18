@@ -279,20 +279,20 @@ private:
 			apply_parse(data, size, &Node::process_fragment_query, this);
 		else
 		{
-			std::vector<uint8_t> msg_data = process_compressed_flag(flags, data, size);
+			std::shared_ptr<Data_Device> msg_data = process_compressed_flag(flags, data, size);
 			if (flags & (FRAGMENT | ANSWER))
 			{
-				Data_Stream data_s{std::make_shared<Byte_Array_Device>(msg_data)};
+				Data_Stream data_s{msg_data};
 
 				if (flags & FRAGMENT)
 				{
 					if (flags & ANSWER)
-						apply_parse(data_s, &Node::process_fragment_answer, this, msg_id, cmd, &data_s, std::ref(msg_data));
+						apply_parse(data_s, &Node::process_fragment_answer, this, msg_id, cmd, &data_s, msg_data);
 					else
-						apply_parse(data_s, &Node::process_fragment, this, msg_id, cmd, &data_s, std::ref(msg_data), /*is_answer*/false, /*answer_id*/0);
+						apply_parse(data_s, &Node::process_fragment, this, msg_id, cmd, &data_s, msg_data, /*is_answer*/false, /*answer_id*/0);
 				}
 				else if (flags & ANSWER)
-					apply_parse(data_s, &Node::process_answer, this, msg_id, cmd, &data_s, std::ref(msg_data));
+					apply_parse(data_s, &Node::process_answer, this, msg_id, cmd, &data_s, msg_data);
 			}
 			else
 				process_message(msg_id, cmd, msg_data);
@@ -366,14 +366,14 @@ private:
 			_lost_msg_list.emplace(_next_msg_id._rx++, now);
 	}
 
-	std::vector<uint8_t> process_compressed_flag(uint8_t flags, const uint8_t* data, std::size_t size)
+	std::shared_ptr<Data_Device> process_compressed_flag(uint8_t flags, const uint8_t* data, std::size_t size)
 	{
 		if (flags & COMPRESSED)
-			return decompress(data, size);
+			return std::make_shared<Byte_Array_Device>(decompress(data, size));
 
-		std::vector<uint8_t> packet{size};
-		memcpy(packet.data(), data, size);
-		return packet;
+		auto dev = std::make_shared<Byte_Array_Device>();
+		dev->write(data, size);
+		return dev;
 	}
 
 	void process_ping(uint8_t msg_id, uint8_t flags)
@@ -405,13 +405,14 @@ private:
 		}
 	}
 
-	void process_fragment_answer(uint8_t answer_id, uint8_t msg_id, uint8_t cmd, Data_Stream* ds, std::shared_ptr<Data_Packet> data)
+	void process_fragment_answer(uint8_t answer_id, uint8_t msg_id, uint8_t cmd, Data_Stream* ds, std::shared_ptr<Data_Device> data)
 	{
 		// TODO: data -> data_stream or ptr and size without parsed data
 		apply_parse(*ds, &Node::process_fragment, this, msg_id, cmd, ds, std::move(data), true, answer_id);
 	}
 
-	void process_fragment(uint32_t full_size, uint32_t pos, uint8_t msg_id, uint8_t cmd, Data_Stream* ds, std::shared_ptr<Data_Packet> data, bool is_answer, uint8_t answer_id)
+	void process_fragment(uint32_t full_size, uint32_t pos, uint8_t msg_id, uint8_t cmd, Data_Stream* ds,
+			std::shared_ptr<Data_Device> data, bool is_answer, uint8_t answer_id)
 	{
 		std::map<uint8_t, Fragmented_Message>::iterator it = _fragmented_messages.find(msg_id);
 
@@ -586,10 +587,10 @@ private:
 		return {};
 	}
 
-	void process_message(uint8_t msg_id, uint8_t cmd, std::vector<uint8_t>& data)
+	void process_message(uint8_t msg_id, uint8_t cmd, std::shared_ptr<Data_Device> data)
 	{
-		std::make_shared<Message>(msg_id, cmd, std::move(data));
-		// TODO: send to next proto
+		auto msg = std::make_shared<Message>(msg_id, cmd, std::move(data));
+		_ctrl->emit_data(*this, *msg);
 	}
 
 	std::vector<uint8_t> prepare_packet_to_send(Message_Item& msg)

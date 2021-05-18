@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "hz_data_stream.h"
+#include "hz_byte_array_device.h"
 #include "hz_net_node_handler.h"
 #include "hz_net_proto_message_item.h"
 
