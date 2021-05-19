@@ -66,7 +66,7 @@ public:
 	{
 		assert(!_msg->_answer_id && "Attempt to wait answer to answer");
 		_msg->_answer_func = std::move(answer_func);
-		auto now = std::chrono::system_clock::now();
+		auto now = Clock::now();
 		if (_msg->_end_time < now)
 			_msg->_end_time = now + std::chrono::seconds(10);
 		return *this;
@@ -76,7 +76,7 @@ public:
 					std::chrono::milliseconds resend_timeout = std::chrono::milliseconds{3000})
 	{
 		_msg->_timeout_func = std::move(timeout_func);
-		_msg->_end_time = std::chrono::system_clock::now() + timeout_duration;
+		_msg->_end_time = Clock::now() + timeout_duration;
 		_msg->_resend_timeout = resend_timeout;
 		return *this;
 	}

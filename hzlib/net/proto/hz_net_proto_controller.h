@@ -3,6 +3,9 @@
 
 #include <thread>
 
+#include <boost/bind/bind.hpp>
+#include <boost/asio/placeholders.hpp>
+
 #include "hz_net_proto_event.h"
 #include "hz_net_proto_node.h"
 #include "hz_net_abstract_handler.h"
@@ -59,6 +62,11 @@ public:
 	}
 
 private:
+	virtual void init() override
+	{
+		_timer.reset(new boost::asio::steady_timer{*io()});
+	}
+
 	Handler& handler() override { return *this; }
 
 	void record_received(Node_Handler& node, Message_Handler& msg) override
@@ -78,9 +86,47 @@ private:
 		std::cout << "Lost " << (int)msg_id << ' ' << (int)expected << "\n";
 	}
 
-	void add_timeout_at(Node_Handler& node, std::chrono::system_clock::time_point tp, void* data) override
+	void add_timeout_at(Node_Handler& node, Time_Point tp, void* data) override
 	{
+		_waiter.emplace(tp, Timeout_Waiter{node.get<Node>()->ptr(), data});
+		if (tp < _timer->expiry())
+		{
+			_timer->cancel();
+			_timer->expires_at(tp);
+			_timer->async_wait(boost::bind(&Controller::waiter_timeout, this, boost::asio::placeholders::error));
+		}
 	}
+
+	void waiter_timeout(const boost::system::error_code& error)
+	{
+		if (!error)
+		{
+			std::lock_guard lock(_mutex);
+
+			auto now = Clock::now();
+			for (auto it = _waiter.begin(); it != _waiter.end();)
+			{
+				if (it->first <= now)
+				{
+					it->second._node->process_wait_list(it->second._data);
+					it = _waiter.erase(it);
+				}
+				else
+					++it;
+			}
+
+			_timer->async_wait(boost::bind(&Controller::waiter_timeout, this, boost::asio::placeholders::error));
+		}
+	}
+
+	struct Timeout_Waiter
+	{
+		std::shared_ptr<Node> _node;
+		void* _data;
+	};
+
+	std::multimap<Time_Point, Timeout_Waiter> _waiter;
+	std::unique_ptr<boost::asio::steady_timer> _timer;
 
 	std::mutex _mutex;
 };

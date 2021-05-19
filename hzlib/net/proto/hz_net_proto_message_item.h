@@ -39,7 +39,7 @@ struct Message_Item : Message_Handler_T<Message_Item>
 
 	std::optional<uint8_t> _id, _answer_id;
 	std::chrono::milliseconds _resend_timeout = std::chrono::milliseconds{3000};
-	std::chrono::time_point<std::chrono::system_clock> _begin_time, _end_time;
+	std::chrono::time_point<std::chrono::steady_clock> _begin_time, _end_time;
 	std::shared_ptr<Data_Device> _data;
 	std::function<void(Data_Device&)> _answer_func;
 	std::function<void()> _timeout_func;

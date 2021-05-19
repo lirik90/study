@@ -82,7 +82,7 @@ public:
 	uint8_t _cmd;
 	uint32_t _full_size, _max_fragment_size;
 
-	std::chrono::system_clock::time_point _last_part_time;
+	Time_Point _last_part_time;
 
 private:
 	void remove_from_part_vect(uint32_t new_part_start, uint32_t new_part_end)

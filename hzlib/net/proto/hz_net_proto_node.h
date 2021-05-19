@@ -120,8 +120,6 @@ namespace Cmd {
 	};
 } // namespace Cmd
 
-using Time_Point = std::chrono::system_clock::time_point;
-
 uint32_t read_uint16(const uint8_t* data)
 {
 	return	static_cast<uint16_t>(data[1]) << 8 |
@@ -217,6 +215,66 @@ protected:
 		// Отбрасываем удачно обработанные пакеты
 		_device.erase_end_pos(data - _device._data.data());
 		_device.erase_data(_device.pos(data));
+	}
+
+	void process_wait_list(void *data)
+	{
+		if (data)
+		{
+			intptr_t value = reinterpret_cast<intptr_t>(data);
+			if (value == FRAGMENT)
+			{
+				Time_Point now = Clock::now();
+
+				for (auto& it: _fragmented_messages)
+				{
+					Fragmented_Message& msg = it.second;
+					if (!msg.is_parts_empty()
+						&& now - msg._last_part_time >= std::chrono::milliseconds(1500))
+					{
+						uint8_t msg_id = it.first;
+						msg._max_fragment_size /= 2;
+						if (msg._max_fragment_size < 128)
+							msg._max_fragment_size = 128;
+
+						_lost_msg_list.emplace(msg_id, now);
+						msg._last_part_time = now;
+
+						const std::pair<uint32_t, uint32_t> next_part = msg.get_next_part();
+
+						auto msg_out = send(msg._cmd);
+						msg_out._msg->set_flags(msg_out._msg->flags() | FRAGMENT_QUERY, Message_Item::Only_Protocol());
+						msg_out << msg_id << next_part;
+
+						_ctrl->add_timeout_at(*this, now + std::chrono::milliseconds(1505), reinterpret_cast<void*>(value));
+					}
+				}
+				return;
+			}
+		}
+
+		std::vector<std::shared_ptr<Message_Item>> messages = pop_waiting_messages();
+
+		Time_Point now = Clock::now();
+		for (std::shared_ptr<Message_Item>& msg: messages)
+		{
+			if (!msg)
+				continue;
+
+			if (msg->_end_time > now && msg->_data)
+			{
+				msg->set_fragment_size(msg->fragment_size() / 2);
+				msg->set_flags(msg->flags() | REPEATED, Message_Item::Only_Protocol{});
+				send(std::move(msg));
+			}
+			else if (msg->_timeout_func)
+			{
+				// msg->_timeout_func();
+				auto new_msg = std::make_shared<Message>(msg->_id.value_or(0), msg->cmd(), Message::TIMEOUT, nullptr);
+				new_msg->set_next_handler(std::move(msg));
+				_ctrl->emit_data(*this, *new_msg);
+			}
+		}
 	}
 
 	friend class Controller;
@@ -334,12 +392,12 @@ private:
 		const Time_Point tp = it->second;
 		_lost_msg_list.erase(it);
 
-		return std::chrono::system_clock::now() - tp < std::chrono::seconds(10);
+		return Clock::now() - tp < std::chrono::seconds(10);
 	}
 
 	void fill_lost_msg(uint8_t msg_id)
 	{
-		const Time_Point now = std::chrono::system_clock::now();
+		const Time_Point now = Clock::now();
 
 		const Time_Point max_tp = now - std::chrono::seconds(10);
 		const uint32_t min_id = std::numeric_limits<uint8_t>::max() + static_cast<uint8_t>(msg_id - 100);
@@ -463,7 +521,7 @@ private:
 		}
 		else
 		{
-			Time_Point now = std::chrono::system_clock::now();
+			Time_Point now = Clock::now();
 			auto emp_it = _lost_msg_list.emplace(msg_id, now);
 			if (!emp_it.second)
 				emp_it.first->second = now;
@@ -498,66 +556,6 @@ private:
 		_ctrl->emit_data(*this, *msg);
 	}
 
-	void process_wait_list(void *data)
-	{
-		if (data)
-		{
-			intptr_t value = reinterpret_cast<intptr_t>(data);
-			if (value == FRAGMENT)
-			{
-				Time_Point now = std::chrono::system_clock::now();
-
-				for (auto& it: _fragmented_messages)
-				{
-					Fragmented_Message& msg = it.second;
-					if (!msg.is_parts_empty()
-						&& now - msg._last_part_time >= std::chrono::milliseconds(1500))
-					{
-						uint8_t msg_id = it.first;
-						msg._max_fragment_size /= 2;
-						if (msg._max_fragment_size < 128)
-							msg._max_fragment_size = 128;
-
-						_lost_msg_list.emplace(msg_id, now);
-						msg._last_part_time = now;
-
-						const std::pair<uint32_t, uint32_t> next_part = msg.get_next_part();
-
-						auto msg_out = send(msg._cmd);
-						msg_out._msg->set_flags(msg_out._msg->flags() | FRAGMENT_QUERY, Message_Item::Only_Protocol());
-						msg_out << msg_id << next_part;
-
-						_ctrl->add_timeout_at(*this, now + std::chrono::milliseconds(1505), reinterpret_cast<void*>(value));
-					}
-				}
-				return;
-			}
-		}
-
-		std::vector<std::shared_ptr<Message_Item>> messages = pop_waiting_messages();
-
-		Time_Point now = std::chrono::system_clock::now();
-		for (std::shared_ptr<Message_Item>& msg: messages)
-		{
-			if (!msg)
-				continue;
-
-			if (msg->_end_time > now/* && msg->_data_device*/)
-			{
-				msg->set_fragment_size(msg->fragment_size() / 2);
-				msg->set_flags(msg->flags() | REPEATED, Message_Item::Only_Protocol{});
-				send(std::move(msg));
-			}
-			else if (msg->_timeout_func)
-			{
-				// msg->_timeout_func();
-				auto new_msg = std::make_shared<Message>(msg->_id.value_or(0), msg->cmd(), Message::TIMEOUT, nullptr);
-				new_msg->set_next_handler(std::move(msg));
-				_ctrl->emit_data(*this, *new_msg);
-			}
-		}
-	}
-
 	void add_to_waiting(Time_Point time_point, std::shared_ptr<Message_Item> message)
 	{
 		uint8_t msg_id = message->_id.value_or(0);
@@ -570,7 +568,7 @@ private:
 	{
 		std::vector<std::shared_ptr<Message_Item>> messages;
 
-		Time_Point now = std::chrono::system_clock::now() + std::chrono::milliseconds(20);
+		Time_Point now = Clock::now() + std::chrono::milliseconds(20);
 		for (auto it = _waiting_messages.begin(); it != _waiting_messages.end(); )
 		{
 			if (it->first > now)
@@ -631,7 +629,7 @@ private:
 				else
 					add_raw_data_to_packet(data, msg._data->pos(), msg.fragment_size(), msg._data.get());
 
-				msg._end_time = std::chrono::system_clock::now() + std::chrono::seconds(10);
+				msg._end_time = Clock::now() + std::chrono::seconds(10);
 			}
 			else
 				add_raw_data_to_packet(data, 0, msg.fragment_size(), msg._data.get());
@@ -654,7 +652,7 @@ private:
 		ds.seek(0);
 		ds << gen_checksum(packet.data() + 2, 7);
 
-		Time_Point now = std::chrono::system_clock::now();
+		Time_Point now = Clock::now();
 
 		if (msg._end_time > now)
 		{
