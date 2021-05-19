@@ -13,6 +13,12 @@ public:
 	Abstract_Node_Handler(std::size_t type_hash) :
 		Abstract_Base_Handler<Node_Handler>{type_hash} {}
 	virtual ~Abstract_Node_Handler() {}
+
+	virtual void send(Message_Handler& msg) override
+	{
+		if (_next)
+			_next->send(msg);
+	}
 };
 
 template<typename T>

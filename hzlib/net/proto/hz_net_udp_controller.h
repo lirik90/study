@@ -62,12 +62,12 @@ protected:
 		_socket->async_send_to(
 			boost::asio::buffer(packet->_data.data(), packet->_data.size()), node->endpoint(),
 			boost::asio::bind_executor(*_strand, boost::bind(&Controller::handle_send, this,
-				packet->get_ptr(),
+				packet->ptr(),
 				boost::asio::placeholders::error,
 				boost::asio::placeholders::bytes_transferred)));
 	}
 
-	void handle_send(std::shared_ptr<Data_Packet>& packet, const boost::system::error_code &err, const std::size_t &bytes_transferred)
+	void handle_send(std::shared_ptr<Data_Packet> packet, const boost::system::error_code &err, const std::size_t &bytes_transferred)
 	{
 		if (err.value() != 0)
 			emit_event(Event_Type::ERROR, Event::SEND_ERROR, nullptr, { err.category().name(), err.message() });

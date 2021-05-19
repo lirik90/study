@@ -439,8 +439,9 @@ private:
 
 		if (!ds->at_end())
 		{
-			uint32_t data_pos = static_cast<uint32_t>(ds->pos());
-			msg.add_data(pos, data->_data.data() + data_pos, data->_data.size() - data_pos);
+			std::vector<uint8_t> part_data(ds->remained());
+			ds->read(part_data.data(), part_data.size());
+			msg.add_data(pos, part_data.data(), part_data.size());
 		}
 
 		auto msg_out = send(cmd);
@@ -451,12 +452,12 @@ private:
 		{
 			msg_out << full_size << msg._max_fragment_size;
 
-			std::vector<uint8_t> msg_data = msg.get_data();
+			std::shared_ptr<Data_Device> msg_data = msg.get_data();
 
 			if (is_answer)
-				process_answer(answer_id, msg_id, cmd, ds, msg_data);
+				process_answer(answer_id, msg_id, cmd, ds, std::move(msg_data));
 			else
-				process_message(msg_id, cmd, msg_data);
+				process_message(msg_id, cmd, std::move(msg_data));
 
 			_fragmented_messages.erase(it);
 		}
@@ -483,17 +484,18 @@ private:
 		}
 	}
 
-	void process_answer(uint8_t answer_id, uint8_t msg_id, uint8_t cmd, Data_Stream* ds, std::vector<uint8_t>& data)
+	void process_answer(uint8_t answer_id, uint8_t msg_id, uint8_t cmd, Data_Stream* ds, std::shared_ptr<Data_Device> data)
 	{
-		std::shared_ptr<Message_Item> msg = pop_waiting_message(answer_id, cmd);
+		std::shared_ptr<Message_Item> origin_msg = pop_waiting_message(answer_id, cmd);
 		// if (msg && msg->_answer_func)
 		// {
 		//	msg->_answer_func(data->data(), data->remained());
 		//	msg->_answer_func = nullptr;
 		// }
 
-		data->set_next_handler(std::move(msg));
-		process_message(msg_id, cmd, data);
+		auto msg = std::make_shared<Message>(msg_id, cmd, Message::ANSWER, std::move(data));
+		msg->set_next_handler(std::move(origin_msg));
+		_ctrl->emit_data(*this, *msg);
 	}
 
 	void process_wait_list(void *data)
@@ -547,7 +549,12 @@ private:
 				send(std::move(msg));
 			}
 			else if (msg->_timeout_func)
-				msg->_timeout_func();
+			{
+				// msg->_timeout_func();
+				auto new_msg = std::make_shared<Message>(msg->_id.value_or(0), msg->cmd(), Message::TIMEOUT, nullptr);
+				new_msg->set_next_handler(std::move(msg));
+				_ctrl->emit_data(*this, *new_msg);
+			}
 		}
 	}
 
@@ -589,7 +596,7 @@ private:
 
 	void process_message(uint8_t msg_id, uint8_t cmd, std::shared_ptr<Data_Device> data)
 	{
-		auto msg = std::make_shared<Message>(msg_id, cmd, std::move(data));
+		auto msg = std::make_shared<Message>(msg_id, cmd, Message::SIMPLE, std::move(data));
 		_ctrl->emit_data(*this, *msg);
 	}
 

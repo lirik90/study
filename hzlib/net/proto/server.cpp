@@ -31,10 +31,15 @@ class My_Proto final :
 {
 public:
 private:
-	void node_process(hz::Net::Node_Handler& node, const uint8_t* data, std::size_t size) override
+	void node_process(hz::Net::Node_Handler& node, hz::Net::Message_Handler& msg) override
 	{
-		emit_event(Event_Type::INFO, 1, &node, {"Client send: " + boost::algorithm::hex(std::string{reinterpret_cast<const char*>(data), size})});
-		send_node_data(node, data, size);
+		auto data = msg.get_from_root<hz::Net::Data_Packet>();
+		if (data)
+		{
+			std::string text{reinterpret_cast<const char*>(data->_data.data()), data->_data.size()};
+			emit_event(Event_Type::INFO, 1, &node, {"Client send: " + boost::algorithm::hex(text)});
+			send_node_data(node, msg);
+		}
 	}
 };
 

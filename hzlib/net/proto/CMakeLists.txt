@@ -44,6 +44,7 @@ set(DEP_LIBS
 	pthread
 	boost_thread
 	fmt
+	z
 	botan-2
 )
 

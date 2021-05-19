@@ -1,11 +1,12 @@
 #ifndef HZ_NET_PROTO_FRAGMENTED_MESSAGE_H
 #define HZ_NET_PROTO_FRAGMENTED_MESSAGE_H
 
-#include <cstdio>
 #include <cstring>
 #include <chrono>
 #include <vector>
 
+#include "hz_byte_array_device.h"
+#include "hz_file_device.h"
 // #include "hz_data_device.h"
 
 namespace hz {
@@ -22,24 +23,25 @@ public:
 	Fragmented_Message& operator =(const Fragmented_Message&) = delete;
 
 	Fragmented_Message(uint8_t cmd, uint32_t max_fragment_size, uint32_t full_size) :
-		_cmd(cmd), _full_size{full_size}, _max_fragment_size(max_fragment_size), _tmpf{nullptr}
+		_cmd(cmd), _full_size{full_size}, _max_fragment_size(max_fragment_size)
 	{
 		if (full_size > 1000000)
 		{
-			_tmpf = std::tmpfile();
-			if (!_tmpf)
-				_data.resize(full_size);
+			try {
+				_data = std::make_shared<File_Device>(File_Device::TMP{});
+
+				const uint8_t fill_data[4096] = {0};
+				for (std::size_t fill_size = 0; fill_size < full_size; fill_size += 4096)
+					_data->write(fill_data, std::min(4096ul, full_size - fill_size));
+			}
+			catch (...) {
+				_data = std::make_shared<Byte_Array_Device>(full_size);
+			}
 		}
 		else
-			_data.resize(full_size);
+			_data = std::make_shared<Byte_Array_Device>(full_size);
 	
 		_part_vect.push_back(std::pair<uint32_t,uint32_t>(0, full_size));
-	}
-
-	~Fragmented_Message()
-	{
-		if (_tmpf)
-			std::fclose(_tmpf);
 	}
 
 	// bool operator <(const Fragmented_Message &o) const { return _id < o._id; }
@@ -52,29 +54,13 @@ public:
 			return false;
 
 		remove_from_part_vect(pos, pos + len);
-	
-		if (_tmpf)
-		{
-			std::fseek(_tmpf, pos, SEEK_SET);
-			std::fwrite(data, sizeof(uint8_t), len, _tmpf);
-		}
-		else
-			memcpy(_data.data() + pos, data, len);
+
+		_data->seek(pos);
+		_data->write(data, len);
 		return true;
 	}
 
-	std::vector<uint8_t> get_data()
-	{
-		std::vector<uint8_t> data;
-		if (_tmpf)
-		{
-			data.resize(_full_size);
-			std::fread(data.data(), sizeof(uint8_t), _full_size, _tmpf);
-		}
-		else
-			data = std::move(_data);
-		return data;
-	}
+	std::shared_ptr<Data_Device> get_data() { return _data; }
 
 	bool is_parts_empty() const
 	{
@@ -200,8 +186,7 @@ private:
 		}
 	}
 
-	std::FILE* _tmpf;
-	std::vector<uint8_t> _data;
+	std::shared_ptr<Data_Device> _data;
 
 	std::vector<std::pair<uint32_t, uint32_t>> _part_vect;
 };
