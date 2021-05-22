@@ -2,6 +2,7 @@
 #define HZ_DATA_STREAM_H
 
 #include <memory>
+#include <variant>
 
 #include "hz_data_device.h"
 
@@ -23,31 +24,36 @@ class Data_Stream
 {
 public:
 	Data_Stream() = default;
+	Data_Stream(Data_Device& dev) : _dev{&dev} {}
 	Data_Stream(std::shared_ptr<Data_Device> dev) : _dev{std::move(dev)} {}
 	Data_Stream(Data_Stream&& o) : _dev{std::move(o._dev)} {}
 	Data_Stream(const Data_Stream&) = delete;
 	Data_Stream& operator=(const Data_Stream&) = delete;
 
-	bool is_valid() const { return static_cast<bool>(_dev); }
+	bool is_valid() const { return dev(); }
 
-	std::shared_ptr<Data_Device> device() { return _dev; }
-	void set_device(std::shared_ptr<Data_Device> dev)
-	{
-		_dev = std::move(dev);
-	}
+	void set_device(std::shared_ptr<Data_Device> dev) { _dev = std::move(dev); }
+	void set_device(Data_Device& dev) { _dev = &dev; }
 
-	std::size_t pos() const { return _dev->pos(); }
-	std::size_t size() const { return _dev->size(); }
-	std::size_t remained() const { return _dev->remained(); }
+	std::size_t pos() const { return dev()->pos(); }
+	std::size_t size() const { return dev()->size(); }
+	std::size_t remained() const { return dev()->remained(); }
 
-	bool at_end() const { return _dev->at_end(); }
+	bool at_end() const { return dev()->at_end(); }
 
-	void seek(std::size_t pos) { _dev->seek(pos); }
-	void read(uint8_t* dest, std::size_t size) { _dev->read(dest, size); }
-	void write(const uint8_t* data, std::size_t size) { _dev->write(data, size); }
+	void seek(std::size_t pos) { dev()->seek(pos); }
+	void read(uint8_t* dest, std::size_t size) { dev()->read(dest, size); }
+	void write(const uint8_t* data, std::size_t size) { dev()->write(data, size); }
 
 private:
-	std::shared_ptr<Data_Device> _dev;
+	// Data_Device* dev() { return _dev.index() == 0 ? std::get<0>(_dev).get() : std::get<1>(_dev); }
+	// const Data_Device* dev() const { return _dev.index() == 0 ? std::get<0>(_dev).get() : std::get<1>(_dev); }
+	Data_Device* dev() const { return _dev.index() == 0 ? std::get<0>(_dev).get() : std::get<1>(_dev); }
+
+	std::variant<
+		std::shared_ptr<Data_Device>,
+		Data_Device*
+	> _dev;
 };
 
 
