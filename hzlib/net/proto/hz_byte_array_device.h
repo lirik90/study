@@ -17,6 +17,7 @@ public:
 	Byte_Array_Device(std::size_t size) : _own{true}, _data{new std::vector<uint8_t>(size)} {}
 	Byte_Array_Device(std::vector<uint8_t>&& data) : _own{true}, _data{new std::vector<uint8_t>(std::move(data))} {}
 	Byte_Array_Device(std::vector<uint8_t>& data) : _own{false}, _data{&data} {}
+	Byte_Array_Device(const std::vector<uint8_t>& data) : _own{false}, _is_read_only{true}, _data{const_cast<std::vector<uint8_t>*>(&data)} {}
 	Byte_Array_Device(Byte_Array_Device&& o) : _own{std::move(o._own)}, _pos{std::move(o._pos)}, _data{std::move(o._data)}
 	{
 		o._own = false;
@@ -48,12 +49,14 @@ public:
 
 	void write(const uint8_t* data, std::size_t size) override
 	{
+		if (_is_read_only)
+			throw std::runtime_error("Failed write to Byte_Array_Device. It's read only.");
 		if (_data->size() < _pos + size)
 			_data->resize(_pos + size);
 		std::memcpy(_data->data() + _pos, data, size);
 	}
 private:
-	bool _own;
+	bool _own, _is_read_only = false;
 	std::size_t _pos = 0;
 	std::vector<uint8_t>* _data;
 };

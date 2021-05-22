@@ -62,7 +62,7 @@ public:
 		_msg->_data = std::move(dev);
 	}
 
-	Sender &answer(std::function<void(Data_Device &)> answer_func)
+	Sender &answer(std::function<void(std::shared_ptr<Data_Device>)> answer_func)
 	{
 		assert(!_msg->_answer_id && "Attempt to wait answer to answer");
 		_msg->_answer_func = std::move(answer_func);

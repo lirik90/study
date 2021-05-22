@@ -30,6 +30,7 @@ public:
 
 	bool is_valid() const { return static_cast<bool>(_dev); }
 
+	std::shared_ptr<Data_Device> device() { return _dev; }
 	void set_device(std::shared_ptr<Data_Device> dev)
 	{
 		_dev = std::move(dev);

@@ -17,6 +17,8 @@
 #include <zconf.h>
 #include <zlib.h>
 
+#include "hz_apply_parse.h"
+
 #include "hz_net_defs.h"
 #include "hz_net_data_packet.h"
 #include "hz_net_abstract_node_handler.h"
@@ -102,11 +104,6 @@ std::vector<uint8_t> decompress(const uint8_t* data, std::size_t size, std::size
 	while (res == Z_BUF_ERROR);
 
 	return res_vect;
-}
-
-template<typename... Args>
-void apply_parse(Args&& ...args)
-{
 }
 
 namespace Cmd {
