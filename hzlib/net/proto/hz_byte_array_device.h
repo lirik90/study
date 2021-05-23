@@ -15,21 +15,18 @@ namespace hz {
 class Byte_Array_Device : public Data_Device
 {
 public:
-	Byte_Array_Device() : _data{std::make_shared<std::vector<uint8_t>()} {}
+	Byte_Array_Device() : _data{std::make_shared<std::vector<uint8_t>>()} {}
 	Byte_Array_Device(std::size_t size) : _data{std::make_shared<std::vector<uint8_t>>(size)} {}
 	Byte_Array_Device(std::vector<uint8_t>&& data) : _data{std::make_shared<std::vector<uint8_t>>(std::move(data))} {}
 	Byte_Array_Device(std::vector<uint8_t>& data) : _data{&data} {}
 	Byte_Array_Device(const std::vector<uint8_t>& data) : _data{&data} {}
 	Byte_Array_Device(const uint8_t* data, std::size_t size) : _data{std::make_pair(data, size)} {}
+	Byte_Array_Device(std::unique_ptr<uint8_t>&& data, std::size_t size) : _data{std::make_pair(std::move(data), size)} {}
+	Byte_Array_Device(const std::pair<const uint8_t*, std::size_t>& data) : _data{data} {}
+	Byte_Array_Device(std::pair<std::unique_ptr<uint8_t>, std::size_t>&& data) : _data{std::move(data)} {}
 	Byte_Array_Device(Byte_Array_Device&& o) : _pos{std::move(o._pos)}, _data{std::move(o._data)}
 	{
 		o._data = std::pair<const uint8_t*, std::size_t>{nullptr, 0};
-	}
-
-	~Byte_Array_Device()
-	{
-		if (_own)
-			delete _data;
 	}
 
 	Byte_Array_Device(const Byte_Array_Device&) = delete;
@@ -118,6 +115,7 @@ private:
 				std::memcpy(data.get(), arg.first.get(), size);
 				arg.first = std::move(data);
 				arg.second = size;
+// TODO: replace _data with new vector
 			}
 		}, _data);
 	}
