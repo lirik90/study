@@ -4,16 +4,51 @@
 #include <cstdint>
 #include <cstring>
 #include <vector>
+#include <memory>
+#include <variant>
 
 #include "hz_data_device.h"
 #include "hz_data_device_exception.h"
 
 namespace hz {
 
-class Base_Byte_Array_Device : public Data_Device
+class Byte_Array_Device : public Data_Device
 {
 public:
+	Byte_Array_Device() : _data{std::make_shared<std::vector<uint8_t>()} {}
+	Byte_Array_Device(std::size_t size) : _data{std::make_shared<std::vector<uint8_t>>(size)} {}
+	Byte_Array_Device(std::vector<uint8_t>&& data) : _data{std::make_shared<std::vector<uint8_t>>(std::move(data))} {}
+	Byte_Array_Device(std::vector<uint8_t>& data) : _data{&data} {}
+	Byte_Array_Device(const std::vector<uint8_t>& data) : _data{&data} {}
+	Byte_Array_Device(const uint8_t* data, std::size_t size) : _data{std::make_pair(data, size)} {}
+	Byte_Array_Device(Byte_Array_Device&& o) : _pos{std::move(o._pos)}, _data{std::move(o._data)}
+	{
+		o._data = std::pair<const uint8_t*, std::size_t>{nullptr, 0};
+	}
+
+	~Byte_Array_Device()
+	{
+		if (_own)
+			delete _data;
+	}
+
+	Byte_Array_Device(const Byte_Array_Device&) = delete;
+	Byte_Array_Device& operator=(const Byte_Array_Device&) = delete;
+
 	std::size_t pos() const override { return _pos; }
+	std::size_t size() const override
+	{
+		return std::visit([](auto&& arg)
+		{
+			using T = std::decay_t<decltype(arg)>;
+			if constexpr (std::is_same_v<T, std::shared_ptr<std::vector<uint8_t>>>
+					|| std::is_same_v<T, const std::vector<uint8_t>*>
+					|| std::is_same_v<T, std::vector<uint8_t>*>)
+				return arg->size();
+			else
+				return arg.second;
+		}, _data);
+	}
 
 	void seek(std::size_t pos) override
 	{
@@ -27,72 +62,75 @@ public:
 		std::memcpy(dest, data() + _pos, size);
 		_pos += size;
 	}
-protected:
-	virtual const uint8_t* data() const = 0;
-
-	std::size_t _pos = 0;
-};
-
-class Byte_Array_Device : public Base_Byte_Array_Device
-{
-public:
-	Byte_Array_Device() : _own{true}, _data{new std::vector<uint8_t>{}} {}
-	Byte_Array_Device(std::size_t size) : _own{true}, _data{new std::vector<uint8_t>(size)} {}
-	Byte_Array_Device(std::vector<uint8_t>&& data) : _own{true}, _data{new std::vector<uint8_t>(std::move(data))} {}
-	Byte_Array_Device(std::vector<uint8_t>& data) : _own{false}, _data{&data} {}
-	Byte_Array_Device(Byte_Array_Device&& o) : _own{std::move(o._own)}, _pos{std::move(o._pos)}, _data{std::move(o._data)}
-	{
-		o._own = false;
-	}
-
-	~Byte_Array_Device()
-	{
-		if (_own)
-			delete _data;
-	}
-
-	Byte_Array_Device(const Byte_Array_Device&) = delete;
-	Byte_Array_Device& operator=(const Byte_Array_Device&) = delete;
-
-	std::size_t size() const override { return _data->size(); }
 
 	void write(const uint8_t* data, std::size_t size) override
 	{
-		if (_data->size() < _pos + size)
-			_data->resize(_pos + size);
+		uint8_t* dest = this->data();
+		if (!dest)
+			throw std::runtime_error("Failed write to Const_Data_Device. It's read only.");
+		if (this->size() < _pos + size)
+			resize(_pos + size);
 		std::memcpy(_data->data() + _pos, data, size);
 	}
 private:
-	const uint8_t* data() const override { return _data->data(); }
-
-	bool _own;
-	std::size_t _pos = 0;
-	std::vector<uint8_t>* _data;
-	// Maybe just use variant? How about move? And copy?
-};
-
-class Const_Data_Device : public Base_Byte_Array_Device
-{
-public:
-	Const_Data_Device(const std::vector<uint8_t>& data) : _data{data.data()}, _size{data.size()} {}
-	Const_Data_Device(const uint8_t* data, std::size_t size) : _data{data}, _size{size} {}
-
-	Const_Data_Device(Const_Data_Device&&) = delete;
-	Const_Data_Device& operator=(Const_Data_Device&&) = delete;
-	Const_Data_Device(const Const_Data_Device&) = delete;
-	Const_Data_Device& operator=(const Const_Data_Device&) = delete;
-
-	std::size_t size() const override { return _size; }
-
-	void write(const uint8_t*, std::size_t) override
+	const uint8_t* data() const
 	{
-		throw std::runtime_error("Failed write to Const_Data_Device. It's read only.");
+		return std::visit([](auto&& arg) -> const uint8_t*
+		{
+			using T = std::decay_t<decltype(arg)>;
+			if constexpr (std::is_same_v<T, std::shared_ptr<std::vector<uint8_t>>>
+					|| std::is_same_v<T, const std::vector<uint8_t>*>
+					|| std::is_same_v<T, std::vector<uint8_t>*>)
+				return arg->data();
+			else if constexpr (std::is_same_v<T, std::pair<std::unique_ptr<uint8_t>,std::size_t>>)
+				return arg.first.get();
+			else
+				return arg.first;
+		}, _data);
 	}
-private:
-	const uint8_t* data() const override { return _data; }
 
-	const uint8_t* _data;
-	std::size_t _size;
+	uint8_t* data()
+	{
+		return std::visit([](auto&& arg) -> uint8_t*
+		{
+			using T = std::decay_t<decltype(arg)>;
+			if constexpr (std::is_same_v<T, std::shared_ptr<std::vector<uint8_t>>>
+					|| std::is_same_v<T, std::vector<uint8_t>*>)
+				return arg->data();
+			else if constexpr (std::is_same_v<T, std::pair<std::unique_ptr<uint8_t>,std::size_t>>)
+				return arg.first.get();
+			else
+				return nullptr;
+		}, _data);
+	}
+
+	void resize(std::size_t size)
+	{
+		std::visit([size](auto&& arg)
+		{
+			using T = std::decay_t<decltype(arg)>;
+			if constexpr (std::is_same_v<T, std::shared_ptr<std::vector<uint8_t>>>
+					|| std::is_same_v<T, std::vector<uint8_t>*>)
+				arg->resize(size);
+			else if constexpr (std::is_same_v<T, std::pair<std::unique_ptr<uint8_t>,std::size_t>>)
+			{
+				std::unique_ptr<uint8_t[]> data{new uint8_t[size]};
+				std::memcpy(data.get(), arg.first.get(), size);
+				arg.first = std::move(data);
+				arg.second = size;
+			}
+		}, _data);
+	}
+
+	std::size_t _pos = 0;
+
+	std::variant<
+		std::shared_ptr<std::vector<uint8_t>>,
+		std::vector<uint8_t>*,
+		const std::vector<uint8_t>*,
+		std::pair<const uint8_t*, std::size_t>,
+		std::pair<std::unique_ptr<uint8_t[]>, std::size_t>
+	> _data;
 };
 
 } // namespace hz

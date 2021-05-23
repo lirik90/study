@@ -130,14 +130,14 @@ typename fn_traits<Fn>::ret apply_parse(Data_Device_T&& dev, Fn f, T* obj, Args&
 template <typename Fn, class T, typename... Args>
 typename fn_traits<Fn>::ret apply_parse(const std::vector<uint8_t> &data, Fn f, T* obj, Args&&... args)
 {
-	Const_Data_Device dev{data};
+	Byte_Array_Device dev{data};
 	return apply_parse(dev, f, obj, std::forward<Args&&>(args)...);
 }
 
 template <typename Fn, class T, typename... Args>
 typename fn_traits<Fn>::ret apply_parse(const uint8_t* data, std::size_t size, Fn f, T* obj, Args&&... args)
 {
-	Const_Data_Device dev{data, size};
+	Byte_Array_Device dev{data, size};
 	return apply_parse(dev, f, obj, std::forward<Args&&>(args)...);
 }
 
