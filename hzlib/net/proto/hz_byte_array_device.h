@@ -21,9 +21,9 @@ public:
 	Byte_Array_Device(std::vector<uint8_t>& data) : _data{&data} {}
 	Byte_Array_Device(const std::vector<uint8_t>& data) : _data{&data} {}
 	Byte_Array_Device(const uint8_t* data, std::size_t size) : _data{std::make_pair(data, size)} {}
-	Byte_Array_Device(std::unique_ptr<uint8_t>&& data, std::size_t size) : _data{std::make_pair(std::move(data), size)} {}
+	Byte_Array_Device(std::unique_ptr<uint8_t[]>&& data, std::size_t size) : _data{std::make_pair(std::move(data), size)} {}
 	Byte_Array_Device(const std::pair<const uint8_t*, std::size_t>& data) : _data{data} {}
-	Byte_Array_Device(std::pair<std::unique_ptr<uint8_t>, std::size_t>&& data) : _data{std::move(data)} {}
+	Byte_Array_Device(std::pair<std::unique_ptr<uint8_t[]>, std::size_t>&& data) : _data{std::move(data)} {}
 	Byte_Array_Device(Byte_Array_Device&& o) : _pos{std::move(o._pos)}, _data{std::move(o._data)}
 	{
 		o._data = std::pair<const uint8_t*, std::size_t>{nullptr, 0};
@@ -67,7 +67,7 @@ public:
 			throw std::runtime_error("Failed write to Const_Data_Device. It's read only.");
 		if (this->size() < _pos + size)
 			resize(_pos + size);
-		std::memcpy(_data->data() + _pos, data, size);
+		std::memcpy(dest + _pos, data, size);
 	}
 private:
 	const uint8_t* data() const
@@ -79,7 +79,7 @@ private:
 					|| std::is_same_v<T, const std::vector<uint8_t>*>
 					|| std::is_same_v<T, std::vector<uint8_t>*>)
 				return arg->data();
-			else if constexpr (std::is_same_v<T, std::pair<std::unique_ptr<uint8_t>,std::size_t>>)
+			else if constexpr (std::is_same_v<T, std::pair<std::unique_ptr<uint8_t[]>,std::size_t>>)
 				return arg.first.get();
 			else
 				return arg.first;
@@ -103,21 +103,21 @@ private:
 
 	void resize(std::size_t size)
 	{
-		std::visit([size](auto&& arg)
+		if (std::holds_alternative<std::pair<std::unique_ptr<uint8_t[]>,std::size_t>>(_data))
 		{
-			using T = std::decay_t<decltype(arg)>;
-			if constexpr (std::is_same_v<T, std::shared_ptr<std::vector<uint8_t>>>
-					|| std::is_same_v<T, std::vector<uint8_t>*>)
-				arg->resize(size);
-			else if constexpr (std::is_same_v<T, std::pair<std::unique_ptr<uint8_t>,std::size_t>>)
+			std::pair<std::unique_ptr<uint8_t[]>,std::size_t>& old = std::get<std::pair<std::unique_ptr<uint8_t[]>,std::size_t>>(_data);
+			auto data = std::make_shared<std::vector<uint8_t>>(size);
+			std::memcpy(data->data(), old.first.get(), size);
+			_data = std::move(data);
+		}
+		else
+			std::visit([size](auto&& arg)
 			{
-				std::unique_ptr<uint8_t[]> data{new uint8_t[size]};
-				std::memcpy(data.get(), arg.first.get(), size);
-				arg.first = std::move(data);
-				arg.second = size;
-// TODO: replace _data with new vector
-			}
-		}, _data);
+				using T = std::decay_t<decltype(arg)>;
+				if constexpr (std::is_same_v<T, std::shared_ptr<std::vector<uint8_t>>>
+						|| std::is_same_v<T, std::vector<uint8_t>*>)
+					arg->resize(size);
+			}, _data);
 	}
 
 	std::size_t _pos = 0;
