@@ -6,6 +6,7 @@
 #include <string>
 
 #include "hz_data_device.h"
+#include "hz_data_device_exception.h"
 
 #if __cplusplus > 201703L
 #include <bit>
@@ -36,6 +37,7 @@ public:
 	void set_device(std::shared_ptr<Data_Device> dev) { _dev = std::move(dev); }
 	void set_device(Data_Device& dev) { _dev = &dev; }
 
+	bool is_readonly() const { return dev()->is_readonly(); }
 	std::size_t pos() const { return dev()->pos(); }
 	std::size_t size() const { return dev()->size(); }
 	std::size_t remained() const { return dev()->remained(); }
@@ -43,8 +45,17 @@ public:
 	bool at_end() const { return dev()->at_end(); }
 
 	void seek(std::size_t pos) { dev()->seek(pos); }
-	void read(uint8_t* dest, std::size_t size) { dev()->read(dest, size); }
-	void write(const uint8_t* data, std::size_t size) { dev()->write(data, size); }
+	void read(uint8_t* dest, std::size_t size)
+	{
+		if (dev()->read(dest, size) < size)
+			throw Device_Read_Past_End{"Hasn't enought data"};
+	}
+	void write(const uint8_t* data, std::size_t size)
+	{
+		if (is_readonly())
+			throw std::runtime_error("Failed write to Data_Stream. It's read only.");
+		dev()->write(data, size);
+	}
 
 private:
 	// Data_Device* dev() { return _dev.index() == 0 ? std::get<0>(_dev).get() : std::get<1>(_dev); }
@@ -76,8 +87,10 @@ template<typename T,
 	typename = typename std::enable_if<std::is_integral<T>::value>::type>
 Data_Stream& operator<< (Data_Stream& ds, T elem)
 {
+	std::cout << "<< I " << (int)elem;
 	IS_BIG_ENDIAN
 		elem = bswap(elem);
+	std::cout << " " << (int)elem << " SZ " << sizeof(T) << std::endl;
 	ds.write(reinterpret_cast<const uint8_t*>(&elem), sizeof(T));
 	return ds;
 }
@@ -139,14 +152,15 @@ Data_Stream& operator>> (Data_Stream& ds, std::pair<T1, T2>& elem)
 
 Data_Stream& operator<< (Data_Stream& ds, const std::string& data)
 {
-	ds << data.size();
-	ds.write(reinterpret_cast<const uint8_t*>(data.data()), data.size());
+	uint32_t size = static_cast<uint32_t>(data.size());
+	ds << size;
+	ds.write(reinterpret_cast<const uint8_t*>(data.data()), size);
 	return ds;
 }
 
 Data_Stream& operator>> (Data_Stream& ds, std::string& data)
 {
-	std::size_t size;
+	uint32_t size;
 	ds >> size;
 
 	if (ds.remained() < size)
@@ -160,14 +174,15 @@ Data_Stream& operator>> (Data_Stream& ds, std::string& data)
 
 Data_Stream& operator<< (Data_Stream& ds, const std::vector<uint8_t>& data)
 {
-	ds << data.size();
-	ds.write(data.data(), data.size());
+	uint32_t size = static_cast<uint32_t>(data.size());
+	ds << size;
+	ds.write(data.data(), size);
 	return ds;
 }
 
 Data_Stream& operator>> (Data_Stream& ds, std::vector<uint8_t>& data)
 {
-	std::size_t size;
+	uint32_t size;
 	ds >> size;
 
 	if (ds.remained() < size)

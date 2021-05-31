@@ -20,6 +20,7 @@ public:
 
 	virtual void tls_alert(Node_Handler& node, Botan::TLS::Alert alert) = 0;
 	virtual bool tls_session_established(Node_Handler& node, const Botan::TLS::Session &session) = 0;
+	virtual void tls_session_activated(Node_Handler& node) = 0;
 
 	virtual void tls_verify_cert_chain(Node_Handler& node,
 		const std::vector<Botan::X509_Certificate>& cert_chain,

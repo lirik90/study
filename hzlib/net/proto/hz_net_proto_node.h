@@ -14,6 +14,8 @@
 #include <functional>
 #include <optional>
 
+#include <boost/algorithm/hex.hpp>
+
 #include <zconf.h>
 #include <zlib.h>
 
@@ -281,6 +283,9 @@ private:
 	{
 		while (size >= 9)
 		{
+			std::string text{reinterpret_cast<const char*>(data), 9};
+			std::cout << "[P] >Recv2 " << size << " D " << boost::algorithm::hex(text) << std::endl;
+
 			uint16_t checksum = read_uint16(data);
 			if (checksum != gen_checksum(data + 2, 7))
 			{
@@ -318,6 +323,7 @@ private:
 
 	void process_stream_message(uint8_t msg_id, uint8_t cmd, uint8_t flags, const uint8_t* data, std::size_t size)
 	{
+		std::cout << "[P] >Recv3 " << size << std::endl;
 		// Проверяем msg_id не пропущено ли. Возвращает false когда повторное (REPEATED) сообщение не найдено в пропущеных.
 		if (!process_msg_id(msg_id, flags))
 			return;
@@ -602,7 +608,7 @@ private:
 
 		Time_Point tt = msg._end_time;
 
-		std::vector<uint8_t> packet, data;
+		std::vector<uint8_t> data;
 		uint8_t flags = msg.flags();
 
 		if (msg._answer_id || msg._data->size() > msg.fragment_size())
@@ -643,10 +649,13 @@ private:
 		if (!msg._id)
 			msg._id = _next_msg_id._tx++;
 
+		std::vector<uint8_t> packet;
 		Data_Stream ds(std::make_shared<Byte_Array_Device>(packet));
 		ds << uint16_t(0) << *msg._id << msg.cmd() << flags << data;
 
 		ds.seek(0);
+		std::string text1{reinterpret_cast<const char*>(packet.data()), packet.size()};
+			std::cout << "[P] >Send " << packet.size() << " D " << boost::algorithm::hex(text1) << " ID " << (int)*msg._id << " CMD " << (int)msg.cmd() << " F " << (int)flags << " SZ " << data.size() << " POS " << ds.pos() << std::endl;
 		ds << gen_checksum(packet.data() + 2, 7);
 
 		Time_Point now = Clock::now();
@@ -663,6 +672,8 @@ private:
 			_ctrl->add_timeout_at(*this, std::move(time_point));
 		}
 
+		std::string text{reinterpret_cast<const char*>(packet.data()), packet.size()};
+			std::cout << "[P] >Send " << packet.size() << " D " << boost::algorithm::hex(text) << std::endl;
 		return packet;
 	}
 

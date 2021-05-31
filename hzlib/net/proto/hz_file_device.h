@@ -43,6 +43,7 @@ public:
 			throw std::runtime_error(std::strerror(errno));
 	}
 
+	bool is_readonly() const override { return false; }
 	std::size_t pos() const override { return std::ftell(_fd); }
 
 	std::size_t size() const override
@@ -61,10 +62,9 @@ public:
 			std::fseek(_fd, pos, SEEK_SET);
 	}
 
-	void read(uint8_t* dest, std::size_t size) override
+	std::size_t read(uint8_t* dest, std::size_t size) override
 	{
-		if (std::fread(dest, sizeof(uint8_t), size, _fd) < size)
-			throw Device_Read_Past_End{std::string("Hasn't enought data: ") + std::strerror(errno)};
+		return std::fread(dest, sizeof(uint8_t), size, _fd);
 	}
 
 	void write(const uint8_t* data, std::size_t size) override

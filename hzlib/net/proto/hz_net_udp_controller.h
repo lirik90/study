@@ -59,6 +59,7 @@ protected:
 		auto packet = msg.get_from_root<Data_Packet>();
 		if (!packet) return;
 
+		// std::cout << "< Send: " << packet->_data.size() << std::endl;
 		_socket->async_send_to(
 			boost::asio::buffer(packet->_data.data(), packet->_data.size()), node->endpoint(),
 			boost::asio::bind_executor(*_strand, boost::bind(&Controller::handle_send, this,
@@ -93,6 +94,7 @@ protected:
 			emit_event(Event_Type::ERROR, Event::RECV_ERROR, nullptr, { err.category().name(), err.message() });
 		else
 		{
+		// std::cout << " >Recv: " << size << std::endl;
 			process_message(*msg_context, size);
 			start_receive(std::move(msg_context));
 		}

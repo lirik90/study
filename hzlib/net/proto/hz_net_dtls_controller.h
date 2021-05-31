@@ -68,22 +68,11 @@ protected:
 		if (!data) return;
 
 		try {
-			if (add_data_to_channel(node, data->_data.data(), data->_data.size()))
-				Abstract_Handler::node_connected(raw_node); // now mutex is unlocked
+			std::lock_guard lock(_mutex);
+			node->push_received_data(data->_data.data(), data->_data.size()); // if all ok this function call record_received
 		} catch (const std::exception& e) {
 			emit_event(Event_Type::ERROR, Event::RECEIVED_DATA_ERROR, &raw_node, { e.what() });
 		}
-	}
-
-	bool add_data_to_channel(Dtls::Node* node, const uint8_t* data, std::size_t size)
-	{
-		std::lock_guard lock(_mutex);
-		const bool connected = node->is_connected();
-
-		// if all ok this function call record_received
-		node->push_received_data(data, size);
-
-		return !connected && node->is_connected();
 	}
 
 	void record_received(Node_Handler& node, Message_Handler& msg) override
@@ -129,6 +118,16 @@ protected:
 			});
 
 		return true;
+	}
+
+	void tls_session_activated(Node_Handler& node) override
+	{
+		auto node_ptr = node.get_root()->get_ptr();
+		io()->post([this, node_ptr]()
+		{
+			Abstract_Handler::node_build(*node_ptr);
+			Abstract_Handler::node_connected(*node_ptr);
+		});
 	}
 
 	Tools _tools;

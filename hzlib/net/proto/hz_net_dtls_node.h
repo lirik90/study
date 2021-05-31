@@ -80,6 +80,11 @@ private:
 		return _ctrl->tls_session_established(*this, session);
 	}
 
+	void tls_session_activated() override
+	{
+		_ctrl->tls_session_activated(*this);
+	}
+
 	std::string tls_server_choose_app_protocol(const std::vector<std::string> &client_protos) override
 	{
 		return _ctrl->tls_server_choose_app_protocol(*this, client_protos);

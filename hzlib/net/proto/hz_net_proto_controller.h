@@ -43,6 +43,7 @@ public:
 
 	void node_build(Node_Handler& raw_node, std::shared_ptr<Node_Init_Payload> payload) override
 	{
+		std::cout << get_root()->node_get_identifier(*raw_node.get_root()) << "Proto node build: " << (intptr_t)raw_node.get_root() << "\n";
 		raw_node.create_next_handler<Node>(this);
 		Abstract_Handler::node_build(raw_node, std::move(payload));
 	}
@@ -71,7 +72,8 @@ public:
 
 	void node_process(Node_Handler& raw_node, Message_Handler& msg) override
 	{
-		Node* node = raw_node.get_from_root<Node>();
+		std::cout << get_root()->node_get_identifier(*raw_node.get_root()) << " Proto node process: " << (intptr_t)raw_node.get_root() << "\n";
+		Node* node = raw_node.get_from_root<Proto::Node>();
 		if (!node)
 			throw std::runtime_error("Proto Controller: Node hasn't proto meta.");
 

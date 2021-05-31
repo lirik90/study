@@ -37,7 +37,7 @@ private:
 		if (!node)
 			return;
 
-		std::cout << "Node " << node_get_identifier(*raw_node.get_root()) << " connected.\n";
+		std::cout << "Node " << get_root()->node_get_identifier(*raw_node.get_root()) << " connected.\n";
 
 		auto sender = node->send(hz::Net::Proto::Cmd::USER_COMMAND);
 		sender << std::string("Hello client");
@@ -45,6 +45,7 @@ private:
 
 	void node_process(hz::Net::Node_Handler& raw_node, hz::Net::Message_Handler& raw_msg) override
 	{
+		std::cout << "MyProto recv\n";
 		auto msg = raw_msg.get_from_root<hz::Net::Proto::Message>();
 		if (msg && !hz::Net::Proto::Controller::default_process_message(*msg))
 		{

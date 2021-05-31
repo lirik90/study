@@ -11,10 +11,11 @@ class Data_Device
 public:
 	virtual ~Data_Device() {}
 
+	virtual bool is_readonly() const = 0;
 	virtual std::size_t pos() const = 0;
 	virtual std::size_t size() const = 0;
 	virtual void seek(std::size_t pos) = 0;
-	virtual void read(uint8_t* out, std::size_t size) = 0;
+	virtual std::size_t read(uint8_t* out, std::size_t size) = 0;
 	virtual void write(const uint8_t* data, std::size_t size) = 0;
 
 	virtual std::size_t remained() const { return size() - pos(); }

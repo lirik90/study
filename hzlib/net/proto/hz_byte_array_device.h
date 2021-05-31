@@ -9,7 +9,6 @@
 #include <iostream>
 
 #include "hz_data_device.h"
-#include "hz_data_device_exception.h"
 
 namespace hz {
 
@@ -33,6 +32,19 @@ public:
 	Byte_Array_Device(const Byte_Array_Device&) = delete;
 	Byte_Array_Device& operator=(const Byte_Array_Device&) = delete;
 
+	bool is_readonly() const override
+	{
+		return std::visit([](auto&& arg) -> bool
+		{
+			using T = std::decay_t<decltype(arg)>;
+			if constexpr (std::is_same_v<T, const std::vector<uint8_t>*>
+				|| std::is_same_v<T, std::pair<const uint8_t*, std::size_t>>)
+				return true;
+			else
+				return false;
+		}, _data);
+	}
+
 	std::size_t pos() const override { return _pos; }
 	std::size_t size() const override
 	{
@@ -50,27 +62,32 @@ public:
 
 	void seek(std::size_t pos) override
 	{
-		_pos = pos >= 0 && pos < size() ? _pos : size();
+		_pos = (pos >= 0 && pos < size()) ? pos : size();
 	}
 
-	void read(uint8_t* dest, std::size_t size) override
+	std::size_t read(uint8_t* dest, std::size_t max_size) override
 	{
-		if (_pos + size > this->size())
-			throw Device_Read_Past_End{"Hasn't enought data"};
-		std::memcpy(dest, data() + _pos, size);
-		_pos += size;
+		if (_pos + max_size > size())
+			max_size = size() - _pos;
+		std::memcpy(dest, data() + _pos, max_size);
+		_pos += max_size;
+		return max_size;
 	}
 
 	void write(const uint8_t* data, std::size_t size) override
 	{
-		if (this->size() < _pos + size)
-			resize(_pos + size);
+		if (!is_readonly())
+		{
+			if (this->size() < _pos + size)
+				resize(_pos + size);
 
-		uint8_t* dest = this->data();
-		if (!dest)
-			throw std::runtime_error("Failed write to Const_Data_Device. It's read only.");
-
-		std::memcpy(dest + _pos, data, size);
+			uint8_t* dest = this->data();
+			if (dest)
+			{
+				std::memcpy(dest + _pos, data, size);
+				_pos += size;
+			}
+		}
 	}
 private:
 	const uint8_t* data() const
@@ -94,7 +111,6 @@ private:
 		return std::visit([](auto&& arg) -> uint8_t*
 		{
 			using T = std::decay_t<decltype(arg)>;
-			std::cout << "BA data " << typeid(T).name() << std::endl;
 			if constexpr (std::is_same_v<T, std::shared_ptr<std::vector<uint8_t>>>
 					|| std::is_same_v<T, std::vector<uint8_t>*>)
 				return arg->data();
