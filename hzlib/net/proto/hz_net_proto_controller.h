@@ -18,6 +18,28 @@ namespace Proto {
 class Controller : public Controller_Handler, public Handler_T<Controller>
 {
 public:
+	static bool default_process_message(Message& msg)
+	{
+		if (msg._type == Message::Type::SIMPLE)
+			return false;
+
+		auto item = msg.get<Message_Item>();
+		if (item)
+		{
+			if (msg._type == Message::Type::TIMEOUT)
+			{
+				if (item._timeout_func)
+					item._timeout_func();
+			}
+			else if (msg._type == Message::Type::ANSWER)
+			{
+				if (item._answer_func)
+					item._answer_func(msg._data);
+			}
+		}
+		return true;
+	}
+
 	void node_build(Node_Handler& raw_node, std::shared_ptr<Node_Init_Payload> payload) override
 	{
 		raw_node.create_next_handler<Node>(this);

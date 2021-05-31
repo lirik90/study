@@ -156,6 +156,8 @@ protected:
 		auto node = raw_node.get_from_root<Node>();
 		if (node)
 		{
+			node_closed(*raw_node.get_root());
+
 			udp::endpoint remote_endpoint = node->endpoint();
 			io()->post([this, remote_endpoint]() { close_node(remote_endpoint); });
 		}

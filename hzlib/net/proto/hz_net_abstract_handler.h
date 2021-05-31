@@ -107,6 +107,12 @@ public:
 			_next->node_process(node, msg);
 	}
 
+	virtual void node_closed(Node_Handler& node) override
+	{
+		if (_next)
+			_next->node_closed(node);
+	}
+
 	virtual void node_connected(Node_Handler& node) override
 	{
 		if (_next)

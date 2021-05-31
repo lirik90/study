@@ -19,10 +19,22 @@ class My_Proto final :
 {
 public:
 private:
-	void node_connected(hz::Net::Node_Handler& node) override
+	void node_connected(hz::Net::Node_Handler& raw_node) override
 	{
-		auto data = std::make_shared<hz::Net::Data_Packet>(reinterpret_cast<const uint8_t*>("Hello"), 5);
-		send_node_data(node, *data);
+		auto node = raw_node.get_from_root<hz::Net::Proto::Node>();
+		if (!node)
+			return;
+
+		auto sender = node->send(hz::Net::Proto::Cmd::USER_COMMAND);
+		sender << std::string("Hello proto");
+	}
+
+	void node_process(hz::Net::Node_Handler& raw_node, hz::Net::Message_Handler& raw_msg) override
+	{
+		auto msg = raw_msg.get_from_root<hz::Net::Proto::Message>();
+		if (msg && !hz::Net::Proto::Controller::default_process_message(*msg))
+		{
+		}
 	}
 };
 
