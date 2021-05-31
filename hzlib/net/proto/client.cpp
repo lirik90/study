@@ -25,6 +25,8 @@ private:
 		if (!node)
 			return;
 
+		std::cout << "Node " << node_get_identifier(*raw_node.get_root()) << " connected. Send hello\n";
+
 		auto sender = node->send(hz::Net::Proto::Cmd::USER_COMMAND);
 		sender << std::string("Hello proto");
 	}

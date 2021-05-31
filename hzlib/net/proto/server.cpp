@@ -31,6 +31,18 @@ class My_Proto final :
 {
 public:
 private:
+	void node_connected(hz::Net::Node_Handler& raw_node) override
+	{
+		auto node = raw_node.get_from_root<hz::Net::Proto::Node>();
+		if (!node)
+			return;
+
+		std::cout << "Node " << node_get_identifier(*raw_node.get_root()) << " connected.\n";
+
+		auto sender = node->send(hz::Net::Proto::Cmd::USER_COMMAND);
+		sender << std::string("Hello client");
+	}
+
 	void node_process(hz::Net::Node_Handler& raw_node, hz::Net::Message_Handler& raw_msg) override
 	{
 		auto msg = raw_msg.get_from_root<hz::Net::Proto::Message>();
@@ -43,7 +55,7 @@ private:
 				std::string text;
 				ds >> text;
 
-				emit_event(Event_Type::INFO, 1, &node, {"Client send: " + text});
+				emit_event(Event_Type::INFO, 1, &raw_node, {"Client send: " + text});
 			}
 		}
 	}

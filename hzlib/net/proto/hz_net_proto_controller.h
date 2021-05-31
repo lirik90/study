@@ -8,6 +8,7 @@
 
 #include "hz_net_proto_event.h"
 #include "hz_net_proto_node.h"
+#include "hz_net_proto_message_item.h"
 #include "hz_net_abstract_handler.h"
 #include "hz_net_node_data_packet.h"
 
@@ -18,23 +19,23 @@ namespace Proto {
 class Controller : public Controller_Handler, public Handler_T<Controller>
 {
 public:
-	static bool default_process_message(Message& msg)
+	static bool default_process_message(Proto::Message& msg)
 	{
 		if (msg._type == Message::Type::SIMPLE)
 			return false;
 
-		auto item = msg.get<Message_Item>();
+		auto item = msg.get_from_root<Message_Item>();
 		if (item)
 		{
 			if (msg._type == Message::Type::TIMEOUT)
 			{
-				if (item._timeout_func)
-					item._timeout_func();
+				if (item->_timeout_func)
+					item->_timeout_func();
 			}
 			else if (msg._type == Message::Type::ANSWER)
 			{
-				if (item._answer_func)
-					item._answer_func(msg._data);
+				if (item->_answer_func)
+					item->_answer_func(msg._data);
 			}
 		}
 		return true;
@@ -48,6 +49,8 @@ public:
 
 	void send_node_data(Node_Handler& raw_node, Message_Handler& raw_msg) override
 	{
+		std::cout << "Client create message for send\n";
+
 		auto node = raw_node.find_ptr_from_root<Node>();
 		if (!node) return;
 
@@ -58,7 +61,7 @@ public:
 		{
 			try {
 				std::lock_guard lock(_mutex);
-				node->send(*msg);
+				node->send(msg);
 			}
 			catch (const std::exception& e) {
 				emit_event(Event_Type::ERROR, Event::TRANSMITED_DATA_ERROR, node.get(), { e.what() });

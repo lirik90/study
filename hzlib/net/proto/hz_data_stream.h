@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <variant>
+#include <string>
 
 #include "hz_data_device.h"
 
@@ -135,6 +136,27 @@ Data_Stream& operator>> (Data_Stream& ds, std::pair<T1, T2>& elem)
 {
 	return ds >> elem.first >> elem.second;
 }
+
+Data_Stream& operator<< (Data_Stream& ds, const std::string& data)
+{
+	ds << data.size();
+	ds.write(reinterpret_cast<const uint8_t*>(data.data()), data.size());
+	return ds;
+}
+
+Data_Stream& operator>> (Data_Stream& ds, std::string& data)
+{
+	std::size_t size;
+	ds >> size;
+
+	if (ds.remained() < size)
+		throw std::runtime_error("Size of string is too big");
+
+	data.resize(size);
+	ds.read(reinterpret_cast<uint8_t*>(data.data()), size);
+	return ds;
+}
+
 
 Data_Stream& operator<< (Data_Stream& ds, const std::vector<uint8_t>& data)
 {
