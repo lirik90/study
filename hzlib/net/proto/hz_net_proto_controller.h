@@ -98,12 +98,14 @@ private:
 
 	void record_received(Node_Handler& node, Message_Handler& msg) override
 	{
+		std::cout << "[P] >Recv6 "  << std::endl;
 		// Now mutex still locking. Call async for unlock it.
 		async_next_node_process(node, msg);
 	}
 
 	void emit_data(Node_Handler& node, Message_Handler& msg) override
 	{
+		std::cout << "[P] >Send6 "  << std::endl;
 		// Now mutex still locking. Call async for unlock it.
 		async_prev_send_node_data(node, msg);
 	}

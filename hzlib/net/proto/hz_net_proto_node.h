@@ -271,7 +271,7 @@ protected:
 				// msg->_timeout_func();
 				auto new_msg = std::make_shared<Message>(msg->_id.value_or(0), msg->cmd(), Message::TIMEOUT, nullptr);
 				new_msg->set_next_handler(std::move(msg));
-				_ctrl->emit_data(*this, *new_msg);
+				_ctrl->record_received(*this, *new_msg);
 			}
 		}
 	}
@@ -328,6 +328,7 @@ private:
 		if (!process_msg_id(msg_id, flags))
 			return;
 
+		std::cout << "[P] >Recv4 " << size << std::endl;
 		// If COMPRESSED or FRAGMENT flag is setted, then data_size can not be zero.
 		if (!size && (flags & (COMPRESSED | FRAGMENT)))
 			throw std::runtime_error("COMPRESSED or FRAGMENT flag is setted, but data_size is zero.");
@@ -556,7 +557,7 @@ private:
 
 		auto msg = std::make_shared<Message>(msg_id, cmd, Message::ANSWER, std::move(data));
 		msg->set_next_handler(std::move(origin_msg));
-		_ctrl->emit_data(*this, *msg);
+		_ctrl->record_received(*this, *msg);
 	}
 
 	void add_to_waiting(Time_Point time_point, std::shared_ptr<Message_Item> message)
@@ -598,7 +599,7 @@ private:
 	void process_message(uint8_t msg_id, uint8_t cmd, std::shared_ptr<Data_Device> data)
 	{
 		auto msg = std::make_shared<Message>(msg_id, cmd, Message::SIMPLE, std::move(data));
-		_ctrl->emit_data(*this, *msg);
+		_ctrl->record_received(*this, *msg);
 	}
 
 	std::vector<uint8_t> prepare_packet_to_send(Message_Item& msg)
