@@ -28,7 +28,7 @@ public:
 		if (full_size > 1000000)
 		{
 			try {
-				_data = std::make_shared<File_Device>(File_Device::TMP{});
+				_data = std::make_shared<File_Device>(File_Device::TEMPORARY_FILE{});
 
 				const uint8_t fill_data[4096] = {0};
 				for (std::size_t fill_size = 0; fill_size < full_size; fill_size += 4096)

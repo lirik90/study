@@ -12,59 +12,80 @@
 namespace hz {
 namespace Net {
 
-class Async_Message_Queue final : public Handler_T<Async_Message_Queue>
+class Async_Message_Queue
 {
 public:
-	Async_Message_Queue() :
-		_is_queue_handler_running{false}
-	{}
+	Async_Message_Queue(boost::asio::io_context* io, std::function<void(Node_Handler&,Message_Handler&)> handler) :
+		_io{io}, _handler{std::move(handler)}
+	{
+	}
 
+	void add(Node_Handler& node, Message_Handler& msg)
+	{
+		if (add_and_start(node, msg))
+			_io->post(boost::bind(&Async_Message_Queue::queue_handler, this));
+	}
 private:
 
-	void node_process(Node_Handler& node, Message_Handler& msg)
+	bool add_and_start(Node_Handler& node, Message_Handler& msg)
 	{
 		std::lock_guard lock(_data_mutex);
 		_data.emplace(node.get_root()->get_ptr(), msg.get_root()->get_ptr());
-		start_queue_handler();
-	}
-
-	void start_queue_handler()
-	{
-		if (_is_queue_handler_running)
-			return;
-
-		_is_queue_handler_running = true;
-		io()->post(boost::bind(&Async_Message_Queue::queue_handler, this));
+		if (!_is_running)
+		{
+			_is_running = true;
+			return true;
+		}
+		return false;
 	}
 
 	void queue_handler()
 	{
-		std::unique_lock lock{_data_mutex, std::defer_lock};
-		do
+		std::unique_lock lock{_data_mutex};
+		if (_data.empty())
+			_is_running = false;
+		else
 		{
-			lock.lock();
-
-			if (_data.empty())
-			{
-				_is_queue_handler_running = false;
-				lock.unlock();
-				break;
-			}
-
 			Node_Data_Packet item = std::move(_data.front());
 			_data.pop();
 
-			lock.unlock();
+			//lock.unlock(); // for possible add to queue
 
-			Abstract_Handler::node_process(*item._node, *item._msg);
+			_handler(*item._node, *item._msg);
+			_io->post(boost::bind(&Async_Message_Queue::queue_handler, this));
 		}
-		while (!io()->stopped());
 	}
 
-	bool _is_queue_handler_running;
+	bool _is_running = false;
 
 	std::mutex _data_mutex;
 	std::queue<Node_Data_Packet> _data;
+
+	boost::asio::io_context* _io;
+	std::function<void(Node_Handler&,Message_Handler&)> _handler;
+};
+
+class Async_Messages final : public Handler_T<Async_Messages>
+{
+	void init() override
+	{
+		using namespace boost::placeholders;
+		_rx.reset(new Async_Message_Queue{io(), [this](Node_Handler& node, Message_Handler& msg) { Abstract_Handler::node_process(node, msg); }});
+		_tx.reset(new Async_Message_Queue{io(), [this](Node_Handler& node, Message_Handler& msg) { Abstract_Handler::send_node_data(node, msg); }});
+		Abstract_Handler::init();
+	}
+
+	void node_process(Node_Handler& node, Message_Handler& msg) override
+	{
+		_rx->add(node, msg);
+	}
+
+	void send_node_data(Node_Handler& node, Message_Handler& msg) override
+	{
+		_tx->add(node, msg);
+	}
+
+	std::unique_ptr<Async_Message_Queue> _rx, _tx;
 };
 
 } // namespace Net

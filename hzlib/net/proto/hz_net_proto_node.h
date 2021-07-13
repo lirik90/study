@@ -284,7 +284,6 @@ private:
 		while (size >= 9)
 		{
 			std::string text{reinterpret_cast<const char*>(data), 9};
-			std::cout << "[P] >Recv2 " << size << " D " << boost::algorithm::hex(text) << std::endl;
 
 			uint16_t checksum = read_uint16(data);
 			if (checksum != gen_checksum(data + 2, 7))
@@ -323,12 +322,10 @@ private:
 
 	void process_stream_message(uint8_t msg_id, uint8_t cmd, uint8_t flags, const uint8_t* data, std::size_t size)
 	{
-		std::cout << "[P] >Recv3 " << size << std::endl;
 		// Проверяем msg_id не пропущено ли. Возвращает false когда повторное (REPEATED) сообщение не найдено в пропущеных.
 		if (!process_msg_id(msg_id, flags))
 			return;
 
-		std::cout << "[P] >Recv4 " << size << std::endl;
 		// If COMPRESSED or FRAGMENT flag is setted, then data_size can not be zero.
 		if (!size && (flags & (COMPRESSED | FRAGMENT)))
 			throw std::runtime_error("COMPRESSED or FRAGMENT flag is setted, but data_size is zero.");
@@ -555,6 +552,7 @@ private:
 		//	msg->_answer_func = nullptr;
 		// }
 
+        data->seek(0);
 		auto msg = std::make_shared<Message>(msg_id, cmd, Message::ANSWER, std::move(data));
 		msg->set_next_handler(std::move(origin_msg));
 		_ctrl->record_received(*this, *msg);
@@ -598,6 +596,7 @@ private:
 
 	void process_message(uint8_t msg_id, uint8_t cmd, std::shared_ptr<Data_Device> data)
 	{
+        data->seek(0);
 		auto msg = std::make_shared<Message>(msg_id, cmd, Message::SIMPLE, std::move(data));
 		_ctrl->record_received(*this, *msg);
 	}

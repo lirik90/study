@@ -1,0 +1,809 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/mnt/second/proj/study/hzlib/net/proto/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20210110.0/
+ALERT	hz_net_dtls_event.h	/^	ALERT,$/;"	e	enum:hz::Net::Dtls::Event
+ANSWER	hz_net_proto_message.h	/^	enum Type { SIMPLE, ANSWER, TIMEOUT };$/;"	e	enum:hz::Net::Proto::Message::Type
+ANSWER	hz_net_proto_node.h	/^		ANSWER			= 0x40,$/;"	e	enum:hz::Net::Proto::Node::Flags
+Abstract_Base_Handler	hz_net_abstract_base_handler.h	/^	Abstract_Base_Handler(std::size_t hash_code) : _type_hash{hash_code}, _prev{nullptr} {}$/;"	f	class:hz::Net::Abstract_Base_Handler
+Abstract_Base_Handler	hz_net_abstract_base_handler.h	/^class Abstract_Base_Handler : public T$/;"	c	namespace:hz::Net
+Abstract_Event_Formatter_Handler	hz_net_abstract_event_formatter_handler.h	/^class Abstract_Event_Formatter_Handler : public Event_Formatter_Handler$/;"	c	namespace:hz::Net
+Abstract_Event_Handler	hz_net_abstract_event_handler.h	/^class Abstract_Event_Handler : public Handler_T<Abstract_Event_Handler>$/;"	c	namespace:hz::Net
+Abstract_Handler	hz_net_abstract_handler.cpp	/^Abstract_Handler::Abstract_Handler(std::size_t hash_code) : $/;"	f	class:hz::Net::Abstract_Handler
+Abstract_Handler	hz_net_abstract_handler.h	/^class Abstract_Handler : public Abstract_Base_Handler<Handler>$/;"	c	namespace:hz::Net
+Abstract_Message_Handler	hz_net_abstract_message_handler.h	/^	Abstract_Message_Handler(std::size_t type_hash) :$/;"	f	class:hz::Net::Abstract_Message_Handler
+Abstract_Message_Handler	hz_net_abstract_message_handler.h	/^class Abstract_Message_Handler : public Abstract_Base_Handler<Message_Handler>$/;"	c	namespace:hz::Net
+Abstract_Node_Handler	hz_net_abstract_node_handler.h	/^	Abstract_Node_Handler(std::size_t type_hash) :$/;"	f	class:hz::Net::Abstract_Node_Handler
+Abstract_Node_Handler	hz_net_abstract_node_handler.h	/^class Abstract_Node_Handler : public Abstract_Base_Handler<Node_Handler>$/;"	c	namespace:hz::Net
+Apply_Parse_Exception	hz_apply_parse.h	/^	Apply_Parse_Exception(const std::string& what, const std::string& type_name, std::size_t type_s/;"	f	struct:hz::Apply_Parse_Exception
+Apply_Parse_Exception	hz_apply_parse.h	/^struct Apply_Parse_Exception : std::runtime_error$/;"	s	namespace:hz
+Async_Message_Queue	hz_net_async_message_queue.h	/^	Async_Message_Queue(boost::asio::io_context* io, std::function<void(Node_Handler&,Message_Handl/;"	f	class:hz::Net::Async_Message_Queue
+Async_Message_Queue	hz_net_async_message_queue.h	/^class Async_Message_Queue$/;"	c	namespace:hz::Net
+Async_Messages	hz_net_async_message_queue.h	/^class Async_Messages final : public Handler_T<Async_Messages>$/;"	c	namespace:hz::Net
+BIND	hz_net_udp_event.h	/^	BIND,$/;"	e	enum:hz::Net::Udp::Event
+Base_Handler	hz_net_base_handler.h	/^class Base_Handler$/;"	c	namespace:hz::Net
+Base_Handler_T	hz_net_abstract_base_handler.h	/^	Base_Handler_T() :$/;"	f	class:hz::Net::Base_Handler_T
+Base_Handler_T	hz_net_abstract_base_handler.h	/^class Base_Handler_T : public Handler_Type$/;"	c	namespace:hz::Net
+Base_Ptr_Handler	hz_net_base_handler.h	/^class Base_Ptr_Handler : public Base_Handler<T>$/;"	c	namespace:hz::Net
+Base_Ptr_Handler_T	hz_net_abstract_base_handler.h	/^class Base_Ptr_Handler_T : public Base_Handler_T<Abstract_Handler_Type, T>, public std::enable_s/;"	c	namespace:hz::Net
+Byte_Array_Device	hz_byte_array_device.cpp	/^Byte_Array_Device::Byte_Array_Device() : _data{std::make_shared<std::vector<uint8_t>>()} {}$/;"	f	class:hz::Byte_Array_Device
+Byte_Array_Device	hz_byte_array_device.cpp	/^Byte_Array_Device::Byte_Array_Device(Byte_Array_Device&& o) : _pos{std::move(o._pos)}, _data{std/;"	f	class:hz::Byte_Array_Device
+Byte_Array_Device	hz_byte_array_device.cpp	/^Byte_Array_Device::Byte_Array_Device(const std::pair<const uint8_t*, std::size_t>& data) : _data/;"	f	class:hz::Byte_Array_Device
+Byte_Array_Device	hz_byte_array_device.cpp	/^Byte_Array_Device::Byte_Array_Device(const std::vector<uint8_t>& data) : _data{&data} {}$/;"	f	class:hz::Byte_Array_Device
+Byte_Array_Device	hz_byte_array_device.cpp	/^Byte_Array_Device::Byte_Array_Device(const uint8_t* data, std::size_t size) : _data{std::make_pa/;"	f	class:hz::Byte_Array_Device
+Byte_Array_Device	hz_byte_array_device.cpp	/^Byte_Array_Device::Byte_Array_Device(std::pair<std::unique_ptr<uint8_t[]>, std::size_t>&& data) /;"	f	class:hz::Byte_Array_Device
+Byte_Array_Device	hz_byte_array_device.cpp	/^Byte_Array_Device::Byte_Array_Device(std::size_t size) : _data{std::make_shared<std::vector<uint/;"	f	class:hz::Byte_Array_Device
+Byte_Array_Device	hz_byte_array_device.cpp	/^Byte_Array_Device::Byte_Array_Device(std::unique_ptr<uint8_t[]>&& data, std::size_t size) : _dat/;"	f	class:hz::Byte_Array_Device
+Byte_Array_Device	hz_byte_array_device.cpp	/^Byte_Array_Device::Byte_Array_Device(std::vector<uint8_t>& data) : _data{&data} {}$/;"	f	class:hz::Byte_Array_Device
+Byte_Array_Device	hz_byte_array_device.cpp	/^Byte_Array_Device::Byte_Array_Device(std::vector<uint8_t>&& data) : _data{std::make_shared<std::/;"	f	class:hz::Byte_Array_Device
+Byte_Array_Device	hz_byte_array_device.h	/^class Byte_Array_Device : public Data_Device$/;"	c	namespace:hz
+CLOSE	hz_net_proto_node.h	/^		CLOSE,$/;"	e	enum:hz::Net::Proto::Cmd::Cmd
+CMAKE_CXX_STANDARD	CMakeLists.txt	/^set(CMAKE_CXX_STANDARD 20)$/;"	v
+CMAKE_CXX_STANDARD_REQUIRED	CMakeLists.txt	/^set(CMAKE_CXX_STANDARD_REQUIRED True)$/;"	v
+COMPRESSED	hz_net_proto_node.h	/^		COMPRESSED		= 0x80,$/;"	e	enum:hz::Net::Proto::Node::Flags
+CONNECTING	hz_net_udp_event.h	/^	CONNECTING,$/;"	e	enum:hz::Net::Udp::Event
+Certificate_Info	hz_net_dtls_credentials_manager.h	/^    struct Certificate_Info$/;"	s	class:hz::Net::Dtls::Credentials_Manager
+Clean_Timer	hz_net_udp_clean_timer.h	/^	Clean_Timer(std::chrono::milliseconds cleaning_timeout = std::chrono::seconds{10}) :$/;"	f	class:hz::Net::Udp::Clean_Timer
+Clean_Timer	hz_net_udp_clean_timer.h	/^class Clean_Timer : public Handler_T<Clean_Timer>$/;"	c	namespace:hz::Net::Udp
+Clean_Timer_Node	hz_net_udp_clean_timer_node.h	/^	Clean_Timer_Node() : _recv_time{std::chrono::system_clock::now()} {}$/;"	f	class:hz::Net::Udp::Clean_Timer_Node
+Clean_Timer_Node	hz_net_udp_clean_timer_node.h	/^class Clean_Timer_Node : public Node_Handler_T<Clean_Timer_Node>$/;"	c	namespace:hz::Net::Udp
+Client	hz_net_dtls_client.h	/^	Client(const std::vector<std::string> &next_protocols, const std::string &tls_policy_file_name,$/;"	f	class:hz::Net::Dtls::Client
+Client	hz_net_dtls_client.h	/^class Client final : public Controller$/;"	c	namespace:hz::Net::Dtls
+Client	hz_net_udp_client.h	/^	Client(const std::string& host, uint16_t port, std::chrono::milliseconds reconnect_timeout) :$/;"	f	class:hz::Net::Udp::Client
+Client	hz_net_udp_client.h	/^class Client final : public Controller$/;"	c	namespace:hz::Net::Udp
+Clock	hz_net_defs.h	/^using Clock = std::chrono::steady_clock;$/;"	t	namespace:hz::Net	typeref:typename:std::chrono::steady_clock
+Cmd	hz_net_proto_node.h	/^	enum Cmd : uint8_t {$/;"	g	namespace:hz::Net::Proto::Cmd	typeref:typename:uint8_t
+Cmd	hz_net_proto_node.h	/^namespace Cmd {$/;"	n	namespace:hz::Net::Proto
+Controller	hz_net_dtls_controller.h	/^	Controller(const std::string &tls_policy_file_name, const std::string &crt_file_name, const std/;"	f	class:hz::Net::Dtls::Controller
+Controller	hz_net_dtls_controller.h	/^class Controller : public Controller_Handler, public Handler_T<Controller>$/;"	c	namespace:hz::Net::Dtls
+Controller	hz_net_proto_controller.h	/^	Controller()$/;"	f	class:hz::Net::Proto::Controller
+Controller	hz_net_proto_controller.h	/^class Controller : public Controller_Handler, public Handler_T<Controller>$/;"	c	namespace:hz::Net::Proto
+Controller	hz_net_udp_controller.h	/^	Controller(const std::string& host, uint16_t port) :$/;"	f	class:hz::Net::Udp::Controller
+Controller	hz_net_udp_controller.h	/^class Controller : public Handler_T<Controller>$/;"	c	namespace:hz::Net::Udp
+Controller_Handler	hz_net_dtls_controller_handler.h	/^class Controller_Handler : public Node_Controller_Handler$/;"	c	namespace:hz::Net::Dtls
+Controller_Handler	hz_net_proto_controller_handler.h	/^class Controller_Handler : public Node_Controller_Handler$/;"	c	namespace:hz::Net::Proto
+Credentials_Manager	hz_net_dtls_credentials_manager.cpp	/^Credentials_Manager::Credentials_Manager(Botan::RandomNumberGenerator &rng, const std::string &s/;"	f	class:hz::Net::Dtls::Credentials_Manager
+Credentials_Manager	hz_net_dtls_credentials_manager.cpp	/^Credentials_Manager::Credentials_Manager(const std::vector<std::string> &paths) { load_certstore/;"	f	class:hz::Net::Dtls::Credentials_Manager
+Credentials_Manager	hz_net_dtls_credentials_manager.h	/^class Credentials_Manager : public Botan::Credentials_Manager$/;"	c	namespace:hz::Net::Dtls
+DEBUG	hz_net_handler.h	/^	enum class Event_Type : uint8_t { DEBUG, INFO, WARNING, ERROR };$/;"	e	enum:hz::Net::Handler::Event_Type
+DEP_LIBS	CMakeLists.txt	/^set(DEP_LIBS$/;"	v
+Data_Device	hz_data_device.h	/^class Data_Device$/;"	c	namespace:hz
+Data_Packet	hz_net_data_packet.h	/^	Data_Packet(const std::vector<uint8_t>& data) :$/;"	f	struct:hz::Net::Data_Packet
+Data_Packet	hz_net_data_packet.h	/^	Data_Packet(const uint8_t* data, std::size_t size)$/;"	f	struct:hz::Net::Data_Packet
+Data_Packet	hz_net_data_packet.h	/^	Data_Packet(std::vector<uint8_t>&& data) :$/;"	f	struct:hz::Net::Data_Packet
+Data_Packet	hz_net_data_packet.h	/^struct Data_Packet final : Message_Handler_T<Data_Packet>$/;"	s	namespace:hz::Net
+Data_Stream	hz_data_stream.cpp	/^Data_Stream::Data_Stream(Data_Device& dev) : _dev{&dev} {}$/;"	f	class:hz::Data_Stream
+Data_Stream	hz_data_stream.cpp	/^Data_Stream::Data_Stream(Data_Stream&& o) : _dev{std::move(o._dev)} {}$/;"	f	class:hz::Data_Stream
+Data_Stream	hz_data_stream.cpp	/^Data_Stream::Data_Stream(std::shared_ptr<Data_Device> dev) : _dev{std::move(dev)} {}$/;"	f	class:hz::Data_Stream
+Data_Stream	hz_data_stream.h	/^class Data_Stream$/;"	c	namespace:hz
+Device_Read_Past_End	hz_data_device_exception.h	/^struct Device_Read_Past_End : std::runtime_error { using std::runtime_error::runtime_error; };$/;"	s	namespace:hz
+Dtls	hz_net_dtls_client.h	/^namespace Dtls {$/;"	n	namespace:hz::Net
+Dtls	hz_net_dtls_controller.h	/^namespace Dtls {$/;"	n	namespace:hz::Net
+Dtls	hz_net_dtls_controller_handler.h	/^namespace Dtls {$/;"	n	namespace:hz::Net
+Dtls	hz_net_dtls_credentials_manager.cpp	/^namespace Dtls {$/;"	n	namespace:hz::Net	file:
+Dtls	hz_net_dtls_credentials_manager.h	/^namespace Dtls {$/;"	n	namespace:hz::Net
+Dtls	hz_net_dtls_event.h	/^namespace Dtls {$/;"	n	namespace:hz::Net
+Dtls	hz_net_dtls_event_formatter.h	/^namespace Dtls {$/;"	n	namespace:hz::Net
+Dtls	hz_net_dtls_node.h	/^namespace Dtls {$/;"	n	namespace:hz::Net
+Dtls	hz_net_dtls_server.h	/^namespace Dtls {$/;"	n	namespace:hz::Net
+Dtls	hz_net_dtls_tools.cpp	/^namespace Dtls {$/;"	n	namespace:hz::Net	file:
+Dtls	hz_net_dtls_tools.h	/^namespace Dtls {$/;"	n	namespace:hz::Net
+E	hz_net_executor_event_formatter.h	/^		using E = Executor_Event;$/;"	t	function:hz::Net::Executor_Event_Formatter::get_format_str	typeref:typename:Executor_Event
+ERROR	hz_net_handler.h	/^	enum class Event_Type : uint8_t { DEBUG, INFO, WARNING, ERROR };$/;"	e	enum:hz::Net::Handler::Event_Type
+Event	hz_net_dtls_event.h	/^enum class Event : uint8_t {$/;"	g	namespace:hz::Net::Dtls	typeref:typename:uint8_t
+Event	hz_net_proto_event.h	/^enum class Event : uint8_t {$/;"	g	namespace:hz::Net::Proto	typeref:typename:uint8_t
+Event	hz_net_udp_clean_timer.h	/^	enum class Event : uint8_t {$/;"	g	class:hz::Net::Udp::Clean_Timer	typeref:typename:uint8_t
+Event	hz_net_udp_event.h	/^enum class Event : uint8_t {$/;"	g	namespace:hz::Net::Udp	typeref:typename:uint8_t
+Event_Code	hz_net_event_code.h	/^	Event_Code(T code) :$/;"	f	struct:hz::Net::Event_Code
+Event_Code	hz_net_event_code.h	/^struct Event_Code$/;"	s	namespace:hz::Net
+Event_Formatter	hz_net_dtls_event_formatter.h	/^class Event_Formatter : public Abstract_Event_Formatter_Handler$/;"	c	namespace:hz::Net::Dtls
+Event_Formatter	hz_net_proto_event_formatter.h	/^class Event_Formatter : public Abstract_Event_Formatter_Handler$/;"	c	namespace:hz::Net::Proto
+Event_Formatter	hz_net_udp_event_formatter.h	/^class Event_Formatter : public Abstract_Event_Formatter_Handler$/;"	c	namespace:hz::Net::Udp
+Event_Formatter_Handler	hz_net_event_formatter_handler.h	/^class Event_Formatter_Handler$/;"	c	namespace:hz::Net
+Event_Handler	client.cpp	/^class Event_Handler : public hz::Net::Abstract_Event_Handler$/;"	c	file:
+Event_Handler	server.cpp	/^class Event_Handler : public hz::Net::Abstract_Event_Handler$/;"	c	file:
+Event_Payload	hz_net_event_payload.h	/^class Event_Payload$/;"	c	namespace:hz::Net
+Event_Type	hz_net_handler.h	/^	enum class Event_Type : uint8_t { DEBUG, INFO, WARNING, ERROR };$/;"	g	class:hz::Net::Handler	typeref:typename:uint8_t
+Executor	hz_net_executor.h	/^	Executor() : Executor{new boost::asio::io_context, true} {}$/;"	f	class:hz::Net::Executor
+Executor	hz_net_executor.h	/^	Executor(boost::asio::io_context& context) : Executor{&context, false} {}$/;"	f	class:hz::Net::Executor
+Executor	hz_net_executor.h	/^	Executor(boost::asio::io_context* context, bool is_own_context) :$/;"	f	class:hz::Net::Executor
+Executor	hz_net_executor.h	/^class Executor final : public Handler_T<Executor>$/;"	c	namespace:hz::Net
+Executor_Event	hz_net_executor_event.h	/^enum class Executor_Event : uint8_t { RUNTIME_ERROR };$/;"	g	namespace:hz::Net	typeref:typename:uint8_t
+Executor_Event_Formatter	hz_net_executor_event_formatter.h	/^class Executor_Event_Formatter : public Abstract_Event_Formatter_Handler$/;"	c	namespace:hz::Net
+FLAGS_ALL	hz_net_proto_node.h	/^		FLAGS_ALL		= RESERVED | REPEATED | FRAGMENT_QUERY | FRAGMENT | ANSWER | COMPRESSED$/;"	e	enum:hz::Net::Proto::Node::Flags
+FRAGMENT	hz_net_proto_node.h	/^		FRAGMENT		= 0x20,$/;"	e	enum:hz::Net::Proto::Node::Flags
+FRAGMENT_QUERY	hz_net_proto_node.h	/^		FRAGMENT_QUERY	= 0x10,$/;"	e	enum:hz::Net::Proto::Node::Flags
+FRAGMENT_REMOVE	hz_net_proto_node.h	/^		FRAGMENT_REMOVE	= FRAGMENT_QUERY | FRAGMENT,$/;"	e	enum:hz::Net::Proto::Node::Flags
+File_Device	hz_file_device.cpp	/^File_Device::File_Device() : _fd{nullptr} {}$/;"	f	class:hz::File_Device
+File_Device	hz_file_device.cpp	/^File_Device::File_Device(File_Device&& o) : _fd{std::move(o._fd)}$/;"	f	class:hz::File_Device
+File_Device	hz_file_device.cpp	/^File_Device::File_Device(const std::string& file_name) { open(file_name); }$/;"	f	class:hz::File_Device
+File_Device	hz_file_device.h	/^class File_Device : public Data_Device$/;"	c	namespace:hz
+Flags	hz_net_proto_node.h	/^	enum Flags {$/;"	g	class:hz::Net::Proto::Node
+Fragmented_Message	hz_net_proto_fragmented_message.h	/^	Fragmented_Message(uint8_t cmd, uint32_t max_fragment_size, uint32_t full_size) :$/;"	f	class:hz::Net::Proto::Fragmented_Message
+Fragmented_Message	hz_net_proto_fragmented_message.h	/^class Fragmented_Message$/;"	c	namespace:hz::Net::Proto
+Generate CA cert:	README.md	/^## Generate CA cert:$/;"	s	chapter:How to generate self-signed certificate via Botan
+Generate server cert:	README.md	/^## Generate server cert:$/;"	s	chapter:How to generate self-signed certificate via Botan
+HANDSHAKE_COMPLETE	hz_net_dtls_event.h	/^	HANDSHAKE_COMPLETE,$/;"	e	enum:hz::Net::Dtls::Event
+HZ_APPLY_PARSE_H	hz_apply_parse.h	/^#define HZ_APPLY_PARSE_H$/;"	d
+HZ_BYTE_ARRAY_DEVICE_H	hz_byte_array_device.h	/^#define HZ_BYTE_ARRAY_DEVICE_H$/;"	d
+HZ_DATA_DEVICE_EXCEPTION_H	hz_data_device_exception.h	/^#define HZ_DATA_DEVICE_EXCEPTION_H$/;"	d
+HZ_DATA_DEVICE_H	hz_data_device.h	/^#define HZ_DATA_DEVICE_H$/;"	d
+HZ_DATA_STREAM_H	hz_data_stream.h	/^#define HZ_DATA_STREAM_H$/;"	d
+HZ_FILE_DEVICE_H	hz_file_device.h	/^#define HZ_FILE_DEVICE_H$/;"	d
+HZ_MAX_MESSAGE_DATA_SIZE	hz_net_defs.h	/^#define HZ_MAX_MESSAGE_DATA_SIZE /;"	d
+HZ_MAX_PACKET_DATA_SIZE	hz_net_defs.h	/^#define HZ_MAX_PACKET_DATA_SIZE /;"	d
+HZ_MAX_UDP_PACKET_SIZE	hz_net_defs.h	/^#define HZ_MAX_UDP_PACKET_SIZE /;"	d
+HZ_NET_ABSTRACT_BASE_HANDLER_H	hz_net_abstract_base_handler.h	/^#define HZ_NET_ABSTRACT_BASE_HANDLER_H$/;"	d
+HZ_NET_ABSTRACT_EVENT_FORMATTER_HANDLER_H	hz_net_abstract_event_formatter_handler.h	/^#define HZ_NET_ABSTRACT_EVENT_FORMATTER_HANDLER_H$/;"	d
+HZ_NET_ABSTRACT_EVENT_HANDLER_H	hz_net_abstract_event_handler.h	/^#define HZ_NET_ABSTRACT_EVENT_HANDLER_H$/;"	d
+HZ_NET_ABSTRACT_HANDLER_H	hz_net_abstract_handler.h	/^#define HZ_NET_ABSTRACT_HANDLER_H$/;"	d
+HZ_NET_ABSTRACT_MESSAGE_HANDLER_H	hz_net_abstract_message_handler.h	/^#define HZ_NET_ABSTRACT_MESSAGE_HANDLER_H$/;"	d
+HZ_NET_ABSTRACT_NODE_HANDLER_H	hz_net_abstract_node_handler.h	/^#define HZ_NET_ABSTRACT_NODE_HANDLER_H$/;"	d
+HZ_NET_ASYNC_MESSAGE_QUEUE_H	hz_net_async_message_queue.h	/^#define HZ_NET_ASYNC_MESSAGE_QUEUE_H$/;"	d
+HZ_NET_BASE_HANDLER_H	hz_net_base_handler.h	/^#define HZ_NET_BASE_HANDLER_H$/;"	d
+HZ_NET_DATA_PACKET_H	hz_net_data_packet.h	/^#define HZ_NET_DATA_PACKET_H$/;"	d
+HZ_NET_DEFS_H	hz_net_defs.h	/^#define HZ_NET_DEFS_H$/;"	d
+HZ_NET_DTLS_CLIENT_H	hz_net_dtls_client.h	/^#define HZ_NET_DTLS_CLIENT_H$/;"	d
+HZ_NET_DTLS_CONTROLLER_H	hz_net_dtls_controller.h	/^#define HZ_NET_DTLS_CONTROLLER_H$/;"	d
+HZ_NET_DTLS_CONTROLLER_HANDLER_H	hz_net_dtls_controller_handler.h	/^#define HZ_NET_DTLS_CONTROLLER_HANDLER_H$/;"	d
+HZ_NET_DTLS_CREDENTIAL_MANAGER_H	hz_net_dtls_credentials_manager.h	/^#define HZ_NET_DTLS_CREDENTIAL_MANAGER_H$/;"	d
+HZ_NET_DTLS_EVENT_FORMATTER_H	hz_net_dtls_event_formatter.h	/^#define HZ_NET_DTLS_EVENT_FORMATTER_H$/;"	d
+HZ_NET_DTLS_EVENT_H	hz_net_dtls_event.h	/^#define HZ_NET_DTLS_EVENT_H$/;"	d
+HZ_NET_DTLS_NODE_H	hz_net_dtls_node.h	/^#define HZ_NET_DTLS_NODE_H$/;"	d
+HZ_NET_DTLS_SERVER_H	hz_net_dtls_server.h	/^#define HZ_NET_DTLS_SERVER_H$/;"	d
+HZ_NET_DTLS_TOOLS_H	hz_net_dtls_tools.h	/^#define HZ_NET_DTLS_TOOLS_H$/;"	d
+HZ_NET_EVENT_FORMATTER_HANDLER_H	hz_net_event_formatter_handler.h	/^#define HZ_NET_EVENT_FORMATTER_HANDLER_H$/;"	d
+HZ_NET_EVENT_H	hz_net_event_code.h	/^#define HZ_NET_EVENT_H$/;"	d
+HZ_NET_EVENT_PAYLOAD_H	hz_net_event_payload.h	/^#define HZ_NET_EVENT_PAYLOAD_H$/;"	d
+HZ_NET_EXECUTOR_EVENT_FORMATTER_H	hz_net_executor_event_formatter.h	/^#define HZ_NET_EXECUTOR_EVENT_FORMATTER_H$/;"	d
+HZ_NET_EXECUTOR_EVENT_H	hz_net_executor_event.h	/^#define HZ_NET_EXECUTOR_EVENT_H$/;"	d
+HZ_NET_EXECUTOR_H	hz_net_executor.h	/^#define HZ_NET_EXECUTOR_H$/;"	d
+HZ_NET_HANDLER_H	hz_net_handler.h	/^#define HZ_NET_HANDLER_H$/;"	d
+HZ_NET_MESSAGE_HANDLER_H	hz_net_message_handler.h	/^#define HZ_NET_MESSAGE_HANDLER_H$/;"	d
+HZ_NET_NODE_CONTROLLER_HANDLER_H	hz_net_node_controller_handler.h	/^#define HZ_NET_NODE_CONTROLLER_HANDLER_H$/;"	d
+HZ_NET_NODE_DATA_PACKET_H	hz_net_node_data_packet.h	/^#define HZ_NET_NODE_DATA_PACKET_H$/;"	d
+HZ_NET_NODE_H	hz_net_node.h	/^#define HZ_NET_NODE_H$/;"	d
+HZ_NET_NODE_HANDLER_H	hz_net_node_handler.h	/^#define HZ_NET_NODE_HANDLER_H$/;"	d
+HZ_NET_NODE_INIT_PAYLOAD_H	hz_net_node_init_payload.h	/^#define HZ_NET_NODE_INIT_PAYLOAD_H$/;"	d
+HZ_NET_PROTO_CONTROLLER_H	hz_net_proto_controller.h	/^#define HZ_NET_PROTO_CONTROLLER_H$/;"	d
+HZ_NET_PROTO_CONTROLLER_HANDLER_H	hz_net_proto_controller_handler.h	/^#define HZ_NET_PROTO_CONTROLLER_HANDLER_H$/;"	d
+HZ_NET_PROTO_EVENT_FORMATTER_H	hz_net_proto_event_formatter.h	/^#define HZ_NET_PROTO_EVENT_FORMATTER_H$/;"	d
+HZ_NET_PROTO_EVENT_H	hz_net_proto_event.h	/^#define HZ_NET_PROTO_EVENT_H$/;"	d
+HZ_NET_PROTO_FRAGMENTED_MESSAGE_H	hz_net_proto_fragmented_message.h	/^#define HZ_NET_PROTO_FRAGMENTED_MESSAGE_H$/;"	d
+HZ_NET_PROTO_MESSAGE_H	hz_net_proto_message.h	/^#define HZ_NET_PROTO_MESSAGE_H$/;"	d
+HZ_NET_PROTO_MESSAGE_ITEM_H	hz_net_proto_message_item.h	/^#define HZ_NET_PROTO_MESSAGE_ITEM_H$/;"	d
+HZ_NET_PROTO_NODE_H	hz_net_proto_node.h	/^#define HZ_NET_PROTO_NODE_H$/;"	d
+HZ_NET_PROTO_SENDER_H	hz_net_proto_sender.h	/^#define HZ_NET_PROTO_SENDER_H$/;"	d
+HZ_NET_SERVER_INFO_H	hz_net_server_info.h	/^#define HZ_NET_SERVER_INFO_H$/;"	d
+HZ_NET_TEXT_EVENT_PAYLOAD_H	hz_net_text_event_payload.h	/^#define HZ_NET_TEXT_EVENT_PAYLOAD_H$/;"	d
+HZ_NET_UDP_CLEAN_TIMER_H	hz_net_udp_clean_timer.h	/^#define HZ_NET_UDP_CLEAN_TIMER_H$/;"	d
+HZ_NET_UDP_CLEAN_TIMER_NODE_H	hz_net_udp_clean_timer_node.h	/^#define HZ_NET_UDP_CLEAN_TIMER_NODE_H$/;"	d
+HZ_NET_UDP_CLIENT_H	hz_net_udp_client.h	/^#define HZ_NET_UDP_CLIENT_H$/;"	d
+HZ_NET_UDP_CONTROLLER_H	hz_net_udp_controller.h	/^#define HZ_NET_UDP_CONTROLLER_H$/;"	d
+HZ_NET_UDP_EVENT_FORMATTER_H	hz_net_udp_event_formatter.h	/^#define HZ_NET_UDP_EVENT_FORMATTER_H$/;"	d
+HZ_NET_UDP_EVENT_H	hz_net_udp_event.h	/^#define HZ_NET_UDP_EVENT_H$/;"	d
+HZ_NET_UDP_SERVER_H	hz_net_udp_server.h	/^#define HZ_NET_UDP_SERVER_H$/;"	d
+HZ_PROTOCOL_MAX_MESSAGE_SIZE	hz_net_defs.h	/^#define HZ_PROTOCOL_MAX_MESSAGE_SIZE /;"	d
+Handler	hz_net_handler.h	/^class Handler : public Base_Handler<Handler>$/;"	c	namespace:hz::Net
+Handler_T	hz_net_abstract_handler.h	/^class Handler_T : public Base_Handler_T<Abstract_Handler, T> {};$/;"	c	namespace:hz::Net
+How to generate self-signed certificate via Botan	README.md	/^# How to generate self-signed certificate via Botan$/;"	c
+IF_BIG_ENDIAN	hz_data_stream.h	/^#define IF_BIG_ENDIAN /;"	d
+INFO	hz_net_handler.h	/^	enum class Event_Type : uint8_t { DEBUG, INFO, WARNING, ERROR };$/;"	e	enum:hz::Net::Handler::Event_Type
+Indices	hz_apply_parse.h	/^	using Indices = std::make_index_sequence<std::tuple_size<Tuple>::value - sizeof...(Args)>;$/;"	t	function:hz::apply_parse
+LIB_SOURCES	CMakeLists.txt	/^set(LIB_SOURCES$/;"	v
+Message	hz_net_proto_message.h	/^	Message(uint8_t msg_id, uint8_t cmd, Type type, std::shared_ptr<Data_Device> data) :$/;"	f	struct:hz::Net::Proto::Message
+Message	hz_net_proto_message.h	/^struct Message final : Message_Handler_T<Message>$/;"	s	namespace:hz::Net::Proto
+Message_Context	hz_net_udp_controller.h	/^struct Message_Context$/;"	s	namespace:hz::Net::Udp
+Message_Handler	hz_net_message_handler.h	/^class Message_Handler : public Base_Ptr_Handler<Message_Handler>$/;"	c	namespace:hz::Net
+Message_Handler_T	hz_net_abstract_message_handler.h	/^class Message_Handler_T : public Base_Ptr_Handler_T<Abstract_Message_Handler, Message_Handler, T/;"	c	namespace:hz::Net
+Message_Item	hz_net_proto_message_item.h	/^	Message_Item(uint8_t cmd) : _cmd{cmd} {}$/;"	f	struct:hz::Net::Proto::Message_Item
+Message_Item	hz_net_proto_message_item.h	/^	Message_Item(uint8_t cmd, uint8_t answer_id) : _answer_id{answer_id}, _cmd{cmd} {}$/;"	f	struct:hz::Net::Proto::Message_Item
+Message_Item	hz_net_proto_message_item.h	/^struct Message_Item : Message_Handler_T<Message_Item>$/;"	s	namespace:hz::Net::Proto
+My_Proto	client.cpp	/^class My_Proto final :$/;"	c	file:
+My_Proto	server.cpp	/^class My_Proto final :$/;"	c	file:
+Net	hz_net_abstract_base_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_abstract_event_formatter_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_abstract_event_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_abstract_handler.cpp	/^namespace Net {$/;"	n	namespace:hz	file:
+Net	hz_net_abstract_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_abstract_message_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_abstract_node_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_async_message_queue.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_base_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_data_packet.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_defs.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_dtls_client.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_dtls_controller.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_dtls_controller_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_dtls_credentials_manager.cpp	/^namespace Net {$/;"	n	namespace:hz	file:
+Net	hz_net_dtls_credentials_manager.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_dtls_event.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_dtls_event_formatter.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_dtls_node.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_dtls_server.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_dtls_tools.cpp	/^namespace Net {$/;"	n	namespace:hz	file:
+Net	hz_net_dtls_tools.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_event_code.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_event_formatter_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_event_payload.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_executor.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_executor_event.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_executor_event_formatter.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_message_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_node.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_node_controller_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_node_data_packet.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_node_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_node_init_payload.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_proto_controller.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_proto_controller_handler.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_proto_event.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_proto_event_formatter.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_proto_fragmented_message.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_proto_message.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_proto_message_item.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_proto_node.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_proto_sender.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_server_info.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_text_event_payload.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_udp_clean_timer.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_udp_clean_timer_node.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_udp_client.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_udp_controller.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_udp_event.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_udp_event_formatter.h	/^namespace Net {$/;"	n	namespace:hz
+Net	hz_net_udp_server.h	/^namespace Net {$/;"	n	namespace:hz
+Node	hz_net_dtls_node.h	/^	Node(Controller_Handler* controller) :$/;"	f	class:hz::Net::Dtls::Node
+Node	hz_net_dtls_node.h	/^class Node final : public Botan::TLS::Callbacks, public Node_Handler_T<Node>$/;"	c	namespace:hz::Net::Dtls
+Node	hz_net_node.h	/^class Node : public Node_Handler_T<Node>$/;"	c	namespace:hz::Net
+Node	hz_net_proto_node.h	/^	Node(Controller_Handler* ctrl) :$/;"	f	class:hz::Net::Proto::Node
+Node	hz_net_proto_node.h	/^class Node : public Node_Handler_T<Node>$/;"	c	namespace:hz::Net::Proto
+Node_Controller_Handler	hz_net_node_controller_handler.h	/^class Node_Controller_Handler$/;"	c	namespace:hz::Net
+Node_Data_Packet	hz_net_node_data_packet.h	/^	Node_Data_Packet(std::shared_ptr<Node_Handler>&& node, const uint8_t* data, std::size_t size) :$/;"	f	struct:hz::Net::Node_Data_Packet
+Node_Data_Packet	hz_net_node_data_packet.h	/^	Node_Data_Packet(std::shared_ptr<Node_Handler>&& node, std::shared_ptr<Message_Handler>&& msg) /;"	f	struct:hz::Net::Node_Data_Packet
+Node_Data_Packet	hz_net_node_data_packet.h	/^struct Node_Data_Packet$/;"	s	namespace:hz::Net
+Node_Handler	hz_net_node_handler.h	/^class Node_Handler : public Base_Ptr_Handler<Node_Handler>$/;"	c	namespace:hz::Net
+Node_Handler_T	hz_net_abstract_node_handler.h	/^class Node_Handler_T : public Base_Ptr_Handler_T<Abstract_Node_Handler, Node_Handler, T> {};$/;"	c	namespace:hz::Net
+Node_Init_Payload	hz_net_node_init_payload.h	/^class Node_Init_Payload$/;"	c	namespace:hz::Net
+Only_Protocol	hz_net_proto_message_item.h	/^	class Only_Protocol { Only_Protocol() = default; friend class Node; };$/;"	c	struct:hz::Net::Proto::Message_Item
+PING	hz_net_proto_node.h	/^		PING			= 0x01,$/;"	e	enum:hz::Net::Proto::Node::Flags
+PING	hz_net_proto_node.h	/^		PING,$/;"	e	enum:hz::Net::Proto::Cmd::Cmd
+PROTOCOL_CHOOSEN	hz_net_dtls_event.h	/^	PROTOCOL_CHOOSEN,$/;"	e	enum:hz::Net::Dtls::Event
+Proto	hz_net_proto_controller.h	/^namespace Proto {$/;"	n	namespace:hz::Net
+Proto	hz_net_proto_controller_handler.h	/^namespace Proto {$/;"	n	namespace:hz::Net
+Proto	hz_net_proto_event.h	/^namespace Proto {$/;"	n	namespace:hz::Net
+Proto	hz_net_proto_event_formatter.h	/^namespace Proto {$/;"	n	namespace:hz::Net
+Proto	hz_net_proto_fragmented_message.h	/^namespace Proto {$/;"	n	namespace:hz::Net
+Proto	hz_net_proto_message.h	/^namespace Proto {$/;"	n	namespace:hz::Net
+Proto	hz_net_proto_message_item.h	/^namespace Proto {$/;"	n	namespace:hz::Net
+Proto	hz_net_proto_node.h	/^namespace Proto {$/;"	n	namespace:hz::Net
+Proto	hz_net_proto_sender.h	/^namespace Proto {$/;"	n	namespace:hz::Net
+RECEIVED_DATA_ERROR	hz_net_dtls_event.h	/^	RECEIVED_DATA_ERROR,$/;"	e	enum:hz::Net::Dtls::Event
+RECEIVED_DATA_ERROR	hz_net_proto_event.h	/^	RECEIVED_DATA_ERROR,$/;"	e	enum:hz::Net::Proto::Event
+RECV_ERROR	hz_net_udp_event.h	/^	RECV_ERROR,$/;"	e	enum:hz::Net::Udp::Event
+REMOVE_FRAGMENT	hz_net_proto_node.h	/^		REMOVE_FRAGMENT,$/;"	e	enum:hz::Net::Proto::Cmd::Cmd
+REPEATED	hz_net_proto_node.h	/^		REPEATED		= 0x08,$/;"	e	enum:hz::Net::Proto::Node::Flags
+RESERVED	hz_net_proto_node.h	/^		RESERVED		= 0x04,$/;"	e	enum:hz::Net::Proto::Node::Flags
+RESERVED_2	hz_net_proto_node.h	/^		RESERVED_2		= 0x02,$/;"	e	enum:hz::Net::Proto::Node::Flags
+RUNTIME_ERROR	hz_net_executor_event.h	/^enum class Executor_Event : uint8_t { RUNTIME_ERROR };$/;"	e	enum:hz::Net::Executor_Event
+SEND_ERROR	hz_net_udp_event.h	/^	SEND_ERROR,$/;"	e	enum:hz::Net::Udp::Event
+SEND_ERROR_WRONG_SIZE	hz_net_udp_event.h	/^	SEND_ERROR_WRONG_SIZE,$/;"	e	enum:hz::Net::Udp::Event
+SESSION_ID	hz_net_dtls_event.h	/^	SESSION_ID,$/;"	e	enum:hz::Net::Dtls::Event
+SESSION_TICKET	hz_net_dtls_event.h	/^	SESSION_TICKET,$/;"	e	enum:hz::Net::Dtls::Event
+SIMPLE	hz_net_proto_message.h	/^	enum Type { SIMPLE, ANSWER, TIMEOUT };$/;"	e	enum:hz::Net::Proto::Message::Type
+SOURCES	CMakeLists.txt	/^set(SOURCES$/;"	v
+Sender	hz_net_proto_sender.h	/^	Sender(Node_Handler& p, uint8_t cmd) :$/;"	f	class:hz::Net::Proto::Sender
+Sender	hz_net_proto_sender.h	/^	Sender(Node_Handler& p, uint8_t cmd, uint8_t answer_id) :$/;"	f	class:hz::Net::Proto::Sender
+Sender	hz_net_proto_sender.h	/^	Sender(Sender&& o) :$/;"	f	class:hz::Net::Proto::Sender
+Sender	hz_net_proto_sender.h	/^class Sender : public Data_Stream$/;"	c	namespace:hz::Net::Proto
+Server	hz_net_dtls_server.h	/^	Server(const std::string &tls_policy_file_name, const std::string &crt_file_name, const std::st/;"	f	class:hz::Net::Dtls::Server
+Server	hz_net_dtls_server.h	/^class Server final : public Controller$/;"	c	namespace:hz::Net::Dtls
+Server	hz_net_udp_server.h	/^	Server(uint16_t port, const std::string& host = "localhost") :$/;"	f	class:hz::Net::Udp::Server
+Server	hz_net_udp_server.h	/^class Server final : public Controller$/;"	c	namespace:hz::Net::Udp
+Server_Info	hz_net_server_info.h	/^	Server_Info(const std::string& host, uint16_t port) :$/;"	f	class:hz::Net::Server_Info
+Server_Info	hz_net_server_info.h	/^class Server_Info final : public Node_Init_Payload$/;"	c	namespace:hz::Net
+T	hz_byte_array_device.cpp	/^			using T = std::decay_t<decltype(arg)>;$/;"	t	function:hz::Byte_Array_Device::resize::__anond40658b80502	file:
+T	hz_byte_array_device.cpp	/^		using T = std::decay_t<decltype(arg)>;$/;"	t	function:hz::Byte_Array_Device::data::__anond40658b80302	file:
+T	hz_byte_array_device.cpp	/^		using T = std::decay_t<decltype(arg)>;$/;"	t	function:hz::Byte_Array_Device::data::__anond40658b80402	file:
+T	hz_byte_array_device.cpp	/^		using T = std::decay_t<decltype(arg)>;$/;"	t	function:hz::Byte_Array_Device::is_readonly::__anond40658b80102	file:
+T	hz_byte_array_device.cpp	/^		using T = std::decay_t<decltype(arg)>;$/;"	t	function:hz::Byte_Array_Device::size::__anond40658b80202	file:
+TEMPORARY_FILE	hz_file_device.h	/^	using TEMPORARY_FILE = std::string;$/;"	t	class:hz::File_Device	typeref:typename:std::string
+TIMEOUT	hz_net_proto_message.h	/^	enum Type { SIMPLE, ANSWER, TIMEOUT };$/;"	e	enum:hz::Net::Proto::Message::Type
+TIMER	hz_net_udp_clean_timer.h	/^		TIMER,$/;"	e	enum:hz::Net::Udp::Clean_Timer::Event
+TRANSMITED_DATA_ERROR	hz_net_dtls_event.h	/^	TRANSMITED_DATA_ERROR,$/;"	e	enum:hz::Net::Dtls::Event
+TRANSMITED_DATA_ERROR	hz_net_proto_event.h	/^	TRANSMITED_DATA_ERROR,$/;"	e	enum:hz::Net::Proto::Event
+Text_Event_Payload	hz_net_text_event_payload.h	/^	Text_Event_Payload(const std::vector<std::string>& data) : _data{{data}} {}$/;"	f	class:hz::Net::Text_Event_Payload
+Text_Event_Payload	hz_net_text_event_payload.h	/^	Text_Event_Payload(std::function<std::vector<std::string>()> getter) : _getter{std::move(getter/;"	f	class:hz::Net::Text_Event_Payload
+Text_Event_Payload	hz_net_text_event_payload.h	/^	Text_Event_Payload(std::vector<std::string>&& data) : _data{std::move(data)} {}$/;"	f	class:hz::Net::Text_Event_Payload
+Text_Event_Payload	hz_net_text_event_payload.h	/^class Text_Event_Payload : public Event_Payload$/;"	c	namespace:hz::Net
+Time_Point	hz_net_defs.h	/^using Time_Point = Clock::time_point;$/;"	t	namespace:hz::Net	typeref:typename:Clock::time_point
+Timeout_Waiter	hz_net_proto_controller.h	/^	struct Timeout_Waiter$/;"	s	class:hz::Net::Proto::Controller
+Tools	hz_net_dtls_tools.cpp	/^Tools::Tools(const std::chrono::milliseconds ocsp_timeout) :$/;"	f	class:hz::Net::Dtls::Tools
+Tools	hz_net_dtls_tools.h	/^class Tools$/;"	c	namespace:hz::Net::Dtls
+Tuple	hz_apply_parse.h	/^	using Tuple = typename fn_traits<Fn>::args; \/\/ TODO: create tuple without Args, only {FArgs -/;"	t	function:hz::apply_parse	typeref:typename:fn_traits<Fn>::args
+Type	hz_net_base_handler.h	/^	using Type = Handler_Type;$/;"	t	class:hz::Net::Base_Handler	typeref:typename:Handler_Type
+Type	hz_net_proto_message.h	/^	enum Type { SIMPLE, ANSWER, TIMEOUT };$/;"	g	struct:hz::Net::Proto::Message
+USER_COMMAND	hz_net_proto_node.h	/^		USER_COMMAND = 16$/;"	e	enum:hz::Net::Proto::Cmd::Cmd
+Udp	hz_net_udp_clean_timer.h	/^namespace Udp {$/;"	n	namespace:hz::Net
+Udp	hz_net_udp_clean_timer_node.h	/^namespace Udp {$/;"	n	namespace:hz::Net
+Udp	hz_net_udp_client.h	/^namespace Udp {$/;"	n	namespace:hz::Net
+Udp	hz_net_udp_controller.h	/^namespace Udp {$/;"	n	namespace:hz::Net
+Udp	hz_net_udp_event.h	/^namespace Udp {$/;"	n	namespace:hz::Net
+Udp	hz_net_udp_event_formatter.h	/^namespace Udp {$/;"	n	namespace:hz::Net
+Udp	hz_net_udp_server.h	/^namespace Udp {$/;"	n	namespace:hz::Net
+User_App_Chooser_Func	hz_net_dtls_server.h	/^	using User_App_Chooser_Func = std::function<std::shared_ptr<Node_Init_Payload>(const std::vecto/;"	t	class:hz::Net::Dtls::Server
+WARNING	hz_net_handler.h	/^	enum class Event_Type : uint8_t { DEBUG, INFO, WARNING, ERROR };$/;"	e	enum:hz::Net::Handler::Event_Type
+ZERO	hz_net_proto_node.h	/^		ZERO = 0,$/;"	e	enum:hz::Net::Proto::Cmd::Cmd
+__anon021cf3810102	hz_net_udp_server.h	/^		{$/;"	f	function:hz::Net::Udp::Server::init	typeref:typename:std::vector<std::string>	file:
+__anon2c06cb6f0102	hz_net_dtls_server.h	/^			{$/;"	f	function:hz::Net::Dtls::Server::tls_server_choose_app_protocol	typeref:typename:std::vector<std::string>	file:
+__anon324d22c80102	hz_net_async_message_queue.h	/^		_rx.reset(new Async_Message_Queue{io(), [this](Node_Handler& node, Message_Handler& msg) { Abs/;"	f	function:hz::Net::Async_Messages::init	file:
+__anon324d22c80202	hz_net_async_message_queue.h	/^		_tx.reset(new Async_Message_Queue{io(), [this](Node_Handler& node, Message_Handler& msg) { Abs/;"	f	function:hz::Net::Async_Messages::init	file:
+__anon42aa38690102	hz_net_udp_client.h	/^		{$/;"	f	function:hz::Net::Udp::Client::connect	typeref:typename:std::vector<std::string>	file:
+__anon59dfec5b0108	hz_net_proto_node.h	/^	{$/;"	s	class:hz::Net::Proto::Node
+__anon59dfec5b0208	hz_net_proto_node.h	/^	{$/;"	s	class:hz::Net::Proto::Node
+__anona266d3ed0102	hz_net_udp_clean_timer.h	/^		{$/;"	f	function:hz::Net::Udp::Clean_Timer::remove_frozen_nodes	file:
+__anonbd4d83ae0102	hz_net_udp_controller.h	/^			io()->post([this, remote_endpoint]() { close_node(remote_endpoint); });$/;"	f	function:hz::Net::Udp::Controller::close_node	file:
+__anond370c8b90102	hz_net_proto_controller.h	/^		{$/;"	f	function:hz::Net::Proto::Controller::send_node_data	file:
+__anond40658b80102	hz_byte_array_device.cpp	/^	{$/;"	f	function:hz::Byte_Array_Device::is_readonly	typeref:typename:bool	file:
+__anond40658b80202	hz_byte_array_device.cpp	/^	{$/;"	f	function:hz::Byte_Array_Device::size	file:
+__anond40658b80302	hz_byte_array_device.cpp	/^	{$/;"	f	function:hz::Byte_Array_Device::data	typeref:typename:const uint8_t *	file:
+__anond40658b80402	hz_byte_array_device.cpp	/^	{$/;"	f	function:hz::Byte_Array_Device::data	typeref:typename:uint8_t *	file:
+__anond40658b80502	hz_byte_array_device.cpp	/^		{$/;"	f	function:hz::Byte_Array_Device::resize	file:
+__anonf71da29c0102	hz_net_dtls_controller.h	/^		{$/;"	f	function:hz::Net::Dtls::Controller::send_node_data	file:
+__anonf71da29c0202	hz_net_dtls_controller.h	/^		{$/;"	f	function:hz::Net::Dtls::Controller::tls_alert	typeref:typename:std::vector<std::string>	file:
+__anonf71da29c0302	hz_net_dtls_controller.h	/^		{$/;"	f	function:hz::Net::Dtls::Controller::tls_session_established	typeref:typename:std::vector<std::string>	file:
+__anonf71da29c0402	hz_net_dtls_controller.h	/^			{$/;"	f	function:hz::Net::Dtls::Controller::tls_session_established	typeref:typename:std::vector<std::string>	file:
+__anonf71da29c0502	hz_net_dtls_controller.h	/^			{$/;"	f	function:hz::Net::Dtls::Controller::tls_session_established	typeref:typename:std::vector<std::string>	file:
+__anonf71da29c0602	hz_net_dtls_controller.h	/^		{$/;"	f	function:hz::Net::Dtls::Controller::tls_session_activated	file:
+__fn_traits	hz_apply_parse.h	/^struct __fn_traits$/;"	s	namespace:hz
+_answer_func	hz_net_proto_message_item.h	/^	std::function<void(std::shared_ptr<Data_Device>)> _answer_func;$/;"	m	struct:hz::Net::Proto::Message_Item	typeref:typename:std::function<void (std::shared_ptr<Data_Device>)>
+_answer_id	hz_net_proto_message_item.h	/^	std::optional<uint8_t> _id, _answer_id;$/;"	m	struct:hz::Net::Proto::Message_Item	typeref:typename:std::optional<uint8_t>
+_begin_time	hz_net_proto_message_item.h	/^	std::chrono::time_point<std::chrono::steady_clock> _begin_time, _end_time;$/;"	m	struct:hz::Net::Proto::Message_Item	typeref:typename:std::chrono::time_point<std::chrono::steady_clock>
+_channel	hz_net_dtls_node.h	/^	std::shared_ptr<Botan::TLS::Channel> _channel;$/;"	m	class:hz::Net::Dtls::Node	typeref:typename:std::shared_ptr<Botan::TLS::Channel>
+_cleaning_timeout	hz_net_udp_clean_timer.h	/^	std::chrono::milliseconds _cleaning_timeout;$/;"	m	class:hz::Net::Udp::Clean_Timer	typeref:typename:std::chrono::milliseconds
+_cmd	hz_net_proto_fragmented_message.h	/^	uint8_t _cmd;$/;"	m	class:hz::Net::Proto::Fragmented_Message	typeref:typename:uint8_t
+_cmd	hz_net_proto_message.h	/^	uint8_t _msg_id, _cmd;$/;"	m	struct:hz::Net::Proto::Message	typeref:typename:uint8_t
+_cmd	hz_net_proto_message_item.h	/^	uint8_t _cmd = 0, _flags = 0;$/;"	m	struct:hz::Net::Proto::Message_Item	typeref:typename:uint8_t
+_code	hz_net_event_code.h	/^	uint8_t _code;$/;"	m	struct:hz::Net::Event_Code	typeref:typename:uint8_t
+_context	hz_net_abstract_handler.h	/^	boost::asio::io_context* _context;$/;"	m	class:hz::Net::Abstract_Handler	typeref:typename:boost::asio::io_context *
+_creds	hz_net_dtls_tools.h	/^	std::unique_ptr<Credentials_Manager> _creds;$/;"	m	class:hz::Net::Dtls::Tools	typeref:typename:std::unique_ptr<Credentials_Manager>
+_ctrl	hz_net_dtls_node.h	/^	Controller_Handler* _ctrl;$/;"	m	class:hz::Net::Dtls::Node	typeref:typename:Controller_Handler *
+_ctrl	hz_net_proto_node.h	/^	Controller_Handler* _ctrl;$/;"	m	class:hz::Net::Proto::Node	typeref:typename:Controller_Handler *
+_data	hz_byte_array_device.h	/^	> _data;$/;"	m	class:hz::Byte_Array_Device
+_data	hz_net_async_message_queue.h	/^	std::queue<Node_Data_Packet> _data;$/;"	m	class:hz::Net::Async_Message_Queue	typeref:typename:std::queue<Node_Data_Packet>
+_data	hz_net_data_packet.h	/^	std::vector<uint8_t> _data;$/;"	m	struct:hz::Net::Data_Packet	typeref:typename:std::vector<uint8_t>
+_data	hz_net_proto_controller.h	/^		void* _data;$/;"	m	struct:hz::Net::Proto::Controller::Timeout_Waiter	typeref:typename:void *
+_data	hz_net_proto_fragmented_message.h	/^	std::shared_ptr<Data_Device> _data;$/;"	m	class:hz::Net::Proto::Fragmented_Message	typeref:typename:std::shared_ptr<Data_Device>
+_data	hz_net_proto_message.h	/^	std::shared_ptr<Data_Device> _data;$/;"	m	struct:hz::Net::Proto::Message	typeref:typename:std::shared_ptr<Data_Device>
+_data	hz_net_proto_message_item.h	/^	std::shared_ptr<Data_Device> _data;$/;"	m	struct:hz::Net::Proto::Message_Item	typeref:typename:std::shared_ptr<Data_Device>
+_data	hz_net_proto_node.h	/^		std::vector<uint8_t> _data;$/;"	m	struct:hz::Net::Proto::Node::__anon59dfec5b0108	typeref:typename:std::vector<uint8_t>
+_data	hz_net_text_event_payload.h	/^	mutable std::vector<std::string> _data;$/;"	m	class:hz::Net::Text_Event_Payload	typeref:typename:std::vector<std::string>
+_data_mutex	hz_net_async_message_queue.h	/^	std::mutex _data_mutex;$/;"	m	class:hz::Net::Async_Message_Queue	typeref:typename:std::mutex
+_dev	hz_data_stream.h	/^	> _dev;$/;"	m	class:hz::Data_Stream	typeref:typename:std::variant<std::shared_ptr<Data_Device>,Data_Device * >
+_device	hz_net_proto_node.h	/^	} _device;$/;"	m	class:hz::Net::Proto::Node	typeref:struct:hz::Net::Proto::Node::__anon59dfec5b0108
+_end_position	hz_net_proto_node.h	/^		std::queue<std::size_t> _end_position;$/;"	m	struct:hz::Net::Proto::Node::__anon59dfec5b0108	typeref:typename:std::queue<std::size_t>
+_end_time	hz_net_proto_message_item.h	/^	std::chrono::time_point<std::chrono::steady_clock> _begin_time, _end_time;$/;"	m	struct:hz::Net::Proto::Message_Item	typeref:typename:std::chrono::time_point<std::chrono::steady_clock>
+_endpoint	hz_net_node.h	/^	udp::endpoint _endpoint;$/;"	m	class:hz::Net::Node	typeref:typename:udp::endpoint
+_fd	hz_file_device.h	/^	std::FILE* _fd;$/;"	m	class:hz::File_Device	typeref:typename:std::FILE *
+_finally_func	hz_net_proto_message_item.h	/^	std::function<void(bool)> _finally_func;$/;"	m	struct:hz::Net::Proto::Message_Item	typeref:typename:std::function<void (bool)>
+_flags	hz_net_proto_message_item.h	/^	uint8_t _cmd = 0, _flags = 0;$/;"	m	struct:hz::Net::Proto::Message_Item	typeref:typename:uint8_t
+_formatters	hz_net_abstract_event_handler.h	/^	std::map<std::size_t, std::shared_ptr<Event_Formatter_Handler>> _formatters;$/;"	m	class:hz::Net::Abstract_Event_Handler	typeref:typename:std::map<std::size_t,std::shared_ptr<Event_Formatter_Handler>>
+_fragment_size	hz_net_proto_message_item.h	/^	uint32_t _fragment_size = HZ_MAX_MESSAGE_DATA_SIZE;$/;"	m	struct:hz::Net::Proto::Message_Item	typeref:typename:uint32_t
+_fragmented_messages	hz_net_proto_node.h	/^	std::map<uint8_t, Fragmented_Message> _fragmented_messages;$/;"	m	class:hz::Net::Proto::Node	typeref:typename:std::map<uint8_t,Fragmented_Message>
+_full_size	hz_net_proto_fragmented_message.h	/^	uint32_t _full_size, _max_fragment_size;$/;"	m	class:hz::Net::Proto::Fragmented_Message	typeref:typename:uint32_t
+_getter	hz_net_text_event_payload.h	/^	mutable std::function<std::vector<std::string>()> _getter;$/;"	m	class:hz::Net::Text_Event_Payload	typeref:typename:std::function<std::vector<std::string> ()>
+_handler	hz_net_async_message_queue.h	/^	std::function<void(Node_Handler&,Message_Handler&)> _handler;$/;"	m	class:hz::Net::Async_Message_Queue	typeref:typename:std::function<void (Node_Handler &,Message_Handler &)>
+_host	hz_net_server_info.h	/^	std::string _host;$/;"	m	class:hz::Net::Server_Info	typeref:typename:std::string
+_id	hz_net_proto_message_item.h	/^	std::optional<uint8_t> _id, _answer_id;$/;"	m	struct:hz::Net::Proto::Message_Item	typeref:typename:std::optional<uint8_t>
+_info	hz_net_udp_controller.h	/^	std::shared_ptr<Server_Info> _info;$/;"	m	class:hz::Net::Udp::Controller	typeref:typename:std::shared_ptr<Server_Info>
+_io	hz_net_async_message_queue.h	/^	boost::asio::io_context* _io;$/;"	m	class:hz::Net::Async_Message_Queue	typeref:typename:boost::asio::io_context *
+_is_running	hz_net_async_message_queue.h	/^	bool _is_running = false;$/;"	m	class:hz::Net::Async_Message_Queue	typeref:typename:bool
+_is_started	hz_net_udp_controller.h	/^	bool _is_started = false;$/;"	m	class:hz::Net::Udp::Controller	typeref:typename:bool
+_last_part_time	hz_net_proto_fragmented_message.h	/^	Time_Point _last_part_time;$/;"	m	class:hz::Net::Proto::Fragmented_Message	typeref:typename:Time_Point
+_lost_msg_list	hz_net_proto_node.h	/^	std::map<uint8_t, Time_Point> _lost_msg_list;$/;"	m	class:hz::Net::Proto::Node	typeref:typename:std::map<uint8_t,Time_Point>
+_max_fragment_size	hz_net_proto_fragmented_message.h	/^	uint32_t _full_size, _max_fragment_size;$/;"	m	class:hz::Net::Proto::Fragmented_Message	typeref:typename:uint32_t
+_min_compress_size	hz_net_proto_message_item.h	/^	uint32_t _min_compress_size = 512;$/;"	m	struct:hz::Net::Proto::Message_Item	typeref:typename:uint32_t
+_msg	hz_net_node_data_packet.h	/^	std::shared_ptr<Message_Handler> _msg;$/;"	m	struct:hz::Net::Node_Data_Packet	typeref:typename:std::shared_ptr<Message_Handler>
+_msg	hz_net_proto_sender.h	/^	std::shared_ptr<Message_Item> _msg;$/;"	m	class:hz::Net::Proto::Sender	typeref:typename:std::shared_ptr<Message_Item>
+_msg_id	hz_net_proto_message.h	/^	uint8_t _msg_id, _cmd;$/;"	m	struct:hz::Net::Proto::Message	typeref:typename:uint8_t
+_mutex	hz_net_dtls_controller.h	/^	std::mutex _mutex;$/;"	m	class:hz::Net::Dtls::Controller	typeref:typename:std::mutex
+_mutex	hz_net_proto_controller.h	/^	std::mutex _mutex;$/;"	m	class:hz::Net::Proto::Controller	typeref:typename:std::mutex
+_next	hz_net_abstract_base_handler.h	/^	std::shared_ptr<T> _next;$/;"	m	class:hz::Net::Abstract_Base_Handler	typeref:typename:std::shared_ptr<T>
+_next_msg_id	hz_net_proto_node.h	/^	} _next_msg_id;$/;"	m	class:hz::Net::Proto::Node	typeref:struct:hz::Net::Proto::Node::__anon59dfec5b0208
+_next_protocols	hz_net_dtls_client.h	/^	std::vector<std::string> _next_protocols;$/;"	m	class:hz::Net::Dtls::Client	typeref:typename:std::vector<std::string>
+_node	hz_net_node_data_packet.h	/^	std::shared_ptr<Node_Handler> _node;$/;"	m	struct:hz::Net::Node_Data_Packet	typeref:typename:std::shared_ptr<Node_Handler>
+_node	hz_net_proto_controller.h	/^		std::shared_ptr<Node> _node;$/;"	m	struct:hz::Net::Proto::Controller::Timeout_Waiter	typeref:typename:std::shared_ptr<Node>
+_node	hz_net_proto_sender.h	/^	std::shared_ptr<Node_Handler> _node;$/;"	m	class:hz::Net::Proto::Sender	typeref:typename:std::shared_ptr<Node_Handler>
+_nodes	hz_net_udp_controller.h	/^	std::map<udp::endpoint, std::shared_ptr<Node>> _nodes;$/;"	m	class:hz::Net::Udp::Controller	typeref:typename:std::map<udp::endpoint,std::shared_ptr<Node>>
+_nodes_mutex	hz_net_udp_controller.h	/^	mutable boost::shared_mutex _nodes_mutex;$/;"	m	class:hz::Net::Udp::Controller	typeref:typename:boost::shared_mutex
+_ocsp_timeout	hz_net_dtls_tools.h	/^	std::chrono::milliseconds _ocsp_timeout;$/;"	m	class:hz::Net::Dtls::Tools	typeref:typename:std::chrono::milliseconds
+_own_context	hz_net_executor.h	/^	bool _own_context;$/;"	m	class:hz::Net::Executor	typeref:typename:bool
+_part_vect	hz_net_proto_fragmented_message.h	/^	std::vector<std::pair<uint32_t, uint32_t>> _part_vect;$/;"	m	class:hz::Net::Proto::Fragmented_Message	typeref:typename:std::vector<std::pair<uint32_t,uint32_t>>
+_policy	hz_net_dtls_tools.h	/^	std::unique_ptr<Botan::TLS::Text_Policy> _policy;$/;"	m	class:hz::Net::Dtls::Tools	typeref:typename:std::unique_ptr<Botan::TLS::Text_Policy>
+_port	hz_net_server_info.h	/^	uint16_t _port;$/;"	m	class:hz::Net::Server_Info	typeref:typename:uint16_t
+_pos	hz_byte_array_device.h	/^	std::size_t _pos = 0;$/;"	m	class:hz::Byte_Array_Device	typeref:typename:std::size_t
+_pos	hz_net_proto_node.h	/^		std::size_t _pos;$/;"	m	struct:hz::Net::Proto::Node::__anon59dfec5b0108	typeref:typename:std::size_t
+_prev	hz_net_abstract_base_handler.h	/^	T* _prev;$/;"	m	class:hz::Net::Abstract_Base_Handler	typeref:typename:T *
+_reconnect_timeout	hz_net_udp_client.h	/^	std::chrono::milliseconds _reconnect_timeout;$/;"	m	class:hz::Net::Udp::Client	typeref:typename:std::chrono::milliseconds
+_recv_buffer	hz_net_udp_controller.h	/^	boost::array<uint8_t, HZ_MAX_UDP_PACKET_SIZE> _recv_buffer;$/;"	m	struct:hz::Net::Udp::Message_Context	typeref:typename:boost::array<uint8_t,HZ_MAX_UDP_PACKET_SIZE>
+_recv_time	hz_net_udp_clean_timer_node.h	/^	std::atomic<std::chrono::system_clock::time_point> _recv_time;$/;"	m	class:hz::Net::Udp::Clean_Timer_Node	typeref:typename:std::atomic<std::chrono::system_clock::time_point>
+_remote_endpoint	hz_net_udp_controller.h	/^	udp::endpoint _remote_endpoint;$/;"	m	struct:hz::Net::Udp::Message_Context	typeref:typename:udp::endpoint
+_rng	hz_net_dtls_tools.h	/^	std::unique_ptr<Botan::RandomNumberGenerator> _rng;$/;"	m	class:hz::Net::Dtls::Tools	typeref:typename:std::unique_ptr<Botan::RandomNumberGenerator>
+_rx	hz_net_async_message_queue.h	/^	std::unique_ptr<Async_Message_Queue> _rx, _tx;$/;"	m	class:hz::Net::Async_Messages	typeref:typename:std::unique_ptr<Async_Message_Queue>
+_rx	hz_net_proto_node.h	/^		uint8_t _rx = 0, _tx = 0;$/;"	m	struct:hz::Net::Proto::Node::__anon59dfec5b0208	typeref:typename:uint8_t
+_session_manager	hz_net_dtls_tools.h	/^	std::unique_ptr<Botan::TLS::Session_Manager_In_Memory> _session_manager;$/;"	m	class:hz::Net::Dtls::Tools	typeref:typename:std::unique_ptr<Botan::TLS::Session_Manager_In_Memory>
+_socket	hz_net_udp_controller.h	/^	std::unique_ptr<udp::socket> _socket;$/;"	m	class:hz::Net::Udp::Controller	typeref:typename:std::unique_ptr<udp::socket>
+_strand	hz_net_udp_controller.h	/^	std::unique_ptr<boost::asio::strand<boost::asio::io_context::executor_type>> _strand;$/;"	m	class:hz::Net::Udp::Controller	typeref:typename:std::unique_ptr<boost::asio::strand<boost::asio::io_context::executor_type>>
+_threads	hz_net_executor.h	/^	std::vector<std::thread> _threads;$/;"	m	class:hz::Net::Executor	typeref:typename:std::vector<std::thread>
+_timeout_func	hz_net_proto_message_item.h	/^	std::function<void()> _timeout_func;$/;"	m	struct:hz::Net::Proto::Message_Item	typeref:typename:std::function<void ()>
+_timer	hz_net_proto_controller.h	/^	std::unique_ptr<boost::asio::steady_timer> _timer;$/;"	m	class:hz::Net::Proto::Controller	typeref:typename:std::unique_ptr<boost::asio::steady_timer>
+_timer	hz_net_udp_clean_timer.h	/^	std::unique_ptr<boost::asio::steady_timer> _timer;$/;"	m	class:hz::Net::Udp::Clean_Timer	typeref:typename:std::unique_ptr<boost::asio::steady_timer>
+_timer	hz_net_udp_client.h	/^	std::unique_ptr<boost::asio::steady_timer> _timer;$/;"	m	class:hz::Net::Udp::Client	typeref:typename:std::unique_ptr<boost::asio::steady_timer>
+_tools	hz_net_dtls_controller.h	/^	Tools _tools;$/;"	m	class:hz::Net::Dtls::Controller	typeref:typename:Tools
+_tx	hz_net_async_message_queue.h	/^	std::unique_ptr<Async_Message_Queue> _rx, _tx;$/;"	m	class:hz::Net::Async_Messages	typeref:typename:std::unique_ptr<Async_Message_Queue>
+_tx	hz_net_proto_node.h	/^		uint8_t _rx = 0, _tx = 0;$/;"	m	struct:hz::Net::Proto::Node::__anon59dfec5b0208	typeref:typename:uint8_t
+_type	hz_net_proto_message.h	/^	Type _type;$/;"	m	struct:hz::Net::Proto::Message	typeref:typename:Type
+_type_hash	hz_net_abstract_base_handler.h	/^	std::size_t _type_hash;$/;"	m	class:hz::Net::Abstract_Base_Handler	typeref:typename:std::size_t
+_user_app_chooser	hz_net_dtls_server.h	/^	User_App_Chooser_Func _user_app_chooser;$/;"	m	class:hz::Net::Dtls::Server	typeref:typename:User_App_Chooser_Func
+_waiter	hz_net_proto_controller.h	/^	std::multimap<Time_Point, Timeout_Waiter> _waiter;$/;"	m	class:hz::Net::Proto::Controller	typeref:typename:std::multimap<Time_Point,Timeout_Waiter>
+_waiting_messages	hz_net_proto_node.h	/^	std::map<Time_Point, std::shared_ptr<Message_Item>> _waiting_messages;$/;"	m	class:hz::Net::Proto::Node	typeref:typename:std::map<Time_Point,std::shared_ptr<Message_Item>>
+add	hz_net_async_message_queue.h	/^	void add(Node_Handler& node, Message_Handler& msg)$/;"	f	class:hz::Net::Async_Message_Queue	typeref:typename:void
+add_and_start	hz_net_async_message_queue.h	/^	bool add_and_start(Node_Handler& node, Message_Handler& msg)$/;"	f	class:hz::Net::Async_Message_Queue	typeref:typename:bool
+add_data	hz_net_proto_fragmented_message.h	/^	bool add_data(uint32_t pos, const uint8_t *data, uint32_t len)$/;"	f	class:hz::Net::Proto::Fragmented_Message	typeref:typename:bool
+add_raw_data_to_packet	hz_net_proto_node.h	/^	void add_raw_data_to_packet(std::vector<uint8_t>& data, uint32_t pos, uint32_t max_data_size, D/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+add_timeout_at	hz_net_proto_controller.h	/^	void add_timeout_at(Node_Handler& node, Time_Point tp, void* data) override$/;"	f	class:hz::Net::Proto::Controller	typeref:typename:void
+add_to_waiting	hz_net_proto_node.h	/^	void add_to_waiting(Time_Point time_point, std::shared_ptr<Message_Item> message)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+answer	hz_net_proto_sender.h	/^	Sender &answer(std::function<void(std::shared_ptr<Data_Device>)> answer_func)$/;"	f	class:hz::Net::Proto::Sender	typeref:typename:Sender &
+apply_parse	hz_apply_parse.h	/^typename fn_traits<Fn>::ret apply_parse(Data_Device_T&& dev, Fn f, T* obj, Args&&... args)$/;"	f	namespace:hz	typeref:typename:fn_traits<Fn>::ret
+apply_parse	hz_apply_parse.h	/^typename fn_traits<Fn>::ret apply_parse(Data_Stream &ds, Fn f, T* obj, Args&&... args)$/;"	f	namespace:hz	typeref:typename:fn_traits<Fn>::ret
+apply_parse	hz_apply_parse.h	/^typename fn_traits<Fn>::ret apply_parse(const std::vector<uint8_t> &data, Fn f, T* obj, Args&&../;"	f	namespace:hz	typeref:typename:fn_traits<Fn>::ret
+apply_parse	hz_apply_parse.h	/^typename fn_traits<Fn>::ret apply_parse(const uint8_t* data, std::size_t size, Fn f, T* obj, Arg/;"	f	namespace:hz	typeref:typename:fn_traits<Fn>::ret
+args	hz_apply_parse.h	/^	using args = std::tuple<typename std::decay<Args>::type...>;$/;"	t	struct:hz::__fn_traits	typeref:typename:std::tuple<typename std::decay<Args>::type...>
+at_end	hz_data_device.h	/^	virtual bool at_end() const { return pos() >= size(); }$/;"	f	class:hz::Data_Device	typeref:typename:bool
+at_end	hz_data_stream.cpp	/^bool Data_Stream::at_end() const { return dev()->at_end(); }$/;"	f	class:hz::Data_Stream	typeref:typename:bool
+bswap	hz_data_stream.h	/^constexpr U bswap(T i)$/;"	f	namespace:hz	typeref:typename:U
+bswap_impl	hz_data_stream.h	/^constexpr T bswap_impl(T i, std::index_sequence<N...>)$/;"	f	namespace:hz	typeref:typename:T
+category	hz_net_dtls_event_formatter.h	/^	std::string category() const override { return "dtls"; }$/;"	f	class:hz::Net::Dtls::Event_Formatter	typeref:typename:std::string
+category	hz_net_executor_event_formatter.h	/^	std::string category() const override { return "net_exec"; }$/;"	f	class:hz::Net::Executor_Event_Formatter	typeref:typename:std::string
+category	hz_net_proto_event_formatter.h	/^	std::string category() const override { return "proto"; }$/;"	f	class:hz::Net::Proto::Event_Formatter	typeref:typename:std::string
+category	hz_net_udp_event_formatter.h	/^	std::string category() const override { return "udp"; }$/;"	f	class:hz::Net::Udp::Event_Formatter	typeref:typename:std::string
+cert_chain	hz_net_dtls_credentials_manager.cpp	/^std::vector<Botan::X509_Certificate> Credentials_Manager::cert_chain(const std::vector<std::stri/;"	f	class:hz::Net::Dtls::Credentials_Manager	typeref:typename:std::vector<Botan::X509_Certificate>
+certs	hz_net_dtls_credentials_manager.h	/^        std::vector<Botan::X509_Certificate> certs;$/;"	m	struct:hz::Net::Dtls::Credentials_Manager::Certificate_Info	typeref:typename:std::vector<Botan::X509_Certificate>
+cleaning	hz_net_udp_clean_timer.h	/^	void cleaning(const boost::system::error_code &err)$/;"	f	class:hz::Net::Udp::Clean_Timer	typeref:typename:void
+clear_nodes	hz_net_udp_controller.h	/^	void clear_nodes()$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:void
+close_node	hz_net_abstract_handler.cpp	/^void Abstract_Handler::close_node(Node_Handler& node)$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+close_node	hz_net_udp_client.h	/^	void close_node(Node_Handler& raw_node) override$/;"	f	class:hz::Net::Udp::Client	typeref:typename:void
+close_node	hz_net_udp_controller.h	/^	virtual void close_node(Node_Handler& raw_node) override$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:void
+close_node	hz_net_udp_controller.h	/^	void close_node(udp::endpoint remote_endpoint)$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:void
+cmd	hz_net_proto_message_item.h	/^	uint8_t cmd() const { return _cmd; }$/;"	f	struct:hz::Net::Proto::Message_Item	typeref:typename:uint8_t
+compress	hz_net_proto_node.h	/^std::vector<uint8_t> compress(const uint8_t* data, std::size_t size, int level = -1)$/;"	f	namespace:hz::Net::Proto	typeref:typename:std::vector<uint8_t>
+connect	hz_net_udp_client.h	/^	void connect()$/;"	f	class:hz::Net::Udp::Client	typeref:typename:void
+create_channel	hz_net_dtls_node.h	/^	void create_channel(Args&& ...args)$/;"	f	class:hz::Net::Dtls::Node	typeref:typename:void
+create_formatter	client.cpp	/^	std::shared_ptr<hz::Net::Event_Formatter_Handler> create_formatter(std::size_t type_hash) overr/;"	f	class:Event_Handler	typeref:typename:std::shared_ptr<hz::Net::Event_Formatter_Handler>	file:
+create_formatter	server.cpp	/^	std::shared_ptr<hz::Net::Event_Formatter_Handler> create_formatter(std::size_t type_hash) overr/;"	f	class:Event_Handler	typeref:typename:std::shared_ptr<hz::Net::Event_Formatter_Handler>	file:
+create_next_handler	hz_net_base_handler.h	/^	std::shared_ptr<T> create_next_handler(Args&& ...args)$/;"	f	class:hz::Net::Base_Handler	typeref:typename:std::shared_ptr<T>
+create_node	hz_net_udp_controller.h	/^	std::shared_ptr<Node> create_node(const udp::endpoint& remote_endpoint)$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:std::shared_ptr<Node>
+ctx	hz_net_text_event_payload.h	/^		using ctx = fmt::format_context;$/;"	t	function:hz::Net::Text_Event_Payload::format_vector	typeref:typename:fmt::format_context
+data	hz_byte_array_device.cpp	/^const uint8_t* Byte_Array_Device::data() const$/;"	f	class:hz::Byte_Array_Device	typeref:typename:const uint8_t *
+data	hz_byte_array_device.cpp	/^uint8_t* Byte_Array_Device::data()$/;"	f	class:hz::Byte_Array_Device	typeref:typename:uint8_t *
+data	hz_net_text_event_payload.h	/^	const std::vector<std::string>& data() const$/;"	f	class:hz::Net::Text_Event_Payload	typeref:typename:const std::vector<std::string> &
+decompress	hz_net_proto_node.h	/^std::vector<uint8_t> decompress(const uint8_t* data, std::size_t size, std::size_t expected = 0)$/;"	f	namespace:hz::Net::Proto	typeref:typename:std::vector<uint8_t>
+default_process_message	hz_net_proto_controller.h	/^	static bool default_process_message(Proto::Message& msg)$/;"	f	class:hz::Net::Proto::Controller	typeref:typename:bool
+dev	hz_data_stream.cpp	/^Data_Device* Data_Stream::dev() const { return _dev.index() == 0 ? std::get<0>(_dev).get() : std/;"	f	class:hz::Data_Stream	typeref:typename:Data_Device *
+emit_data	hz_net_dtls_controller.h	/^	void emit_data(Node_Handler& node, Message_Handler& msg) override$/;"	f	class:hz::Net::Dtls::Controller	typeref:typename:void
+emit_data	hz_net_proto_controller.h	/^	void emit_data(Node_Handler& node, Message_Handler& msg) override$/;"	f	class:hz::Net::Proto::Controller	typeref:typename:void
+emit_event	hz_net_abstract_event_handler.h	/^	void emit_event(std::size_t emiter_hash, Event_Type type, Event_Code code, Node_Handler* node,$/;"	f	class:hz::Net::Abstract_Event_Handler	typeref:typename:void
+emit_event	hz_net_abstract_handler.cpp	/^void Abstract_Handler::emit_event(Event_Type type, Event_Code code, Node_Handler* node)$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+emit_event	hz_net_abstract_handler.cpp	/^void Abstract_Handler::emit_event(Event_Type type, Event_Code code, Node_Handler* node, const st/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+emit_event	hz_net_abstract_handler.cpp	/^void Abstract_Handler::emit_event(Event_Type type, Event_Code code, Node_Handler* node, std::fun/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+emit_event	hz_net_abstract_handler.cpp	/^void Abstract_Handler::emit_event(Event_Type type, Event_Code code, Node_Handler* node, std::sha/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+emit_event	hz_net_abstract_handler.cpp	/^void Abstract_Handler::emit_event(std::size_t emiter_hash, Event_Type type, Event_Code code, Nod/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+endpoint	hz_net_node.h	/^	const udp::endpoint& endpoint() const$/;"	f	class:hz::Net::Node	typeref:typename:const udp::endpoint &
+erase_data	hz_net_proto_node.h	/^		void erase_data(std::size_t pos)$/;"	f	struct:hz::Net::Proto::Node::__anon59dfec5b0108	typeref:typename:void
+erase_end_pos	hz_net_proto_node.h	/^		void erase_end_pos(std::size_t pos)$/;"	f	struct:hz::Net::Proto::Node::__anon59dfec5b0108	typeref:typename:void
+erase_lost	hz_net_proto_node.h	/^	bool erase_lost(uint8_t msg_id)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:bool
+exec	hz_net_executor.h	/^	int exec(int thread_count = 1, bool dont_use_this_thread = false)$/;"	f	class:hz::Net::Executor	typeref:typename:int
+fill_lost_msg	hz_net_proto_node.h	/^	void fill_lost_msg(uint8_t msg_id)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+finally	hz_net_proto_sender.h	/^	Sender &finally(std::function<void(bool)> func)$/;"	f	class:hz::Net::Proto::Sender	typeref:typename:Sender &
+find_node	hz_net_abstract_handler.cpp	/^void Abstract_Handler::find_node(std::function<bool(Node_Handler&)> cb)$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+find_node	hz_net_udp_controller.h	/^	std::shared_ptr<Node> find_node(const udp::endpoint& remote_endpoint) const$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:std::shared_ptr<Node>
+find_node	hz_net_udp_controller.h	/^	void find_node(std::function<bool(Node_Handler&)> cb) override$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:void
+find_ptr	hz_net_base_handler.h	/^	std::shared_ptr<U> find_ptr()$/;"	f	class:hz::Net::Base_Ptr_Handler	typeref:typename:std::shared_ptr<U>
+find_ptr_from_root	hz_net_base_handler.h	/^	std::shared_ptr<U> find_ptr_from_root()$/;"	f	class:hz::Net::Base_Ptr_Handler	typeref:typename:std::shared_ptr<U>
+flags	hz_net_proto_message_item.h	/^	uint8_t flags() const { return _flags; }$/;"	f	struct:hz::Net::Proto::Message_Item	typeref:typename:uint8_t
+fmt	hz_net_text_event_payload.h	/^namespace fmt {$/;"	n
+fn_traits	hz_apply_parse.h	/^template<typename R, typename O, typename... Args> struct fn_traits<R (O::*)(Args...) const> : _/;"	s	namespace:hz
+fn_traits	hz_apply_parse.h	/^template<typename R, typename O, typename... Args> struct fn_traits<R (O::*)(Args...)> : __fn_tr/;"	s	namespace:hz
+fn_traits	hz_apply_parse.h	/^template<typename R, typename... Args> struct fn_traits<R (*)(Args...)> : __fn_traits<R, void, A/;"	s	namespace:hz
+format	hz_net_abstract_event_formatter_handler.h	/^	std::string format(uint8_t code, Node_Handler* node, std::shared_ptr<Event_Payload> payload) co/;"	f	class:hz::Net::Abstract_Event_Formatter_Handler	typeref:typename:std::string
+format	hz_net_text_event_payload.h	/^	std::string format(std::string str) const override$/;"	f	class:hz::Net::Text_Event_Payload	typeref:typename:std::string
+format_node	hz_net_abstract_event_handler.h	/^	virtual std::string format_node(Node_Handler* node)$/;"	f	class:hz::Net::Abstract_Event_Handler	typeref:typename:std::string
+format_type	hz_net_abstract_event_handler.h	/^	virtual std::string format_type(Handler::Event_Type type)$/;"	f	class:hz::Net::Abstract_Event_Handler	typeref:typename:std::string
+format_vector	hz_net_text_event_payload.h	/^	std::string format_vector(const std::string& format_str, const std::vector<std::string>& args) /;"	f	class:hz::Net::Text_Event_Payload	typeref:typename:std::string
+fragment_size	hz_net_proto_message_item.h	/^	uint32_t fragment_size() const { return _fragment_size; }$/;"	f	struct:hz::Net::Proto::Message_Item	typeref:typename:uint32_t
+gen_checksum	hz_net_proto_node.h	/^uint16_t gen_checksum(const uint8_t *data, std::size_t len)$/;"	f	namespace:hz::Net::Proto	typeref:typename:uint16_t
+get	hz_net_abstract_base_handler.h	/^	T* get(std::size_t type_hash) override$/;"	f	class:hz::Net::Abstract_Base_Handler	typeref:typename:T *
+get	hz_net_base_handler.h	/^	T* get()$/;"	f	class:hz::Net::Base_Handler	typeref:typename:T *
+get_data	hz_net_proto_fragmented_message.h	/^	std::shared_ptr<Data_Device> get_data() { return _data; }$/;"	f	class:hz::Net::Proto::Fragmented_Message	typeref:typename:std::shared_ptr<Data_Device>
+get_format_str	hz_net_dtls_event_formatter.h	/^	std::string get_format_str(uint8_t code, Node_Handler* \/*node*\/) const override$/;"	f	class:hz::Net::Dtls::Event_Formatter	typeref:typename:std::string
+get_format_str	hz_net_executor_event_formatter.h	/^	std::string get_format_str(uint8_t code, Node_Handler* \/*node*\/) const override$/;"	f	class:hz::Net::Executor_Event_Formatter	typeref:typename:std::string
+get_format_str	hz_net_proto_event_formatter.h	/^	std::string get_format_str(uint8_t code, Node_Handler* \/*node*\/) const override$/;"	f	class:hz::Net::Proto::Event_Formatter	typeref:typename:std::string
+get_format_str	hz_net_udp_event_formatter.h	/^	std::string get_format_str(uint8_t code, Node_Handler* \/*node*\/) const override$/;"	f	class:hz::Net::Udp::Event_Formatter	typeref:typename:std::string
+get_formatter	hz_net_abstract_event_handler.h	/^	std::shared_ptr<Event_Formatter_Handler> get_formatter(std::size_t type_hash)$/;"	f	class:hz::Net::Abstract_Event_Handler	typeref:typename:std::shared_ptr<Event_Formatter_Handler>
+get_from_root	hz_net_base_handler.h	/^	T* get_from_root()$/;"	f	class:hz::Net::Base_Handler	typeref:typename:T *
+get_next_part	hz_net_proto_fragmented_message.h	/^	std::pair<uint32_t, uint32_t> get_next_part() const$/;"	f	class:hz::Net::Proto::Fragmented_Message	typeref:typename:std::pair<uint32_t,uint32_t>
+get_node	hz_net_udp_controller.h	/^	std::shared_ptr<Node> get_node(const udp::endpoint& remote_endpoint)$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:std::shared_ptr<Node>
+get_ptr	hz_net_abstract_base_handler.h	/^	std::shared_ptr<Handler_Type> get_ptr() override$/;"	f	class:hz::Net::Base_Ptr_Handler_T	typeref:typename:std::shared_ptr<Handler_Type>
+get_root	hz_net_abstract_base_handler.h	/^	T* get_root() override$/;"	f	class:hz::Net::Abstract_Base_Handler	typeref:typename:T *
+get_style	hz_net_abstract_event_handler.h	/^	virtual fmt::text_style get_style(Handler::Event_Type type)$/;"	f	class:hz::Net::Abstract_Event_Handler	typeref:typename:fmt::text_style
+handle	hz_net_abstract_event_handler.h	/^	virtual void handle(const std::string& text)$/;"	f	class:hz::Net::Abstract_Event_Handler	typeref:typename:void
+handle_receive	hz_net_udp_controller.h	/^	void handle_receive(std::shared_ptr<Message_Context>& msg_context,$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:void
+handle_send	hz_net_udp_controller.h	/^	void handle_send(std::shared_ptr<Data_Packet> packet, const boost::system::error_code &err, con/;"	f	class:hz::Net::Udp::Controller	typeref:typename:void
+handler	hz_net_dtls_controller.h	/^	Handler& handler() override { return *this; }$/;"	f	class:hz::Net::Dtls::Controller	typeref:typename:Handler &
+handler	hz_net_proto_controller.h	/^	Handler& handler() override { return *this; }$/;"	f	class:hz::Net::Proto::Controller	typeref:typename:Handler &
+hash_code	hz_net_abstract_base_handler.h	/^	std::size_t hash_code() const override$/;"	f	class:hz::Net::Abstract_Base_Handler	typeref:typename:std::size_t
+host	hz_net_server_info.h	/^	const std::string& host() const { return _host; }$/;"	f	class:hz::Net::Server_Info	typeref:typename:const std::string &
+hz	hz_apply_parse.h	/^namespace hz {$/;"	n
+hz	hz_byte_array_device.cpp	/^namespace hz {$/;"	n	file:
+hz	hz_byte_array_device.h	/^namespace hz {$/;"	n
+hz	hz_data_device.h	/^namespace hz {$/;"	n
+hz	hz_data_device_exception.h	/^namespace hz {$/;"	n
+hz	hz_data_stream.cpp	/^namespace hz {$/;"	n	file:
+hz	hz_data_stream.h	/^namespace hz {$/;"	n
+hz	hz_file_device.cpp	/^namespace hz {$/;"	n	file:
+hz	hz_file_device.h	/^namespace hz {$/;"	n
+hz	hz_net_abstract_base_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_abstract_event_formatter_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_abstract_event_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_abstract_handler.cpp	/^namespace hz {$/;"	n	file:
+hz	hz_net_abstract_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_abstract_message_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_abstract_node_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_async_message_queue.h	/^namespace hz {$/;"	n
+hz	hz_net_base_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_data_packet.h	/^namespace hz {$/;"	n
+hz	hz_net_defs.h	/^namespace hz {$/;"	n
+hz	hz_net_dtls_client.h	/^namespace hz {$/;"	n
+hz	hz_net_dtls_controller.h	/^namespace hz {$/;"	n
+hz	hz_net_dtls_controller_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_dtls_credentials_manager.cpp	/^namespace hz {$/;"	n	file:
+hz	hz_net_dtls_credentials_manager.h	/^namespace hz {$/;"	n
+hz	hz_net_dtls_event.h	/^namespace hz {$/;"	n
+hz	hz_net_dtls_event_formatter.h	/^namespace hz {$/;"	n
+hz	hz_net_dtls_node.h	/^namespace hz {$/;"	n
+hz	hz_net_dtls_server.h	/^namespace hz {$/;"	n
+hz	hz_net_dtls_tools.cpp	/^namespace hz {$/;"	n	file:
+hz	hz_net_dtls_tools.h	/^namespace hz {$/;"	n
+hz	hz_net_event_code.h	/^namespace hz {$/;"	n
+hz	hz_net_event_formatter_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_event_payload.h	/^namespace hz {$/;"	n
+hz	hz_net_executor.h	/^namespace hz {$/;"	n
+hz	hz_net_executor_event.h	/^namespace hz {$/;"	n
+hz	hz_net_executor_event_formatter.h	/^namespace hz {$/;"	n
+hz	hz_net_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_message_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_node.h	/^namespace hz {$/;"	n
+hz	hz_net_node_controller_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_node_data_packet.h	/^namespace hz {$/;"	n
+hz	hz_net_node_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_node_init_payload.h	/^namespace hz {$/;"	n
+hz	hz_net_proto_controller.h	/^namespace hz {$/;"	n
+hz	hz_net_proto_controller_handler.h	/^namespace hz {$/;"	n
+hz	hz_net_proto_event.h	/^namespace hz {$/;"	n
+hz	hz_net_proto_event_formatter.h	/^namespace hz {$/;"	n
+hz	hz_net_proto_fragmented_message.h	/^namespace hz {$/;"	n
+hz	hz_net_proto_message.h	/^namespace hz {$/;"	n
+hz	hz_net_proto_message_item.h	/^namespace hz {$/;"	n
+hz	hz_net_proto_node.h	/^namespace hz {$/;"	n
+hz	hz_net_proto_sender.h	/^namespace hz {$/;"	n
+hz	hz_net_server_info.h	/^namespace hz {$/;"	n
+hz	hz_net_text_event_payload.h	/^namespace hz {$/;"	n
+hz	hz_net_udp_clean_timer.h	/^namespace hz {$/;"	n
+hz	hz_net_udp_clean_timer_node.h	/^namespace hz {$/;"	n
+hz	hz_net_udp_client.h	/^namespace hz {$/;"	n
+hz	hz_net_udp_controller.h	/^namespace hz {$/;"	n
+hz	hz_net_udp_event.h	/^namespace hz {$/;"	n
+hz	hz_net_udp_event_formatter.h	/^namespace hz {$/;"	n
+hz	hz_net_udp_server.h	/^namespace hz {$/;"	n
+hzUdpClient	CMakeLists.txt	/^add_executable(hzUdpClient ${LIB_SOURCES} client.cpp)$/;"	t
+hzUdpServer	CMakeLists.txt	/^add_executable(hzUdpServer ${LIB_SOURCES} ${SOURCES})$/;"	t
+hzUdpServer	CMakeLists.txt	/^project(hzUdpServer)$/;"	p
+init	hz_net_abstract_handler.cpp	/^void Abstract_Handler::init()$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+init	hz_net_async_message_queue.h	/^	void init() override$/;"	f	class:hz::Net::Async_Messages	typeref:typename:void
+init	hz_net_dtls_tools.cpp	/^std::string Tools::init($/;"	f	class:hz::Net::Dtls::Tools	typeref:typename:std::string
+init	hz_net_executor.h	/^	void init() override$/;"	f	class:hz::Net::Executor	typeref:typename:void
+init	hz_net_proto_controller.h	/^	virtual void init() override$/;"	f	class:hz::Net::Proto::Controller	typeref:typename:void
+init	hz_net_udp_clean_timer.h	/^	void init() override$/;"	f	class:hz::Net::Udp::Clean_Timer	typeref:typename:void
+init	hz_net_udp_client.h	/^	void init() override$/;"	f	class:hz::Net::Udp::Client	typeref:typename:void
+init	hz_net_udp_controller.h	/^	virtual void init() override$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:void
+init	hz_net_udp_server.h	/^	void init() override$/;"	f	class:hz::Net::Udp::Server	typeref:typename:void
+init_policy	hz_net_dtls_tools.cpp	/^void Tools::init_policy(const std::string &tls_policy_file_name)$/;"	f	class:hz::Net::Dtls::Tools	typeref:typename:void
+init_rnd	hz_net_dtls_tools.cpp	/^std::string Tools::init_rnd(const std::string drbg_seed)$/;"	f	class:hz::Net::Dtls::Tools	typeref:typename:std::string
+io	hz_net_abstract_handler.cpp	/^boost::asio::io_context* Abstract_Handler::io()$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:boost::asio::io_context *
+is_connected	hz_net_dtls_node.h	/^	bool is_connected() const$/;"	f	class:hz::Net::Dtls::Node	typeref:typename:bool
+is_parts_empty	hz_net_proto_fragmented_message.h	/^	bool is_parts_empty() const$/;"	f	class:hz::Net::Proto::Fragmented_Message	typeref:typename:bool
+is_readonly	hz_byte_array_device.cpp	/^bool Byte_Array_Device::is_readonly() const$/;"	f	class:hz::Byte_Array_Device	typeref:typename:bool
+is_readonly	hz_data_stream.cpp	/^bool Data_Stream::is_readonly() const { return dev()->is_readonly(); }$/;"	f	class:hz::Data_Stream	typeref:typename:bool
+is_readonly	hz_file_device.cpp	/^bool File_Device::is_readonly() const { return false; }$/;"	f	class:hz::File_Device	typeref:typename:bool
+is_valid	hz_data_stream.cpp	/^bool Data_Stream::is_valid() const { return dev(); }$/;"	f	class:hz::Data_Stream	typeref:typename:bool
+join	hz_net_executor.h	/^	void join()$/;"	f	class:hz::Net::Executor	typeref:typename:void
+key	hz_net_dtls_credentials_manager.h	/^        std::shared_ptr<Botan::Private_Key> key;$/;"	m	struct:hz::Net::Dtls::Credentials_Manager::Certificate_Info	typeref:typename:std::shared_ptr<Botan::Private_Key>
+load_certstores	hz_net_dtls_credentials_manager.cpp	/^void Credentials_Manager::load_certstores(const std::vector<std::string> &paths)$/;"	f	class:hz::Net::Dtls::Credentials_Manager	typeref:typename:void
+lost_msg_detected	hz_net_proto_controller.h	/^	void lost_msg_detected(uint8_t msg_id, uint8_t expected) override$/;"	f	class:hz::Net::Proto::Controller	typeref:typename:void
+m_certstores	hz_net_dtls_credentials_manager.h	/^    std::vector<std::shared_ptr<Botan::Certificate_Store>> m_certstores;$/;"	m	class:hz::Net::Dtls::Credentials_Manager	typeref:typename:std::vector<std::shared_ptr<Botan::Certificate_Store>>
+m_creds	hz_net_dtls_credentials_manager.h	/^    std::vector<Certificate_Info> m_creds;$/;"	m	class:hz::Net::Dtls::Credentials_Manager	typeref:typename:std::vector<Certificate_Info>
+main	client.cpp	/^int main(int argc, char* argv[])$/;"	f	typeref:typename:int
+main	server.cpp	/^int main(int argc, char* argv[])$/;"	f	typeref:typename:int
+min_compress_size	hz_net_proto_message_item.h	/^	uint32_t min_compress_size() const { return _min_compress_size; }$/;"	f	struct:hz::Net::Proto::Message_Item	typeref:typename:uint32_t
+next	hz_net_abstract_base_handler.h	/^	T* next() override { return _next.get(); }$/;"	f	class:hz::Net::Abstract_Base_Handler	typeref:typename:T *
+node_build	hz_net_abstract_handler.cpp	/^void Abstract_Handler::node_build(Node_Handler& node, std::shared_ptr<Node_Init_Payload> payload/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+node_build	hz_net_dtls_client.h	/^	void node_build(Node_Handler& raw_node, std::shared_ptr<Node_Init_Payload> payload) override$/;"	f	class:hz::Net::Dtls::Client	typeref:typename:void
+node_build	hz_net_dtls_server.h	/^	void node_build(Node_Handler& raw_node, std::shared_ptr<Node_Init_Payload> \/*payload*\/) overr/;"	f	class:hz::Net::Dtls::Server	typeref:typename:void
+node_build	hz_net_proto_controller.h	/^	void node_build(Node_Handler& raw_node, std::shared_ptr<Node_Init_Payload> payload) override$/;"	f	class:hz::Net::Proto::Controller	typeref:typename:void
+node_build	hz_net_udp_clean_timer.h	/^	void node_build(Node_Handler& raw_node, std::shared_ptr<Node_Init_Payload> payload) override$/;"	f	class:hz::Net::Udp::Clean_Timer	typeref:typename:void
+node_closed	hz_net_abstract_handler.cpp	/^void Abstract_Handler::node_closed(Node_Handler& node)$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+node_connected	client.cpp	/^	void node_connected(hz::Net::Node_Handler& raw_node) override$/;"	f	class:My_Proto	typeref:typename:void	file:
+node_connected	hz_net_abstract_handler.cpp	/^void Abstract_Handler::node_connected(Node_Handler& node)$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+node_connected	hz_net_dtls_controller.h	/^	void node_connected(Node_Handler& \/*raw_node*\/) override {}$/;"	f	class:hz::Net::Dtls::Controller	typeref:typename:void
+node_connected	server.cpp	/^	void node_connected(hz::Net::Node_Handler& raw_node) override$/;"	f	class:My_Proto	typeref:typename:void	file:
+node_get_identifier	hz_net_abstract_handler.cpp	/^std::string Abstract_Handler::node_get_identifier(Node_Handler& node)$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:std::string
+node_get_identifier	hz_net_udp_controller.h	/^	std::string node_get_identifier(Node_Handler& node) override$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:std::string
+node_is_connected	hz_net_abstract_handler.cpp	/^bool Abstract_Handler::node_is_connected(Node_Handler& node)$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:bool
+node_is_connected	hz_net_udp_clean_timer.h	/^	bool node_is_connected(Node_Handler& raw_node) override$/;"	f	class:hz::Net::Udp::Clean_Timer	typeref:typename:bool
+node_process	client.cpp	/^	void node_process(hz::Net::Node_Handler& raw_node, hz::Net::Message_Handler& raw_msg) override$/;"	f	class:My_Proto	typeref:typename:void	file:
+node_process	hz_net_abstract_handler.cpp	/^void Abstract_Handler::node_process(Node_Handler& node, Message_Handler& msg)$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+node_process	hz_net_async_message_queue.h	/^	void node_process(Node_Handler& node, Message_Handler& msg) override$/;"	f	class:hz::Net::Async_Messages	typeref:typename:void
+node_process	hz_net_dtls_controller.h	/^	void node_process(Node_Handler& raw_node, Message_Handler& msg) override$/;"	f	class:hz::Net::Dtls::Controller	typeref:typename:void
+node_process	hz_net_proto_controller.h	/^	void node_process(Node_Handler& raw_node, Message_Handler& msg) override$/;"	f	class:hz::Net::Proto::Controller	typeref:typename:void
+node_process	hz_net_udp_clean_timer.h	/^	void node_process(Node_Handler& raw_node, Message_Handler& msg) override$/;"	f	class:hz::Net::Udp::Clean_Timer	typeref:typename:void
+node_process	server.cpp	/^	void node_process(hz::Net::Node_Handler& raw_node, hz::Net::Message_Handler& raw_msg) override$/;"	f	class:My_Proto	typeref:typename:void	file:
+obj	hz_apply_parse.h	/^	using obj = Obj;$/;"	t	struct:hz::__fn_traits	typeref:typename:Obj
+open	hz_file_device.cpp	/^void File_Device::open(const std::string& file_name)$/;"	f	class:hz::File_Device	typeref:typename:void
+operator <<	hz_data_stream.cpp	/^Data_Stream& operator<< (Data_Stream& ds, const std::string& data)$/;"	f	namespace:hz	typeref:typename:Data_Stream &
+operator <<	hz_data_stream.cpp	/^Data_Stream& operator<< (Data_Stream& ds, const std::vector<uint8_t>& data)$/;"	f	namespace:hz	typeref:typename:Data_Stream &
+operator <<	hz_data_stream.h	/^Data_Stream& operator<< (Data_Stream& ds, T elem)$/;"	f	namespace:hz	typeref:typename:Data_Stream &
+operator <<	hz_data_stream.h	/^Data_Stream& operator<< (Data_Stream& ds, const T& elem)$/;"	f	namespace:hz	typeref:typename:::type> Data_Stream &
+operator <<	hz_data_stream.h	/^Data_Stream& operator<< (Data_Stream& ds, const std::pair<T1, T2>& elem)$/;"	f	namespace:hz	typeref:typename:Data_Stream &
+operator <<	hz_net_proto_sender.h	/^	Data_Stream& operator <<(const T& item) { return static_cast<Data_Stream&>(*this) << item; }$/;"	f	class:hz::Net::Proto::Sender	typeref:typename:Data_Stream &
+operator >>	hz_data_stream.cpp	/^Data_Stream& operator>> (Data_Stream& ds, std::string& data)$/;"	f	namespace:hz	typeref:typename:Data_Stream &
+operator >>	hz_data_stream.cpp	/^Data_Stream& operator>> (Data_Stream& ds, std::vector<uint8_t>& data)$/;"	f	namespace:hz	typeref:typename:Data_Stream &
+operator >>	hz_data_stream.h	/^Data_Stream& operator>> (Data_Stream& ds, T& elem)$/;"	f	namespace:hz	typeref:typename:Data_Stream &
+operator >>	hz_data_stream.h	/^Data_Stream& operator>> (Data_Stream& ds, std::pair<T1, T2>& elem)$/;"	f	namespace:hz	typeref:typename:Data_Stream &
+operator uint8_t	hz_net_event_code.h	/^	operator uint8_t() const { return _code; }$/;"	f	struct:hz::Net::Event_Code
+parse	hz_apply_parse.h	/^T parse(Data_Stream &ds)$/;"	f	namespace:hz	typeref:typename:T
+parse	hz_apply_parse.h	/^T parse(std::shared_ptr<Data_Device> data_dev)$/;"	f	namespace:hz	typeref:typename:T
+parse	hz_apply_parse.h	/^void parse(Data_Stream &, _Tuple&) {}$/;"	f	namespace:hz	typeref:typename:void
+parse	hz_apply_parse.h	/^void parse(Data_Stream &ds, _Tuple& __t)$/;"	f	namespace:hz	typeref:typename:void
+parse_out	hz_apply_parse.h	/^void parse_out(Data_Stream &) {}$/;"	f	namespace:hz	typeref:typename:void
+parse_out	hz_apply_parse.h	/^void parse_out(Data_Stream &ds, T& out, Args&... args)$/;"	f	namespace:hz	typeref:typename:void
+parse_out	hz_apply_parse.h	/^void parse_out(const std::vector<uint8_t> &data, Args&... args)$/;"	f	namespace:hz	typeref:typename:void
+parse_out	hz_apply_parse.h	/^void parse_out(std::shared_ptr<Data_Device> data_dev, Args&... args)$/;"	f	namespace:hz	typeref:typename:void
+pop_waiting_message	hz_net_proto_node.h	/^	std::shared_ptr<Message_Item> pop_waiting_message(uint8_t msg_id, uint8_t cmd = 0)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:std::shared_ptr<Message_Item>
+pop_waiting_messages	hz_net_proto_node.h	/^	std::vector<std::shared_ptr<Message_Item>> pop_waiting_messages()$/;"	f	class:hz::Net::Proto::Node	typeref:typename:std::vector<std::shared_ptr<Message_Item>>
+port	hz_net_server_info.h	/^	uint16_t port() const { return _port; }$/;"	f	class:hz::Net::Server_Info	typeref:typename:uint16_t
+pos	hz_byte_array_device.cpp	/^std::size_t Byte_Array_Device::pos() const { return _pos; }$/;"	f	class:hz::Byte_Array_Device	typeref:typename:std::size_t
+pos	hz_data_stream.cpp	/^std::size_t Data_Stream::pos() const { return dev()->pos(); }$/;"	f	class:hz::Data_Stream	typeref:typename:std::size_t
+pos	hz_file_device.cpp	/^std::size_t File_Device::pos() const { return std::ftell(_fd); }$/;"	f	class:hz::File_Device	typeref:typename:std::size_t
+pos	hz_net_proto_node.h	/^		std::size_t pos(const uint8_t* ptr) const$/;"	f	struct:hz::Net::Proto::Node::__anon59dfec5b0108	typeref:typename:std::size_t
+prepare_packet_to_send	hz_net_proto_node.h	/^	std::vector<uint8_t> prepare_packet_to_send(Message_Item& msg)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:std::vector<uint8_t>
+prev	hz_net_abstract_base_handler.h	/^	T* prev() override { return _prev; }$/;"	f	class:hz::Net::Abstract_Base_Handler	typeref:typename:T *
+private_key_for	hz_net_dtls_credentials_manager.cpp	/^Botan::Private_Key *Credentials_Manager::private_key_for(const Botan::X509_Certificate &cert, co/;"	f	class:hz::Net::Dtls::Credentials_Manager	typeref:typename:Botan::Private_Key *
+process_answer	hz_net_proto_node.h	/^	void process_answer(uint8_t answer_id, uint8_t msg_id, uint8_t cmd, Data_Stream* ds, std::share/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+process_compressed_flag	hz_net_proto_node.h	/^	std::shared_ptr<Data_Device> process_compressed_flag(uint8_t flags, const uint8_t* data, std::s/;"	f	class:hz::Net::Proto::Node	typeref:typename:std::shared_ptr<Data_Device>
+process_fragment	hz_net_proto_node.h	/^	void process_fragment(uint32_t full_size, uint32_t pos, uint8_t msg_id, uint8_t cmd, Data_Strea/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+process_fragment_answer	hz_net_proto_node.h	/^	void process_fragment_answer(uint8_t answer_id, uint8_t msg_id, uint8_t cmd, Data_Stream* ds, s/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+process_fragment_query	hz_net_proto_node.h	/^	void process_fragment_query(uint8_t msg_id, uint32_t pos, uint32_t fragmanted_size)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+process_fragment_remove	hz_net_proto_node.h	/^	void process_fragment_remove(uint8_t msg_id)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+process_message	hz_net_proto_node.h	/^	void process_message(uint8_t msg_id, uint8_t cmd, std::shared_ptr<Data_Device> data)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+process_message	hz_net_udp_controller.h	/^	void process_message(Message_Context& msg_context, std::size_t size)$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:void
+process_msg_id	hz_net_proto_node.h	/^	bool process_msg_id(uint8_t msg_id, uint8_t flags)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:bool
+process_ping	hz_net_proto_node.h	/^	void process_ping(uint8_t msg_id, uint8_t flags)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+process_stream	hz_net_proto_node.h	/^	bool process_stream(const uint8_t*& data, std::size_t& size)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:bool
+process_stream_message	hz_net_proto_node.h	/^	void process_stream_message(uint8_t msg_id, uint8_t cmd, uint8_t flags, const uint8_t* data, st/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+process_wait_list	hz_net_proto_node.h	/^	void process_wait_list(void *data)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+ptr	hz_net_abstract_base_handler.h	/^	std::shared_ptr<T> ptr()$/;"	f	class:hz::Net::Base_Ptr_Handler_T	typeref:typename:std::shared_ptr<T>
+push_received_data	hz_net_dtls_node.h	/^	void push_received_data(const uint8_t* data, std::size_t size)$/;"	f	class:hz::Net::Dtls::Node	typeref:typename:void
+push_received_data	hz_net_proto_node.h	/^	void push_received_data(const uint8_t* data, std::size_t size)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+queue_handler	hz_net_async_message_queue.h	/^	void queue_handler()$/;"	f	class:hz::Net::Async_Message_Queue	typeref:typename:void
+read	hz_byte_array_device.cpp	/^std::size_t Byte_Array_Device::read(uint8_t* dest, std::size_t max_size)$/;"	f	class:hz::Byte_Array_Device	typeref:typename:std::size_t
+read	hz_data_stream.cpp	/^void Data_Stream::read(uint8_t* dest, std::size_t size)$/;"	f	class:hz::Data_Stream	typeref:typename:void
+read	hz_file_device.cpp	/^std::size_t File_Device::read(uint8_t* dest, std::size_t size)$/;"	f	class:hz::File_Device	typeref:typename:std::size_t
+read_uint16	hz_net_proto_node.h	/^uint32_t read_uint16(const uint8_t* data)$/;"	f	namespace:hz::Net::Proto	typeref:typename:uint32_t
+read_uint32	hz_net_proto_node.h	/^uint32_t read_uint32(const uint8_t* data)$/;"	f	namespace:hz::Net::Proto	typeref:typename:uint32_t
+reconnect	hz_net_udp_client.h	/^	void reconnect(const boost::system::error_code &err = {})$/;"	f	class:hz::Net::Udp::Client	typeref:typename:void
+record_received	hz_net_dtls_controller.h	/^	void record_received(Node_Handler& node, Message_Handler& msg) override$/;"	f	class:hz::Net::Dtls::Controller	typeref:typename:void
+record_received	hz_net_proto_controller.h	/^	void record_received(Node_Handler& node, Message_Handler& msg) override$/;"	f	class:hz::Net::Proto::Controller	typeref:typename:void
+recv_time	hz_net_udp_clean_timer_node.h	/^	std::chrono::system_clock::time_point recv_time() const { return _recv_time; }$/;"	f	class:hz::Net::Udp::Clean_Timer_Node	typeref:typename:std::chrono::system_clock::time_point
+release	hz_net_proto_sender.h	/^	void release()$/;"	f	class:hz::Net::Proto::Sender	typeref:typename:void
+remained	hz_data_device.h	/^	virtual std::size_t remained() const { return size() - pos(); }$/;"	f	class:hz::Data_Device	typeref:typename:std::size_t
+remained	hz_data_stream.cpp	/^std::size_t Data_Stream::remained() const { return dev()->remained(); }$/;"	f	class:hz::Data_Stream	typeref:typename:std::size_t
+remove_from_part_vect	hz_net_proto_fragmented_message.h	/^	void remove_from_part_vect(uint32_t new_part_start, uint32_t new_part_end)$/;"	f	class:hz::Net::Proto::Fragmented_Message	typeref:typename:void
+remove_frozen_nodes	hz_net_udp_clean_timer.h	/^	void remove_frozen_nodes()$/;"	f	class:hz::Net::Udp::Clean_Timer	typeref:typename:void
+resize	hz_byte_array_device.cpp	/^void Byte_Array_Device::resize(std::size_t size)$/;"	f	class:hz::Byte_Array_Device	typeref:typename:void
+resolve_endpoint	hz_net_udp_controller.h	/^	udp::endpoint resolve_endpoint()$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:udp::endpoint
+ret	hz_apply_parse.h	/^	using ret = Ret;$/;"	t	struct:hz::__fn_traits	typeref:typename:Ret
+seek	hz_byte_array_device.cpp	/^void Byte_Array_Device::seek(std::size_t pos)$/;"	f	class:hz::Byte_Array_Device	typeref:typename:void
+seek	hz_data_stream.cpp	/^void Data_Stream::seek(std::size_t pos) { dev()->seek(pos); }$/;"	f	class:hz::Data_Stream	typeref:typename:void
+seek	hz_file_device.cpp	/^void File_Device::seek(std::size_t pos)$/;"	f	class:hz::File_Device	typeref:typename:void
+send	hz_net_abstract_node_handler.h	/^	virtual void send(Message_Handler& msg) override$/;"	f	class:hz::Net::Abstract_Node_Handler	typeref:typename:void
+send	hz_net_dtls_node.h	/^	void send(Message_Handler& msg) override$/;"	f	class:hz::Net::Dtls::Node	typeref:typename:void
+send	hz_net_dtls_node.h	/^	void send(const uint8_t* data, std::size_t size)$/;"	f	class:hz::Net::Dtls::Node	typeref:typename:void
+send	hz_net_proto_node.h	/^	Sender send(uint8_t cmd) { return {*this, cmd}; }$/;"	f	class:hz::Net::Proto::Node	typeref:typename:Sender
+send	hz_net_proto_node.h	/^	Sender send(uint8_t cmd, uint8_t answer_id) { return {*this, cmd, answer_id}; }$/;"	f	class:hz::Net::Proto::Node	typeref:typename:Sender
+send	hz_net_proto_node.h	/^	void send(Message_Handler& msg) override$/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+send	hz_net_proto_node.h	/^	void send(std::shared_ptr<Message_Item> msg)$/;"	f	class:hz::Net::Proto::Node	typeref:typename:void
+send_node_data	hz_net_abstract_handler.cpp	/^void Abstract_Handler::send_node_data(Node_Handler& node, Message_Handler& msg)$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+send_node_data	hz_net_async_message_queue.h	/^	void send_node_data(Node_Handler& node, Message_Handler& msg) override$/;"	f	class:hz::Net::Async_Messages	typeref:typename:void
+send_node_data	hz_net_dtls_controller.h	/^	void send_node_data(Node_Handler& raw_node, Message_Handler& raw_msg) override$/;"	f	class:hz::Net::Dtls::Controller	typeref:typename:void
+send_node_data	hz_net_proto_controller.h	/^	void send_node_data(Node_Handler& raw_node, Message_Handler& raw_msg) override$/;"	f	class:hz::Net::Proto::Controller	typeref:typename:void
+send_node_data	hz_net_udp_controller.h	/^	void send_node_data(Node_Handler& raw_node, Message_Handler& msg) override$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:void
+set_data_device	hz_net_proto_sender.h	/^	void set_data_device(std::shared_ptr<Data_Device> dev, uint32_t fragment_size = HZ_MAX_MESSAGE_/;"	f	class:hz::Net::Proto::Sender	typeref:typename:void
+set_device	hz_data_stream.cpp	/^void Data_Stream::set_device(Data_Device& dev) { _dev = &dev; }$/;"	f	class:hz::Data_Stream	typeref:typename:void
+set_device	hz_data_stream.cpp	/^void Data_Stream::set_device(std::shared_ptr<Data_Device> dev) { _dev = std::move(dev); }$/;"	f	class:hz::Data_Stream	typeref:typename:void
+set_endpoint	hz_net_node.h	/^	void set_endpoint(const udp::endpoint& endpoint)$/;"	f	class:hz::Net::Node	typeref:typename:void
+set_flags	hz_net_proto_message_item.h	/^	void set_flags(uint8_t flags, const Only_Protocol) { _flags = flags; }$/;"	f	struct:hz::Net::Proto::Message_Item	typeref:typename:void
+set_fragment_size	hz_net_proto_message_item.h	/^	void set_fragment_size(uint32_t size)$/;"	f	struct:hz::Net::Proto::Message_Item	typeref:typename:void
+set_fragment_size	hz_net_proto_sender.h	/^	void set_fragment_size(uint32_t fragment_size) { _msg->set_fragment_size(fragment_size); }$/;"	f	class:hz::Net::Proto::Sender	typeref:typename:void
+set_io_context	hz_net_abstract_handler.cpp	/^void Abstract_Handler::set_io_context(boost::asio::io_context* context)$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+set_min_compress_size	hz_net_proto_message_item.h	/^	void set_min_compress_size(uint32_t min_compress_size) { _min_compress_size = min_compress_size/;"	f	struct:hz::Net::Proto::Message_Item	typeref:typename:void
+set_min_compress_size	hz_net_proto_sender.h	/^	void set_min_compress_size(uint32_t min_compress_size) { _msg->set_min_compress_size(min_compre/;"	f	class:hz::Net::Proto::Sender	typeref:typename:void
+set_next_handler	hz_net_abstract_base_handler.h	/^	virtual std::shared_ptr<T> set_next_handler(std::shared_ptr<T> handler) override$/;"	f	class:hz::Net::Abstract_Base_Handler	typeref:typename:std::shared_ptr<T>
+set_next_handler	hz_net_abstract_handler.cpp	/^std::shared_ptr<Handler> Abstract_Handler::set_next_handler(std::shared_ptr<Handler> handler)$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:std::shared_ptr<Handler>
+set_previous	hz_net_abstract_base_handler.h	/^	void set_previous(T* prev) override$/;"	f	class:hz::Net::Abstract_Base_Handler	typeref:typename:void
+set_recv_time	hz_net_udp_clean_timer_node.h	/^	void set_recv_time(std::chrono::system_clock::time_point recv_time) { _recv_time = recv_time; }$/;"	f	class:hz::Net::Udp::Clean_Timer_Node	typeref:typename:void
+size	hz_byte_array_device.cpp	/^std::size_t Byte_Array_Device::size() const$/;"	f	class:hz::Byte_Array_Device	typeref:typename:std::size_t
+size	hz_data_stream.cpp	/^std::size_t Data_Stream::size() const { return dev()->size(); }$/;"	f	class:hz::Data_Stream	typeref:typename:std::size_t
+size	hz_file_device.cpp	/^std::size_t File_Device::size() const$/;"	f	class:hz::File_Device	typeref:typename:std::size_t
+start	hz_net_abstract_handler.cpp	/^void Abstract_Handler::start()$/;"	f	class:hz::Net::Abstract_Handler	typeref:typename:void
+start	hz_net_udp_client.h	/^	void start() override$/;"	f	class:hz::Net::Udp::Client	typeref:typename:void
+start	hz_net_udp_controller.h	/^	virtual void start() override$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:void
+start_receive	hz_net_udp_controller.h	/^	void start_receive(std::shared_ptr<Message_Context> msg_context)$/;"	f	class:hz::Net::Udp::Controller	typeref:typename:void
+stop	hz_net_executor.h	/^	void stop()$/;"	f	class:hz::Net::Executor	typeref:typename:void
+thread_exec	hz_net_executor.h	/^	void thread_exec()$/;"	f	class:hz::Net::Executor	typeref:typename:void
+timeout	hz_net_proto_sender.h	/^	Sender &timeout(std::function<void()> timeout_func, std::chrono::milliseconds timeout_duration,$/;"	f	class:hz::Net::Proto::Sender	typeref:typename:Sender &
+tls_alert	hz_net_dtls_controller.h	/^	void tls_alert(Node_Handler& node, Botan::TLS::Alert alert) override$/;"	f	class:hz::Net::Dtls::Controller	typeref:typename:void
+tls_alert	hz_net_dtls_node.h	/^	void tls_alert(Botan::TLS::Alert alert) override$/;"	f	class:hz::Net::Dtls::Node	typeref:typename:void
+tls_emit_data	hz_net_dtls_node.h	/^	void tls_emit_data(const uint8_t data[], size_t size) override$/;"	f	class:hz::Net::Dtls::Node	typeref:typename:void
+tls_record_received	hz_net_dtls_node.h	/^	void tls_record_received(Botan::u64bit, const uint8_t data[], std::size_t size) override$/;"	f	class:hz::Net::Dtls::Node	typeref:typename:void
+tls_server_choose_app_protocol	hz_net_dtls_controller_handler.h	/^	virtual std::string tls_server_choose_app_protocol(Node_Handler& node, const std::vector<std::s/;"	f	class:hz::Net::Dtls::Controller_Handler	typeref:typename:std::string
+tls_server_choose_app_protocol	hz_net_dtls_node.h	/^	std::string tls_server_choose_app_protocol(const std::vector<std::string> &client_protos) overr/;"	f	class:hz::Net::Dtls::Node	typeref:typename:std::string
+tls_server_choose_app_protocol	hz_net_dtls_server.h	/^	std::string tls_server_choose_app_protocol(Node_Handler& node, const std::vector<std::string> &/;"	f	class:hz::Net::Dtls::Server	typeref:typename:std::string
+tls_session_activated	hz_net_dtls_controller.h	/^	void tls_session_activated(Node_Handler& node) override$/;"	f	class:hz::Net::Dtls::Controller	typeref:typename:void
+tls_session_activated	hz_net_dtls_node.h	/^	void tls_session_activated() override$/;"	f	class:hz::Net::Dtls::Node	typeref:typename:void
+tls_session_established	hz_net_dtls_controller.h	/^	bool tls_session_established(Node_Handler& node, const Botan::TLS::Session &session) override$/;"	f	class:hz::Net::Dtls::Controller	typeref:typename:bool
+tls_session_established	hz_net_dtls_node.h	/^	bool tls_session_established(const Botan::TLS::Session &session) override$/;"	f	class:hz::Net::Dtls::Node	typeref:typename:bool
+tls_verify_cert_chain	hz_net_dtls_controller_handler.h	/^	virtual void tls_verify_cert_chain(Node_Handler& node,$/;"	f	class:hz::Net::Dtls::Controller_Handler	typeref:typename:void
+tls_verify_cert_chain	hz_net_dtls_node.h	/^	void tls_verify_cert_chain($/;"	f	class:hz::Net::Dtls::Node	typeref:typename:void
+trusted_certificate_authorities	hz_net_dtls_credentials_manager.cpp	/^std::vector<Botan::Certificate_Store *> Credentials_Manager::trusted_certificate_authorities(con/;"	f	class:hz::Net::Dtls::Credentials_Manager	typeref:typename:std::vector<Botan::Certificate_Store * >
+waiter_timeout	hz_net_proto_controller.h	/^	void waiter_timeout(const boost::system::error_code& error)$/;"	f	class:hz::Net::Proto::Controller	typeref:typename:void
+write	hz_byte_array_device.cpp	/^void Byte_Array_Device::write(const uint8_t* data, std::size_t size)$/;"	f	class:hz::Byte_Array_Device	typeref:typename:void
+write	hz_data_stream.cpp	/^void Data_Stream::write(const uint8_t* data, std::size_t size)$/;"	f	class:hz::Data_Stream	typeref:typename:void
+write	hz_file_device.cpp	/^void File_Device::write(const uint8_t* data, std::size_t size)$/;"	f	class:hz::File_Device	typeref:typename:void
+~Abstract_Base_Handler	hz_net_abstract_base_handler.h	/^	virtual ~Abstract_Base_Handler()$/;"	f	class:hz::Net::Abstract_Base_Handler
+~Abstract_Handler	hz_net_abstract_handler.cpp	/^Abstract_Handler::~Abstract_Handler() {}$/;"	f	class:hz::Net::Abstract_Handler
+~Abstract_Message_Handler	hz_net_abstract_message_handler.h	/^	virtual ~Abstract_Message_Handler() {}$/;"	f	class:hz::Net::Abstract_Message_Handler
+~Abstract_Node_Handler	hz_net_abstract_node_handler.h	/^	virtual ~Abstract_Node_Handler() {}$/;"	f	class:hz::Net::Abstract_Node_Handler
+~Base_Handler	hz_net_base_handler.h	/^	virtual ~Base_Handler() {}$/;"	f	class:hz::Net::Base_Handler
+~Controller	hz_net_dtls_controller.h	/^	virtual ~Controller() {}$/;"	f	class:hz::Net::Dtls::Controller
+~Controller_Handler	hz_net_dtls_controller_handler.h	/^	virtual ~Controller_Handler() {}$/;"	f	class:hz::Net::Dtls::Controller_Handler
+~Controller_Handler	hz_net_proto_controller_handler.h	/^	virtual ~Controller_Handler() {}$/;"	f	class:hz::Net::Proto::Controller_Handler
+~Data_Device	hz_data_device.h	/^	virtual ~Data_Device() {}$/;"	f	class:hz::Data_Device
+~Event_Formatter_Handler	hz_net_event_formatter_handler.h	/^	virtual ~Event_Formatter_Handler() {}$/;"	f	class:hz::Net::Event_Formatter_Handler
+~Event_Payload	hz_net_event_payload.h	/^	virtual ~Event_Payload() {}$/;"	f	class:hz::Net::Event_Payload
+~Executor	hz_net_executor.h	/^	~Executor()$/;"	f	class:hz::Net::Executor
+~File_Device	hz_file_device.cpp	/^File_Device::~File_Device()$/;"	f	class:hz::File_Device
+~Handler	hz_net_handler.h	/^	virtual ~Handler() {}$/;"	f	class:hz::Net::Handler
+~Message_Handler	hz_net_message_handler.h	/^	virtual ~Message_Handler() {}$/;"	f	class:hz::Net::Message_Handler
+~Message_Item	hz_net_proto_message_item.h	/^	virtual ~Message_Item()$/;"	f	struct:hz::Net::Proto::Message_Item
+~Node_Controller_Handler	hz_net_node_controller_handler.h	/^	virtual ~Node_Controller_Handler() {}$/;"	f	class:hz::Net::Node_Controller_Handler
+~Node_Handler	hz_net_node_handler.h	/^	virtual ~Node_Handler() {}$/;"	f	class:hz::Net::Node_Handler
+~Node_Init_Payload	hz_net_node_init_payload.h	/^	virtual ~Node_Init_Payload() {}$/;"	f	class:hz::Net::Node_Init_Payload
+~Sender	hz_net_proto_sender.h	/^	~Sender()$/;"	f	class:hz::Net::Proto::Sender

@@ -45,7 +45,6 @@ private:
 
 	void node_process(hz::Net::Node_Handler& raw_node, hz::Net::Message_Handler& raw_msg) override
 	{
-		std::cout << "MyProto recv\n";
 		auto msg = raw_msg.get_from_root<hz::Net::Proto::Message>();
 		if (msg && !hz::Net::Proto::Controller::default_process_message(*msg))
 		{
@@ -102,7 +101,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	return server.exec(5);
+	return server.exec(thread_count);
 }
 
 /*

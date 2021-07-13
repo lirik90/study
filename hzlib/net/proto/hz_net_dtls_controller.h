@@ -28,7 +28,7 @@ public:
 		std::string rnd_type = _tools.init(tls_policy_file_name, crt_file_name, key_file_name, cert_paths);
 		(void)rnd_type; // TODO: init tools in init funciton and send debug event
 
-		create_next_handler<Async_Message_Queue>();
+		create_next_handler<Async_Messages>();
 	}
 
 	virtual ~Controller() {}
@@ -37,6 +37,17 @@ protected:
 
 	void send_node_data(Node_Handler& raw_node, Message_Handler& raw_msg) override
 	{
+			try {
+				auto msg = raw_msg.get_from_root<Data_Packet>();
+				std::lock_guard lock(_mutex);
+				// if all ok this function call emit_data
+				raw_node.get_from_root<Dtls::Node>()->send(msg->_data.data(), msg->_data.size());
+			}
+			catch (const std::exception& e) {
+				emit_event(Event_Type::ERROR, Event::TRANSMITED_DATA_ERROR, &raw_node, { e.what() });
+			}
+			return;
+
 		auto node = raw_node.find_ptr_from_root<Dtls::Node>();
 		if (!node) return;
 
@@ -78,13 +89,13 @@ protected:
 	void record_received(Node_Handler& node, Message_Handler& msg) override
 	{
 		// Now mutex still locking. Call async for unlock it.
-		async_next_node_process(node, msg);
+		Abstract_Handler::node_process(node, msg);
 	}
 
 	void emit_data(Node_Handler& node, Message_Handler& msg) override
 	{
 		// Now mutex still locking. Call async for unlock it.
-		async_prev_send_node_data(node, msg);
+		Abstract_Handler::send_node_data(node, msg);
 	}
 
 	void tls_alert(Node_Handler& node, Botan::TLS::Alert alert) override
@@ -123,9 +134,9 @@ protected:
 	void tls_session_activated(Node_Handler& node) override
 	{
 		auto node_ptr = node.get_root()->get_ptr();
+		Abstract_Handler::node_build(*node_ptr);
 		io()->post([this, node_ptr]()
 		{
-			Abstract_Handler::node_build(*node_ptr);
 			Abstract_Handler::node_connected(*node_ptr);
 		});
 	}

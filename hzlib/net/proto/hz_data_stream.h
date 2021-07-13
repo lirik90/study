@@ -4,19 +4,20 @@
 #include <memory>
 #include <variant>
 #include <string>
+#include <vector>
 
 #include "hz_data_device.h"
 #include "hz_data_device_exception.h"
 
 #if __cplusplus > 201703L
 #include <bit>
-#define IS_BIG_ENDIAN \
+#define IF_BIG_ENDIAN \
 	if constexpr (std::endian::native == std::endian::big)
 #elif defined(__BYTE_ORDER__)
-#define IS_BIG_ENDIAN \
+#define IF_BIG_ENDIAN \
 	if constexpr (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
 #else
-#define IS_BIG_ENDIAN \
+#define IF_BIG_ENDIAN \
 	if constexpr ("\x0\x1"[0] == 0x1)
 #endif
 
@@ -26,41 +27,32 @@ class Data_Stream
 {
 public:
 	Data_Stream() = default;
-	Data_Stream(Data_Device& dev) : _dev{&dev} {}
-	Data_Stream(std::shared_ptr<Data_Device> dev) : _dev{std::move(dev)} {}
-	Data_Stream(Data_Stream&& o) : _dev{std::move(o._dev)} {}
+	Data_Stream(Data_Device& dev);
+	Data_Stream(std::shared_ptr<Data_Device> dev);
+	Data_Stream(Data_Stream&& o);
 	Data_Stream(const Data_Stream&) = delete;
 	Data_Stream& operator=(const Data_Stream&) = delete;
 
-	bool is_valid() const { return dev(); }
+	bool is_valid() const;
 
-	void set_device(std::shared_ptr<Data_Device> dev) { _dev = std::move(dev); }
-	void set_device(Data_Device& dev) { _dev = &dev; }
+	void set_device(std::shared_ptr<Data_Device> dev);
+	void set_device(Data_Device& dev);
 
-	bool is_readonly() const { return dev()->is_readonly(); }
-	std::size_t pos() const { return dev()->pos(); }
-	std::size_t size() const { return dev()->size(); }
-	std::size_t remained() const { return dev()->remained(); }
+	bool is_readonly() const;
+	std::size_t pos() const;
+	std::size_t size() const;
+	std::size_t remained() const;
 
-	bool at_end() const { return dev()->at_end(); }
+	bool at_end() const;
 
-	void seek(std::size_t pos) { dev()->seek(pos); }
-	void read(uint8_t* dest, std::size_t size)
-	{
-		if (dev()->read(dest, size) < size)
-			throw Device_Read_Past_End{"Hasn't enought data"};
-	}
-	void write(const uint8_t* data, std::size_t size)
-	{
-		if (is_readonly())
-			throw std::runtime_error("Failed write to Data_Stream. It's read only.");
-		dev()->write(data, size);
-	}
-
+	void seek(std::size_t pos);
+	void read(uint8_t* dest, std::size_t size);
+	void write(const uint8_t* data, std::size_t size);
+	
 private:
 	// Data_Device* dev() { return _dev.index() == 0 ? std::get<0>(_dev).get() : std::get<1>(_dev); }
 	// const Data_Device* dev() const { return _dev.index() == 0 ? std::get<0>(_dev).get() : std::get<1>(_dev); }
-	Data_Device* dev() const { return _dev.index() == 0 ? std::get<0>(_dev).get() : std::get<1>(_dev); }
+	Data_Device* dev() const;
 
 	std::variant<
 		std::shared_ptr<Data_Device>,
@@ -87,10 +79,10 @@ template<typename T,
 	typename = typename std::enable_if<std::is_integral<T>::value>::type>
 Data_Stream& operator<< (Data_Stream& ds, T elem)
 {
-	std::cout << "<< I " << (int)elem;
-	IS_BIG_ENDIAN
+	// std::cout << "<< I " << (int)elem << typeid(T).name();
+	IF_BIG_ENDIAN
 		elem = bswap(elem);
-	std::cout << " " << (int)elem << " SZ " << sizeof(T) << std::endl;
+	// std::cout << " " << (int)elem << " SZ " << sizeof(T) << std::endl;
 	ds.write(reinterpret_cast<const uint8_t*>(&elem), sizeof(T));
 	return ds;
 }
@@ -100,7 +92,7 @@ template<typename T,
 Data_Stream& operator>> (Data_Stream& ds, T& elem)
 {
 	ds.read(reinterpret_cast<uint8_t*>(&elem), sizeof(T));
-	IS_BIG_ENDIAN
+	IF_BIG_ENDIAN
 		elem = bswap(elem);
 	return ds;
 }
@@ -109,7 +101,7 @@ template<typename T,
 	typename = typename std::enable_if<!std::is_integral<T>::value && std::is_trivially_copyable<T>::value && !std::is_pointer<T>::value>::type>
 Data_Stream& operator<< (Data_Stream& ds, const T& elem)
 {
-	IS_BIG_ENDIAN
+	IF_BIG_ENDIAN
 	{
 		const uint8_t* data = reinterpret_cast<const uint8_t*>(&elem);
 		for (int i = sizeof(T) - 1; i >= 0; --i)
@@ -124,7 +116,7 @@ template<typename T,
 	std::enable_if_t<!std::is_integral_v<T> && std::is_trivially_copyable_v<T> && !std::is_pointer_v<T>, bool> = true>
 Data_Stream& operator>> (Data_Stream& ds, T& elem)
 {
-	IS_BIG_ENDIAN
+	IF_BIG_ENDIAN
 	{
 		uint8_t data[sizeof(T)];
 		ds.read(data, sizeof(T));
@@ -150,48 +142,11 @@ Data_Stream& operator>> (Data_Stream& ds, std::pair<T1, T2>& elem)
 	return ds >> elem.first >> elem.second;
 }
 
-Data_Stream& operator<< (Data_Stream& ds, const std::string& data)
-{
-	uint32_t size = static_cast<uint32_t>(data.size());
-	ds << size;
-	ds.write(reinterpret_cast<const uint8_t*>(data.data()), size);
-	return ds;
-}
+Data_Stream& operator<< (Data_Stream& ds, const std::string& data);
+Data_Stream& operator>> (Data_Stream& ds, std::string& data);
 
-Data_Stream& operator>> (Data_Stream& ds, std::string& data)
-{
-	uint32_t size;
-	ds >> size;
-
-	if (ds.remained() < size)
-		throw std::runtime_error("Size of string is too big");
-
-	data.resize(size);
-	ds.read(reinterpret_cast<uint8_t*>(data.data()), size);
-	return ds;
-}
-
-
-Data_Stream& operator<< (Data_Stream& ds, const std::vector<uint8_t>& data)
-{
-	uint32_t size = static_cast<uint32_t>(data.size());
-	ds << size;
-	ds.write(data.data(), size);
-	return ds;
-}
-
-Data_Stream& operator>> (Data_Stream& ds, std::vector<uint8_t>& data)
-{
-	uint32_t size;
-	ds >> size;
-
-	if (ds.remained() < size)
-		throw std::runtime_error("Size of byte array is too big");
-
-	data.resize(size);
-	ds.read(data.data(), size);
-	return ds;
-}
+Data_Stream& operator<< (Data_Stream& ds, const std::vector<uint8_t>& data);
+Data_Stream& operator>> (Data_Stream& ds, std::vector<uint8_t>& data);
 
 } // namespace hz
 

@@ -2,6 +2,7 @@
 #define HZ_NET_UDP_CONTROLLER_H
 
 #include <iostream> // temp
+#include <mutex>
 #include <queue>
 
 #include <boost/array.hpp>
@@ -35,7 +36,7 @@ public:
 	Controller(const std::string& host, uint16_t port) :
 		_info{std::make_shared<Server_Info>(host, port)}
 	{
-		create_next_handler<Async_Message_Queue>();
+		create_next_handler<Async_Messages>();
 	}
 
 protected:
@@ -45,9 +46,17 @@ protected:
 		Abstract_Handler::init();
 	}
 
+	bool _is_started = false;
 	virtual void start() override
 	{
-		start_receive(std::make_shared<Message_Context>());
+		{
+			std::lock_guard lock(_nodes_mutex);
+			if (!_is_started)
+			{
+				_is_started = true;
+				start_receive(std::make_shared<Message_Context>());
+			}
+		}
 		Abstract_Handler::start();
 	}
 
@@ -59,7 +68,6 @@ protected:
 		auto packet = msg.get_from_root<Data_Packet>();
 		if (!packet) return;
 
-		// std::cout << "< Send: " << packet->_data.size() << std::endl;
 		_socket->async_send_to(
 			boost::asio::buffer(packet->_data.data(), packet->_data.size()), node->endpoint(),
 			boost::asio::bind_executor(*_strand, boost::bind(&Controller::handle_send, this,
@@ -70,6 +78,7 @@ protected:
 
 	void handle_send(std::shared_ptr<Data_Packet> packet, const boost::system::error_code &err, const std::size_t &bytes_transferred)
 	{
+		// std::cout << "< Sended: " << packet->_data.size() << std::endl;
 		if (err.value() != 0)
 			emit_event(Event_Type::ERROR, Event::SEND_ERROR, nullptr, { err.category().name(), err.message() });
 		else if (packet->_data.size() != bytes_transferred)
@@ -91,10 +100,16 @@ protected:
 						const boost::system::error_code &err, std::size_t size)
 	{
 		if (err)
+		{
 			emit_event(Event_Type::ERROR, Event::RECV_ERROR, nullptr, { err.category().name(), err.message() });
+			_is_started = false;
+		}
 		else
 		{
-		// std::cout << " >Recv: " << size << std::endl;
+            // {
+            //     static int i = 0;
+            //     std::cout << " >Recved: " << size << " i " << ++i << std::endl;
+            // }
 			process_message(*msg_context, size);
 			start_receive(std::move(msg_context));
 		}

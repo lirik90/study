@@ -10,6 +10,7 @@
 #include "hz_net_proto_node.h"
 #include "hz_net_proto_message_item.h"
 #include "hz_net_abstract_handler.h"
+#include "hz_net_async_message_queue.h"
 #include "hz_net_node_data_packet.h"
 
 namespace hz {
@@ -19,6 +20,11 @@ namespace Proto {
 class Controller : public Controller_Handler, public Handler_T<Controller>
 {
 public:
+	Controller()
+	{
+		create_next_handler<Async_Messages>();
+	}
+
 	static bool default_process_message(Proto::Message& msg)
 	{
 		if (msg._type == Message::Type::SIMPLE)
@@ -43,15 +49,13 @@ public:
 
 	void node_build(Node_Handler& raw_node, std::shared_ptr<Node_Init_Payload> payload) override
 	{
-		std::cout << get_root()->node_get_identifier(*raw_node.get_root()) << "Proto node build: " << (intptr_t)raw_node.get_root() << "\n";
+		std::lock_guard lock(_mutex);
 		raw_node.create_next_handler<Node>(this);
 		Abstract_Handler::node_build(raw_node, std::move(payload));
 	}
 
 	void send_node_data(Node_Handler& raw_node, Message_Handler& raw_msg) override
 	{
-		std::cout << "Client create message for send\n";
-
 		auto node = raw_node.find_ptr_from_root<Node>();
 		if (!node) return;
 
@@ -72,6 +76,7 @@ public:
 
 	void node_process(Node_Handler& raw_node, Message_Handler& msg) override
 	{
+			std::lock_guard lock(_mutex);
 		std::cout << get_root()->node_get_identifier(*raw_node.get_root()) << " Proto node process: " << (intptr_t)raw_node.get_root() << "\n";
 		Node* node = raw_node.get_from_root<Proto::Node>();
 		if (!node)
@@ -81,7 +86,6 @@ public:
 		if (!data) return;
 
 		try {
-			std::lock_guard lock(_mutex);
 			node->push_received_data(data->_data.data(), data->_data.size());
 		} catch (const std::exception& e) {
 			emit_event(Event_Type::ERROR, Event::RECEIVED_DATA_ERROR, &raw_node, { e.what() });
@@ -92,22 +96,22 @@ private:
 	virtual void init() override
 	{
 		_timer.reset(new boost::asio::steady_timer{*io()});
+
+		Abstract_Handler::init();
 	}
 
 	Handler& handler() override { return *this; }
 
 	void record_received(Node_Handler& node, Message_Handler& msg) override
 	{
-		std::cout << "[P] >Recv6 "  << std::endl;
 		// Now mutex still locking. Call async for unlock it.
-		async_next_node_process(node, msg);
+		Abstract_Handler::node_process(node, msg);
 	}
 
 	void emit_data(Node_Handler& node, Message_Handler& msg) override
 	{
-		std::cout << "[P] >Send6 "  << std::endl;
 		// Now mutex still locking. Call async for unlock it.
-		async_prev_send_node_data(node, msg);
+		Abstract_Handler::send_node_data(node, msg);
 	}
 
 	void lost_msg_detected(uint8_t msg_id, uint8_t expected) override
