@@ -1,6 +1,8 @@
 #ifndef HZ_CLI_KEY_H
 #define HZ_CLI_KEY_H
 
+#include <vector>
+#include <string>
 #include <variant>
 #include <functional>
 
