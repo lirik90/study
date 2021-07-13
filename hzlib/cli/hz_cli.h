@@ -13,39 +13,19 @@ public:
 
 	Cli() = default;
 
-	bool process(int argc, char* argv[]) const
-	{
-		return false;
-	}
+	bool parse(int argc, char* argv[]);
+	bool parse(const std::vector<std::string>& args);
 
-	bool process(const std::vector<std::string>& args) const
-	{
-		return false;
-	}
+	void add(const Cli_Key_Id& id, const std::string& description = {}, std::function<void()> callback = nullptr);
+	void add(const Cli_Key_Id& id, const std::string& description, const std::vector<Cli_Key_Variant>& key_variants, std::function<void(int)> callback);
 
-	void add(const Cli_Key_Id& id, const std::string& description = {}, std::function<void()> callback = nullptr)
-	{
-		_keys.emplace_back(id, description, std::move(callback));
-	}
+	bool has(char id) const;
 
-	void add(const Cli_Key_Id& id, const std::string& description, const std::vector<Cli_Key_Variant>& key_variants, std::function<void(int)> callback)
-	{
-		_keys.emplace_back(id, description, key_variants, std::move(callback));
-	}
+	Cli_Key* find_key(const std::string& id) const {}
+	Cli_Key* find_key(char id) const {}
 
-	bool has(char id)
-	{
-		return false;
-	}
-
-	void print_help() const
-	{
-	}
-
-	std::string get_help_text() const
-	{
-		return {};
-	}
+	void print_help() const;
+	std::string get_help_text() const;
 
 	template<typename... Args>
 	void add_arg(Args&& ...args) {}
@@ -53,11 +33,13 @@ public:
 	template<typename... Args>
 	void add_rule(Args&& ...args) {}
 
-	std::string get_arg(const std::string& id) const
-	{
-		return {};
-	}
+	std::string get_arg(const std::string& id) const;
 private:
+	void parse(const char* data, Cli_Key** key);
+	void process(const char* begin, const char* end, bool is_key, Cli_Key** key);
+
+	Cli_Key* get_next_empty_arg() const {}
+
 	std::vector<Cli_Key> _keys;
 };
 

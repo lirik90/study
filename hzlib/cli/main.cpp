@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 	cli.add_arg("cmd", hz::Cli::OPTIONAL);
 	// add_args for cmd1 cmd2 cmd3...
 	
-	if (cli.process(argc, argv)) // true if action triggered
+	if (cli.parse(argc, argv)) // true if action triggered
 		return false;
 
 	if (cli.has('r'))

@@ -39,6 +39,10 @@ public:
 		_id{id}, _description{description}, _key_variants{key_variants}, _callback{std::move(callback)}
 	{}
 
+	bool is_flag() const {}
+	void set_flag() {}
+	void set_value(const std::string& value) {}
+	void set_value(std::string&& value) {}
 private:
 	Cli_Key_Id _id;
 	std::string _description;
