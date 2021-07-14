@@ -51,6 +51,9 @@ void Cli::parse(const char* data, Cli_Key** key)
 			// Если не наёден ключ, то и значение после = не обрабатываем
 			if (!*key)
 				break;
+
+			begin = data + 1;
+			is_key = false;
 		}
 
 		++data;

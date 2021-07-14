@@ -31,12 +31,22 @@ struct Cli_Key_Variant
 class Cli_Key
 {
 public:
-	Cli_Key(const Cli_Key_Id& id, const std::string& description = {}, std::function<void()> callback = nullptr) :
-		_id{id}, _description{description}, _callback{std::move(callback)}
+	struct NO_INITIALIZED {};
+
+	using Value_Type = std::variant<
+		NO_INITIALIZED,
+		bool, // flag
+		std::string, // text
+		int // key_variants
+	>;
+
+	var.index() == std::variant_npos ? // ; How about is'n flag
+	Cli_Key(const Cli_Key_Id& id, const std::string& description = {}, std::function<void()> callback = nullptr, Value_Type default_value = NO_INITIALIZED{}) :
+		_id{id}, _description{description}, _callback{std::move(callback)}, _value{std::move(default_value)}
 	{}
 
-	Cli_Key(const Cli_Key_Id& id, const std::string& description, const std::vector<Cli_Key_Variant>& key_variants, std::function<void(int)> callback) :
-		_id{id}, _description{description}, _key_variants{key_variants}, _callback{std::move(callback)}
+	Cli_Key(const Cli_Key_Id& id, const std::string& description, const std::vector<Cli_Key_Variant>& key_variants, std::function<void(int)> callback = nullptr, Value_Type default_value = NO_INITIALIZED{}) :
+		_id{id}, _description{description}, _key_variants{key_variants}, _callback{std::move(callback)}, _value{std::move(default_value)}
 	{}
 
 	bool is_flag() const {}
@@ -51,6 +61,8 @@ private:
 		std::function<void()>,
 		std::function<void(int)>
 	> _callback;
+
+	Value_Type _value;
 };
 
 } // namespace
