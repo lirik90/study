@@ -9,6 +9,7 @@ project(hzCli)
 set(LIB_SOURCES
 	hz_cli.cpp
 	hz_cli.h
+	hz_cli_key.cpp
 	hz_cli_key.h
 )
 

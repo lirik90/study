@@ -68,10 +68,12 @@ void Cli::process(const char* begin, const char* end, bool is_key, Cli_Key** key
 	if (is_key)
 	{
 		*key = find_key(text);
-		if (*key && (*key)->is_flag())
+		if (*key)
 		{
-			(*key)->set_flag();
-			*key = nullptr;
+			bool is_flag = (*key)->type() == Cli_Key::Type::FLAG;
+			(*key)->set_value(true);
+			if (is_flag)
+				*key = nullptr;
 		}
 	}
 	else
@@ -88,23 +90,55 @@ void Cli::process(const char* begin, const char* end, bool is_key, Cli_Key** key
 	}
 }
 
-void Cli::add(const Cli_Key_Id& id, const std::string& description, std::function<void()> callback)
+Cli_Key* Cli::add(const Cli_Key_Id& id, const std::string& description, std::function<void()> callback)
 {
-	_keys.emplace_back(id, description, std::move(callback));
+	return &_keys.emplace_back(id, description, std::move(callback));
 }
 
-void Cli::add(const Cli_Key_Id& id, const std::string& description, const std::vector<Cli_Key_Variant>& key_variants, std::function<void(int)> callback)
+Cli_Key* Cli::add(const Cli_Key_Id& id, const std::string& description, const std::vector<Cli_Key_Variant>& key_variants, std::function<void(int)> callback)
 {
-	_keys.emplace_back(id, description, key_variants, std::move(callback));
+	return &_keys.emplace_back(id, description, key_variants, std::move(callback));
+}
+
+bool Cli::has(const std::string& id) const
+{
+	const Cli_Key* key = find_key(id);
+	return key ? key->has_value() : false;
 }
 
 bool Cli::has(char id) const
 {
-	return false;
+	const Cli_Key* key = find_key(id);
+	return key ? key->has_value() : false;
+}
+
+const Cli_Key* Cli::find_key(const std::string& id) const
+{
+	auto it = std::find(_keys.cbegin(), _keys.cend(), id);
+	return it == _keys.cend() ? nullptr : &*it;
+}
+
+const Cli_Key* Cli::find_key(char id) const
+{
+	auto it = std::find(_keys.cbegin(), _keys.cend(), id);
+	return it == _keys.cend() ? nullptr : &*it;
+}
+
+Cli_Key* Cli::find_key(const std::string& id)
+{
+	auto it = std::find(_keys.begin(), _keys.end(), id);
+	return it == _keys.end() ? nullptr : &*it;
+}
+
+Cli_Key* Cli::find_key(char id)
+{
+	auto it = std::find(_keys.begin(), _keys.end(), id);
+	return it == _keys.end() ? nullptr : &*it;
 }
 
 void Cli::print_help() const
 {
+	std::cout << get_help_text() << std::endl;
 }
 
 std::string Cli::get_help_text() const
@@ -112,9 +146,54 @@ std::string Cli::get_help_text() const
 	return {};
 }
 
+void Cli::add_arg(const std::string& id, const std::string& description, char type)
+{
+	std::string err = add_arg_or_get_error(id, description, type);
+	if (!err.empty())
+		throw std::runtime_error("Cli: " + err);
+}
+
+std::string Cli::add_arg_or_get_error(const std::string& id, const std::string& description, char type)
+{
+	if (id.empty())
+		return "Id can't be empty";
+
+	if (!_args.empty())
+	{
+		// throw if last is multiple or if last is optional but current is not
+		Cli_Key& last = _args.back();
+		if (last.id()._small & Arg_Type::MULTIPLE)
+			return "Attempt to add argument after multiple";
+		if ((last.id()._small & Arg_Type::OPTIONAL) != 0 && (type & Arg_Type::OPTIONAL) == 0)
+			return "Only optional argument can be after last optional";
+	}
+
+	_args.emplace_back(Cli_Key_Id{type, id}, description, nullptr, Cli_Key::NO_INITIALIZED{}, Cli_Key::Type::TEXT);
+	return {};
+}
+
 std::string Cli::get_arg(const std::string& id) const
 {
 	return {};
+}
+
+std::vector<std::string> Cli::get_args(const std::string& id) const
+{
+	return {};
+}
+
+Cli_Key* Cli::get_next_empty_arg()
+{
+	for (Cli_Key& key: _args)
+	{
+		if (!key.has_value())
+		{
+			if (key.id()._small & Arg_Type::MULTIPLE)
+				_args.push_back(key);
+			return &key;
+		}
+	}
+	return nullptr;
 }
 
 } // namespace hz

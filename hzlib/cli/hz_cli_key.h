@@ -15,6 +15,9 @@ struct Cli_Key_Id
 	Cli_Key_Id(const std::string& full) :
 		_small{0}, _full{full} {}
 
+	bool operator==(const std::string& id) const { return id == _full; }
+	bool operator==(char id) const { return id == _small; }
+
 	char _small;
 	std::string _full;
 };
@@ -31,30 +34,52 @@ struct Cli_Key_Variant
 class Cli_Key
 {
 public:
+	enum class Type : uint8_t { AUTO, FLAG, TEXT, KEY_VARIANT };
 	struct NO_INITIALIZED {};
 
 	using Value_Type = std::variant<
 		NO_INITIALIZED,
 		bool, // flag
 		std::string, // text
-		int // key_variants
+		int // key_variant
 	>;
 
-	var.index() == std::variant_npos ? // ; How about is'n flag
-	Cli_Key(const Cli_Key_Id& id, const std::string& description = {}, std::function<void()> callback = nullptr, Value_Type default_value = NO_INITIALIZED{}) :
-		_id{id}, _description{description}, _callback{std::move(callback)}, _value{std::move(default_value)}
-	{}
+	Cli_Key(const Cli_Key_Id& id, const std::string& description = {}, std::function<void()> callback = nullptr, Value_Type default_value = NO_INITIALIZED{}, Type type = Type::AUTO);
 
-	Cli_Key(const Cli_Key_Id& id, const std::string& description, const std::vector<Cli_Key_Variant>& key_variants, std::function<void(int)> callback = nullptr, Value_Type default_value = NO_INITIALIZED{}) :
-		_id{id}, _description{description}, _key_variants{key_variants}, _callback{std::move(callback)}, _value{std::move(default_value)}
-	{}
+	Cli_Key(const Cli_Key_Id& id, const std::string& description, const std::vector<Cli_Key_Variant>& key_variants, std::function<void(int)> callback = nullptr, const Value_Type& default_value = NO_INITIALIZED{});
 
-	bool is_flag() const {}
-	void set_flag() {}
-	void set_value(const std::string& value) {}
-	void set_value(std::string&& value) {}
+	bool operator==(const std::string& id) const;
+	bool operator==(char id) const;
+
+	const Cli_Key_Id& id() const;
+
+	Type type() const;
+	bool has_value() const;
+
+	void clear();
+	bool set_value(bool flag);
+	bool set_value(const std::string& text_or_key_variant);
+	bool set_value(std::string&& text_or_key_variant);
+	bool set_value(int key_variant);
+	bool set_key_variant(const std::string& text);
+
+	bool get_flag() const;
+	std::string get_text() const;
+	int get_key_variant() const;
+
+	template<typename T,
+		std::enable_if_t<
+			std::is_same_v<T, bool> || std::is_same_v<T, std::string> || std::is_same_v<T, int>,
+		bool> = true
+	>
+	T value() const
+	{
+		const T* v = std::get_if<T>(&_value);
+		return v ? *v : T{};
+	}
 private:
 	Cli_Key_Id _id;
+	Type _type;
 	std::string _description;
 	std::vector<Cli_Key_Variant> _key_variants;
 	std::variant<

@@ -47,9 +47,8 @@ int main(int argc, char* argv[])
 	cli.add_rule(hz::Cli::PAIR, 'i', 's');
 	cli.add_rule(hz::Cli::POSSIBLE, 'i', 's', 'v');
 
-	cli.add_arg("cmd", hz::Cli::OPTIONAL);
-	// add_args for cmd1 cmd2 cmd3...
-	
+	cli.add_arg("cmd", "Some command", hz::Cli::OPTIONAL);
+
 	if (cli.parse(argc, argv)) // true if action triggered
 		return false;
 
